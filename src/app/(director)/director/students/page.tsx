@@ -1,10 +1,9 @@
 import { prisma } from "@/lib/db";
-import DirectorStudentsScreen from "@/app/(director)/director/students/DirectorStudentsScreen";
+import DirectorStudentsScreen from "./DirectorStudentsScreen";
 import type {
-    DirectorStudent,
     DirectorClassOption,
-    StudentStatus,
-} from "@/app/(director)/director/students/DirectorStudentsScreen";
+    DirectorStudent,
+} from "./DirectorStudentsScreen";
 
 export const dynamic = "force-dynamic";
 
@@ -17,9 +16,9 @@ export default async function DirectorStudentsPage() {
                 schoolName: true,
                 grade: true,
                 status: true,
+                enrolledAt: true,
                 user: {
                     select: {
-                        id: true,
                         email: true,
                     },
                 },
@@ -44,7 +43,6 @@ export default async function DirectorStudentsPage() {
                 parentLinks: {
                     where: { endedAt: null },
                     select: {
-                        id: true,
                         relationship: true,
                         parent: {
                             select: { name: true },
@@ -52,7 +50,7 @@ export default async function DirectorStudentsPage() {
                     },
                 },
             },
-            orderBy: { name: "asc" },
+            orderBy: [{ status: "asc" }, { name: "asc" }],
         }),
         prisma.class.findMany({
             where: { active: true },
@@ -65,27 +63,31 @@ export default async function DirectorStudentsPage() {
         }),
     ]);
 
-    const endedByStudent = await prisma.classEnrollment.findMany({
+    const endedEnrollments = await prisma.classEnrollment.findMany({
         where: {
-            studentId: { in: students.map((s) => s.id) },
+            studentId: { in: students.map((student) => student.id) },
             endedAt: { not: null },
         },
         select: {
             id: true,
             studentId: true,
             endedAt: true,
-            status: true,
             class: { select: { name: true } },
         },
         orderBy: { endedAt: "desc" },
     });
 
-    const endedMap = new Map<string, typeof endedByStudent>();
-    for (const row of endedByStudent) {
-        const list = endedMap.get(row.studentId) ?? [];
-        if (list.length < 5) {
-            list.push(row);
-            endedMap.set(row.studentId, list);
+    const recentChangesByStudent = new Map<
+        string,
+        typeof endedEnrollments
+    >();
+
+    for (const enrollment of endedEnrollments) {
+        const changes =
+            recentChangesByStudent.get(enrollment.studentId) ?? [];
+        if (changes.length < 5) {
+            changes.push(enrollment);
+            recentChangesByStudent.set(enrollment.studentId, changes);
         }
     }
 
@@ -94,13 +96,14 @@ export default async function DirectorStudentsPage() {
         name: student.name,
         schoolName: student.schoolName,
         grade: student.grade,
-        status: student.status as StudentStatus,
+        status: student.status,
+        enrolledAt: student.enrolledAt.toISOString(),
         googleLinked: Boolean(student.user),
         email: student.user?.email ?? null,
-        parentCount: student.parentLinks.length,
-        parentNames: student.parentLinks.map(
-            (link) =>
-                `${link.parent.name}${link.relationship ? ` (${link.relationship})` : ""}`,
+        parentNames: student.parentLinks.map((link) =>
+            link.relationship
+                ? `${link.parent.name} (${link.relationship})`
+                : link.parent.name,
         ),
         classes: student.enrollments.map((enrollment) => ({
             enrollmentId: enrollment.id,
@@ -109,11 +112,12 @@ export default async function DirectorStudentsPage() {
             teacherName: enrollment.class.teacher?.name ?? null,
             enrolledAt: enrollment.enrolledAt.toISOString(),
         })),
-        recentChanges: (endedMap.get(student.id) ?? []).map((row) => ({
-            id: row.id,
-            className: row.class.name,
-            endedAt: row.endedAt!.toISOString(),
-            status: row.status,
+        recentChanges: (
+            recentChangesByStudent.get(student.id) ?? []
+        ).map((enrollment) => ({
+            id: enrollment.id,
+            className: enrollment.class.name,
+            endedAt: enrollment.endedAt!.toISOString(),
         })),
     }));
 
@@ -124,6 +128,9 @@ export default async function DirectorStudentsPage() {
     }));
 
     return (
-        <DirectorStudentsScreen students={rows} classOptions={classOptions} />
+        <DirectorStudentsScreen
+            students={rows}
+            classOptions={classOptions}
+        />
     );
 }

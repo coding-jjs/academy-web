@@ -1,4 +1,4 @@
-import AcademyWireframe from "@/app/AcademyWireframe";
+import AcademyWireframe from "@/features/wireframe/AcademyWireframe";
 
 export default function LandingPage() {
     return (

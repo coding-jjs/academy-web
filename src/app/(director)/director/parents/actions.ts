@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 export type ParentLinkState = {
     status: "idle" | "success" | "error";
     message: string;
-}
+};
 
 const allowedRelationships = new Set([
     "어머니",
@@ -16,154 +16,165 @@ const allowedRelationships = new Set([
     "기타 보호자",
 ]);
 
-export async function linkParentStudent(_prevState: ParentLinkState, formData: FormData) : Promise<ParentLinkState> {
+const allowedEndReasons = new Set([
+    "잘못된 연결",
+    "학생 퇴원",
+    "보호자 변경",
+    "원장 수동 해제",
+]);
+
+async function requireDirector() {
+    const session = await auth();
+
+    if (!session?.user || session.user.role !== "DIRECTOR") {
+        return null;
+    }
+
+    return session;
+}
+
+export async function linkParentStudent(
+    _previousState: ParentLinkState,
+    formData: FormData,
+): Promise<ParentLinkState> {
+    const session = await requireDirector();
+
+    if (!session) {
+        return {
+            status: "error",
+            message: "학부모와 학생을 연결할 권한이 없습니다.",
+        };
+    }
+
+    const parentUserId = formData.get("parentUserId");
+    const studentId = formData.get("studentId");
+    const relationship = formData.get("relationship");
+
+    if (typeof parentUserId !== "string" || !parentUserId) {
+        return { status: "error", message: "학부모를 선택해 주세요." };
+    }
+
+    if (typeof studentId !== "string" || !studentId) {
+        return { status: "error", message: "학생을 선택해 주세요." };
+    }
+
+    if (
+        typeof relationship !== "string" ||
+        !allowedRelationships.has(relationship)
+    ) {
+        return {
+            status: "error",
+            message: "학생과의 관계를 다시 선택해 주세요.",
+        };
+    }
+
     try {
-        const session = await auth();
-
-        if (!session?.user || session.user.role !== "DIRECTOR") {
-            return {
-                status: "error",
-                message: "권한이 없습니다."
-            }
-        }
-
-        const parentUserId = formData.get("parentUserId");
-        const studentId = formData.get("studentId");
-        const relationshipValue = formData.get("relationship");
-
-        if (typeof parentUserId !== "string" || !parentUserId) {
-            return {
-                status: "error",
-                message: "학부모를 선택해주세요."
-            }
-        }
-
-        if (typeof studentId !== "string" || !studentId) {
-            return {
-                status: "error",
-                message: "학생을 선택해주세요."
-            }
-        }
-
-        if (typeof relationshipValue !== "string" || !allowedRelationships.has(relationshipValue)) {
-            return {
-                status: "error",
-                message: "학생과의 관계를 다시 선택해주세요."
-            }
-        }
-
-        const relationship = relationshipValue
-
         await prisma.$transaction(async (tx) => {
-            const parent = await tx.user.findFirst({
-                where: {
-                    id: parentUserId,
-                    role: "PARENT",
-                    status: "ACTIVE",
-                },
-                select: {
-                    id: true,
-                }
-            });
+            const [parent, student, activeLink] = await Promise.all([
+                tx.user.findFirst({
+                    where: {
+                        id: parentUserId,
+                        role: "PARENT",
+                        status: "ACTIVE",
+                        onboardingCompleteAt: { not: null },
+                    },
+                    select: { id: true },
+                }),
+                tx.student.findFirst({
+                    where: {
+                        id: studentId,
+                        status: "ENROLLED",
+                        user: {
+                            is: {
+                                role: "STUDENT",
+                                status: "ACTIVE",
+                            },
+                        },
+                    },
+                    select: { id: true },
+                }),
+                tx.parentStudentLink.findFirst({
+                    where: {
+                        studentId,
+                        endedAt: null,
+                    },
+                    select: { id: true },
+                }),
+            ]);
 
             if (!parent) {
-                return {
-                    status: "error",
-                    message: "연결할 수 없는 학부모입니다."
-                }
+                throw new Error("연결할 수 없는 학부모 계정입니다.");
             }
 
-            const student = await tx.student.findFirst({
-                where: {
-                    id: studentId,
-                    status: "ENROLLED",
-                    user: {
-                        is: {
-                            role: "STUDENT",
-                            status: "ACTIVE",
-                        }
-                    }
-                },
-                select: {
-                    id: true,
-                }
-            });
             if (!student) {
-                return {
-                    status: "error",
-                    message: "연결할 수 없는 학생입니다."
-                }
+                throw new Error("연결할 수 없는 학생 계정입니다.");
             }
-
-            const activeLink = await tx.parentStudentLink.findFirst({
-                where: {
-                    studentId: student.id,
-                    endedAt: null,
-                },
-                select: {
-                    id: true, 
-                },
-            });
 
             if (activeLink) {
-                return {
-                    status: "error",
-                    message: "이미 학부모가 연결된 학생입니다."
-                }
+                throw new Error("이미 학부모가 연결된 학생입니다.");
             }
 
             await tx.parentStudentLink.create({
                 data: {
                     parentUserId: parent.id,
                     studentId: student.id,
-                    relationship: relationship || null,
+                    relationship,
                     linkedBy: session.user.id,
-                }
-            })
-        })
+                },
+            });
+        });
 
         revalidatePath("/director/parents");
+        revalidatePath("/director/students");
 
         return {
             status: "success",
-            message: "학부모와 학생이 성공적으로 연결되었습니다."
-        }
+            message: "학부모와 학생을 연결했습니다.",
+        };
     } catch (error) {
-        console.error(error);
+        console.error("학부모-학생 연결 실패", error);
+
         return {
             status: "error",
-            message: 
+            message:
                 error instanceof Error
-                ? error.message
-                : "알 수 없는 오류가 발생했습니다."
-        }
+                    ? error.message
+                    : "연결 처리 중 오류가 발생했습니다.",
+        };
     }
 }
-export async function unlinkParentStudent(_prevState: ParentLinkState, formData: FormData) : Promise<ParentLinkState> {
+
+export async function unlinkParentStudent(
+    _previousState: ParentLinkState,
+    formData: FormData,
+): Promise<ParentLinkState> {
+    const session = await requireDirector();
+
+    if (!session) {
+        return {
+            status: "error",
+            message: "연결을 해제할 권한이 없습니다.",
+        };
+    }
+
+    const linkId = formData.get("linkId");
+    const reason = formData.get("reason");
+
+    if (typeof linkId !== "string" || !linkId) {
+        return {
+            status: "error",
+            message: "연결 정보가 올바르지 않습니다.",
+        };
+    }
+
+    if (typeof reason !== "string" || !allowedEndReasons.has(reason)) {
+        return {
+            status: "error",
+            message: "연결 해제 사유를 선택해 주세요.",
+        };
+    }
+
     try {
-        const session = await auth();
-
-        if (!session?.user || session.user.role !== "DIRECTOR") {
-            return {
-                status: "error",
-                message: "권한이 없습니다."
-            }
-        }
-        const linkId = formData.get("linkId");
-        const reasonValue = formData.get("reason");
-
-        if (typeof linkId !== "string" || !linkId) {
-            return {
-                status: "error",
-                message: "연결을 해제할 수 없습니다."
-            }
-        }
-
-        const reason =
-            typeof reasonValue === "string"
-                ? reasonValue.trim()
-                : "원장 수동 해제";
-
         await prisma.$transaction(async (tx) => {
             const link = await tx.parentStudentLink.findFirst({
                 where: {
@@ -186,64 +197,58 @@ export async function unlinkParentStudent(_prevState: ParentLinkState, formData:
             }
 
             await tx.parentStudentLink.update({
-                where: {
-                    id: link.id,
-                },
+                where: { id: link.id },
                 data: {
                     endedAt: new Date(),
                     endedBy: session.user.id,
-                    endReason: reason || "원장 수동 해제",
+                    endReason: reason,
                 },
             });
 
-            // 학부모에게 다른 활성 자녀 연결이 있는지 확인
-            const remainingParentLinks =
-                await tx.parentStudentLink.count({
-                    where: {
-                        parentUserId: link.parentUserId,
-                        endedAt: null,
-                    },
-                });
+            const remainingParentLinks = await tx.parentStudentLink.count({
+                where: {
+                    parentUserId: link.parentUserId,
+                    endedAt: null,
+                },
+            });
 
-            // 연결된 자녀가 더 없다면 학부모를 GUEST로 변경
             if (remainingParentLinks === 0) {
                 await tx.user.updateMany({
                     where: {
                         id: link.parentUserId,
                         role: "PARENT",
                     },
-                    data: {
-                        role: "GUEST",
-                    },
+                    data: { role: "GUEST" },
                 });
             }
 
-            // 학생은 한 명의 학부모만 지원하므로 GUEST로 변경
             if (link.student.userId) {
                 await tx.user.updateMany({
                     where: {
                         id: link.student.userId,
                         role: "STUDENT",
                     },
-                    data: {
-                        role: "GUEST",
-                    },
+                    data: { role: "GUEST" },
                 });
             }
         });
+
         revalidatePath("/director/parents");
+        revalidatePath("/director/students");
+
         return {
             status: "success",
-            message: "학부모와 학생의 연결이 성공적으로 해제되었습니다."
-        }
+            message: "학부모와 학생의 연결을 해제했습니다.",
+        };
     } catch (error) {
-        console.error(error);
+        console.error("학부모-학생 연결 해제 실패", error);
+
         return {
             status: "error",
-            message: 
+            message:
                 error instanceof Error
-                ? error.message
-                : "알 수 없는 오류가 발생했습니다."
-        }
+                    ? error.message
+                    : "연결 해제 중 오류가 발생했습니다.",
+        };
     }
 }

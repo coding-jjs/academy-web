@@ -1,22 +1,18 @@
 "use client";
 
+import { useActionState, useEffect, useRef } from "react";
+import { linkParentStudent, type ParentLinkState } from "./actions";
 import styles from "./page.module.css";
-import {useActionState, useEffect, useRef} from "react";
-import { linkParentStudent, type ParentLinkState} from "./actions";
 
 const initialState: ParentLinkState = {
     status: "idle",
     message: "",
-}
+};
 
 type ParentOption = {
     id: string;
     name: string;
     email: string;
-    parentLinks: Array<{
-        id: string;
-        studentId: string;
-    }>;
 };
 
 type StudentOption = {
@@ -24,25 +20,21 @@ type StudentOption = {
     name: string;
     schoolName: string | null;
     grade: string | null;
-    user: {
-        id: string;
-        email: string;
-    } | null;
 };
 
-function getUnavailavleMessage(
-    parentsCount: number,
-    studentsCount: number,
-) {
-    if (parentsCount === 0 && studentsCount === 0) {
-        return ("연결 가능한 학부모와 학생 계정이 없습니다.");
+function getUnavailableMessage(parentCount: number, studentCount: number) {
+    if (parentCount === 0 && studentCount === 0) {
+        return "연결 가능한 학부모와 학생 계정이 없습니다.";
     }
-    if (parentsCount === 0) {
-        return ("연결 가능한 학부모 계정이 없습니다.");
+
+    if (parentCount === 0) {
+        return "연결 가능한 학부모 계정이 없습니다.";
     }
-    if (studentsCount === 0) {
-        return ("연결 가능한 학생 계정이 없습니다.");
+
+    if (studentCount === 0) {
+        return "학부모가 연결되지 않은 학생이 없습니다.";
     }
+
     return null;
 }
 
@@ -51,20 +43,27 @@ function formatStudentOption(student: StudentOption) {
         student.name,
         student.schoolName,
         student.grade ? `${student.grade}학년` : null,
-    ].filter(Boolean).join(" · ");
+    ]
+        .filter(Boolean)
+        .join(" · ");
 }
 
 export default function ParentStudentLinkForm({
     parents,
     students,
-} : {
+}: {
     parents: ParentOption[];
     students: StudentOption[];
 }) {
     const formRef = useRef<HTMLFormElement>(null);
-    const unavailableMessage = getUnavailavleMessage(parents.length, students.length);
-    const canSubmit = parents.length > 0 && students.length > 0;
-    const [state, formAction, pending] = useActionState(linkParentStudent, initialState);
+    const unavailableMessage = getUnavailableMessage(
+        parents.length,
+        students.length,
+    );
+    const [state, formAction, pending] = useActionState(
+        linkParentStudent,
+        initialState,
+    );
 
     useEffect(() => {
         if (state.status === "success") {
@@ -82,25 +81,20 @@ export default function ParentStudentLinkForm({
                 <div className={styles.formIcon} aria-hidden="true">
                     +
                 </div>
-    
                 <div className={styles.formHeading}>
                     <span className={styles.sectionLabel}>
                         FAMILY CONNECTION
                     </span>
                     <h2>새로운 가족 연결</h2>
-                    <p>
-                        가입이 완료된 학부모와 학생 계정을 연결합니다.
-                    </p>
+                    <p>가입이 완료된 학부모와 학생 계정을 연결합니다.</p>
                 </div>
             </header>
-    
+
             <div className={styles.formGrid}>
                 <label className={styles.field}>
                     <span className={styles.fieldLabel}>
-                        학부모
-                        <small>필수</small>
+                        학부모 <small>필수</small>
                     </span>
-    
                     <select
                         name="parentUserId"
                         defaultValue=""
@@ -110,25 +104,21 @@ export default function ParentStudentLinkForm({
                         <option value="" disabled>
                             학부모를 선택해 주세요
                         </option>
-    
                         {parents.map((parent) => (
                             <option key={parent.id} value={parent.id}>
                                 {parent.name} · {parent.email}
                             </option>
                         ))}
                     </select>
-    
                     <small className={styles.fieldHint}>
                         한 학부모에게 여러 자녀를 연결할 수 있습니다.
                     </small>
                 </label>
-    
+
                 <label className={styles.field}>
                     <span className={styles.fieldLabel}>
-                        학생
-                        <small>필수</small>
+                        학생 <small>필수</small>
                     </span>
-    
                     <select
                         name="studentId"
                         defaultValue=""
@@ -138,25 +128,21 @@ export default function ParentStudentLinkForm({
                         <option value="" disabled>
                             학생을 선택해 주세요
                         </option>
-    
                         {students.map((student) => (
                             <option key={student.id} value={student.id}>
                                 {formatStudentOption(student)}
                             </option>
                         ))}
                     </select>
-    
                     <small className={styles.fieldHint}>
                         현재 학부모가 연결되지 않은 학생만 표시됩니다.
                     </small>
                 </label>
-    
+
                 <label className={styles.field}>
                     <span className={styles.fieldLabel}>
-                        학생과의 관계
-                        <small>필수</small>
+                        학생과의 관계 <small>필수</small>
                     </span>
-    
                     <select
                         name="relationship"
                         defaultValue=""
@@ -169,32 +155,22 @@ export default function ParentStudentLinkForm({
                         <option value="어머니">어머니</option>
                         <option value="아버지">아버지</option>
                         <option value="조부모">조부모</option>
-                        <option value="기타 보호자">
-                            기타 보호자
-                        </option>
+                        <option value="기타 보호자">기타 보호자</option>
                     </select>
-    
                     <small className={styles.fieldHint}>
                         학부모 계정과 학생의 관계입니다.
                     </small>
                 </label>
             </div>
-    
+
             <footer className={styles.formFooter}>
-                <div
-                    className={styles.feedbackArea}
-                    aria-live="polite"
-                >
+                <div className={styles.feedbackArea} aria-live="polite">
                     {unavailableMessage ? (
-                        <p className={styles.notice}>
-                            {unavailableMessage}
-                        </p>
+                        <p className={styles.notice}>{unavailableMessage}</p>
                     ) : state.message ? (
                         <p
                             role={
-                                state.status === "error"
-                                    ? "alert"
-                                    : "status"
+                                state.status === "error" ? "alert" : "status"
                             }
                             className={`${styles.feedback} ${
                                 state.status === "success"
@@ -209,22 +185,19 @@ export default function ParentStudentLinkForm({
                         </p>
                     ) : (
                         <p className={styles.defaultHint}>
-                            연결 후 학부모 계정에서 자녀 정보를
-                            확인할 수 있습니다.
+                            연결 후 학부모 계정에서 자녀 정보를 확인할 수
+                            있습니다.
                         </p>
                     )}
                 </div>
-    
+
                 <button
                     type="submit"
                     className={styles.primaryButton}
-                    disabled={!canSubmit || pending}
+                    disabled={Boolean(unavailableMessage) || pending}
                 >
                     {pending && (
-                        <span
-                            className={styles.spinner}
-                            aria-hidden="true"
-                        />
+                        <span className={styles.spinner} aria-hidden="true" />
                     )}
                     {pending ? "연결하는 중…" : "학부모 연결"}
                 </button>

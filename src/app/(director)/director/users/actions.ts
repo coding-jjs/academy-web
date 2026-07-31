@@ -30,56 +30,20 @@ export async function assignUserRole(formData: FormData) {
         throw new Error("부여할 수 없는 역할입니다.");
     }
 
-    await prisma.$transaction(async (tx) => {
-        const user = await tx.user.findFirst({
-            where: {
-                id: userId,
-                role: "GUEST",
-                status: "ACTIVE",
-            },
-            select: {
-                id: true,
-                name: true,
-                phone: true,
-                schoolName: true,
-                grade: true,
-            },
-        });
-    
-        if (!user) {
-            throw new Error("역할을 부여할 수 없는 사용자입니다.");
-        }
-    
-        // 학생 역할이면 Student 프로필도 함께 생성
-        if (requestedRole === "STUDENT") {
-            await tx.student.upsert({
-                where: {
-                    userId: user.id,
-                },
-                create: {
-                    userId: user.id,
-                    name: user.name,
-                    phone: user.phone,
-                    schoolName: user.schoolName,
-                    grade: user.grade,
-                },
-                update: {
-                    name: user.name,
-                    phone: user.phone,
-                    schoolName: user.schoolName,
-                    grade: user.grade,
-                },
-            });
-        }
-    
-        await tx.user.update({
-            where: {
-                id: user.id,
-            },
-            data: {
-                role: requestedRole as AssignableRole,
-            },
-        });
+    const result = await prisma.user.updateMany({
+        where: {
+            id: userId,
+            role: "GUEST",
+            status: "ACTIVE",
+        },
+        data: {
+            role: requestedRole as AssignableRole,
+        },
     });
-    revalidatePath("/director/users")
+
+    if (result.count === 0) {
+        throw new Error("역할을 부여할 수 없는 사용자입니다.");
+    }
+
+    revalidatePath("/director/users");
 }
