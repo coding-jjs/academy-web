@@ -359,3 +359,20 @@ td small {
         flex-direction: column;
     }
 }
+
+.statusRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.statusSelect {
+    min-height: 36px;
+    padding: 0 10px;
+    border: 1px solid #d2d2d7;
+    border-radius: 10px;
+    background: #fbfbfd;
+    font: inherit;
+    font-size: 13px;
+}

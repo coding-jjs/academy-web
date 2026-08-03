@@ -39,3 +39,43 @@
     font-size: 12px;
     font-weight: 650;
 }
+.thresholdForm {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 18px;
+    padding: 16px;
+    border: 1px solid rgb(0 0 0 / 7%);
+    border-radius: 16px;
+    background: #fff;
+}
+
+.thresholdForm label {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 650;
+    color: #6e6e73;
+}
+
+.thresholdForm input {
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid #d2d2d7;
+    border-radius: 10px;
+    font: inherit;
+    color: #1d1d1f;
+}
+
+.feedback {
+    margin-top: 14px;
+    color: #1d1d1f;
+    font-size: 13px;
+}
+
+.headerActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}

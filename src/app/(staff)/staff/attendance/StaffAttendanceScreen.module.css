@@ -1,0 +1,278 @@
+.page {
+    animation: screen-enter 360ms cubic-bezier(.22, 1, .36, 1) both;
+  }
+  
+  .heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .heading > div > span {
+    color: #0066cc;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: .12em;
+  }
+  
+  .heading h1 {
+    margin: 8px 0;
+    font-family: "SF Pro Display", system-ui, sans-serif;
+    font-size: clamp(31px, 5vw, 42px);
+    line-height: 1.08;
+    letter-spacing: -.045em;
+  }
+  
+  .heading p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 15px;
+  }
+  
+  .sessionSwitch {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    margin-bottom: 16px;
+    padding-bottom: 4px;
+  }
+  
+  .sessionBtn,
+  .sessionActive {
+    min-width: 160px;
+    padding: 12px 14px;
+    border: 1px solid rgb(0 0 0 / 7%);
+    border-radius: 14px;
+    background: #fff;
+    text-align: left;
+    cursor: pointer;
+  }
+  
+  .sessionBtn strong,
+  .sessionActive strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+  
+  .sessionBtn span,
+  .sessionActive span {
+    color: #6e6e73;
+    font-size: 12px;
+  }
+  
+  .sessionActive {
+    border-color: rgb(0 113 227 / 35%);
+    background: #eef5ff;
+  }
+  
+  .empty,
+  .panel {
+    border: 1px solid rgb(0 0 0 / 7%);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 9px 30px rgb(0 0 0 / 5%);
+  }
+  
+  .empty {
+    padding: 28px 24px;
+    text-align: center;
+  }
+  
+  .empty h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+  }
+  
+  .empty p,
+  .muted {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 13px;
+  }
+  
+  .panel {
+    padding: 22px;
+  }
+  
+  .panelHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .panelHead h2 {
+    margin: 10px 0 6px;
+    font-size: 22px;
+  }
+  
+  .panelHead p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 13px;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  
+  .primaryBtn,
+  .secondaryBtn {
+    min-height: 42px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  
+  .primaryBtn {
+    color: #fff;
+    background: #0071e3;
+  }
+  
+  .secondaryBtn {
+    color: #1d1d1f;
+    background: #e8e8ed;
+  }
+  
+  .primaryBtn:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+  }
+  
+  .success {
+    margin: 0 0 12px;
+    color: #248a3d;
+    font-size: 13px;
+  }
+  
+  .error {
+    margin: 0 0 12px;
+    color: #c9342d;
+    font-size: 13px;
+  }
+  
+  .tableWrap {
+    overflow-x: auto;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  
+  .table th,
+  .table td {
+    padding: 12px 10px;
+    border-top: 1px solid #ededf0;
+    text-align: left;
+    vertical-align: middle;
+  }
+  
+  .table th {
+    color: #86868b;
+    font-weight: 650;
+    border-top: 0;
+  }
+  
+  .table td strong {
+    display: block;
+    margin-bottom: 2px;
+  }
+  
+  .table td span {
+    color: #6e6e73;
+    font-size: 12px;
+  }
+  
+  .select {
+    min-height: 36px;
+    padding: 0 10px;
+    border: 1px solid #d2d2d7;
+    border-radius: 10px;
+    background: #fbfbfd;
+    font: inherit;
+  }
+  
+  @keyframes screen-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 800px) {
+    .heading,
+    .panelHead {
+      align-items: start;
+      flex-direction: column;
+    }
+  
+    .actions {
+      width: 100%;
+    }
+  
+    .primaryBtn,
+    .secondaryBtn {
+      flex: 1;
+    }
+  }
+
+  .absenceBox {
+    display: grid;
+    gap: 6px;
+    max-width: 220px;
+}
+
+.absenceBox small {
+    color: #6e6e73;
+    font-size: 12px;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.absenceActions {
+    display: flex;
+    gap: 6px;
+}
+
+.miniPrimary,
+.miniSecondary {
+    min-height: 30px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.miniPrimary {
+    color: #fff;
+    background: #0071e3;
+}
+
+.miniSecondary {
+    color: #1d1d1f;
+    background: #e8e8ed;
+}
+
+.miniPrimary:disabled,
+.miniSecondary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}

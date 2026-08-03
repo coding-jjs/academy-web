@@ -87,6 +87,25 @@ enum AiReportStatus {
   @@map("ai_report_status")
 }
 
+enum MessageStatus {
+  DRAFT
+  PENDING_APPROVAL
+  SENT
+  REJECTED
+  CANCELLED
+
+  @@map("message_status")
+}
+
+enum MessageAudience {
+  ALL
+  STAFF
+  PARENT
+  STUDENT
+
+  @@map("message_audience")
+}
+
 enum ChurnCaseStatus {
   DETECTED
   COUNSELING
@@ -200,7 +219,9 @@ model User {
   churnCasesAssigned  ChurnCase[]
   invoices            Invoice[]
   payments            Payment[]
-  sentMessages        Message[]
+  sentMessages        Message[]              @relation("MessageSender")
+  authoredMessages    Message[]              @relation("MessageAuthor")
+  approvedMessages    Message[]              @relation("MessageApprover")
   messageRecipients   MessageRecipient[]
   pushSubscriptions   PushSubscription[]
   newsItems           NewsItem[]
@@ -280,6 +301,7 @@ model Student {
   churnCases      ChurnCase[]
   invoices        Invoice[]
   reports         AiReport[]
+  targetedMessages Message[] @relation("MessageTargetStudent")
 
   @@index([status, name])
   @@map("students")
@@ -322,6 +344,7 @@ model Class {
   learningRecords LearningRecord[]
   gradeRecords    GradeRecord[]
   wrongNotes      WrongNote[]
+  targetedMessages Message[] @relation("MessageTargetClass")
 
   @@index([teacherUserId, active])
   @@map("classes")
@@ -628,19 +651,36 @@ model Payment {
 }
 
 model Message {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  senderUserId String?  @map("sender_user_id") @db.Uuid
-  reportId     String?  @map("report_id") @db.Uuid
-  title        String
-  content      String
-  deepLink     String?  @map("deep_link")
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  senderUserId    String?          @map("sender_user_id") @db.Uuid
+  authorUserId    String?          @map("author_user_id") @db.Uuid
+  approverUserId  String?          @map("approver_user_id") @db.Uuid
+  reportId        String?          @map("report_id") @db.Uuid
+  title           String
+  content         String
+  deepLink        String?          @map("deep_link")
+  status          MessageStatus    @default(SENT)
+  audience        MessageAudience? @map("audience")
+  targetStudentId String?          @map("target_student_id") @db.Uuid
+  targetClassId   String?          @map("target_class_id") @db.Uuid
+  rejectionReason String?          @map("rejection_reason")
+  submittedAt     DateTime?        @map("submitted_at") @db.Timestamptz(6)
+  approvedAt      DateTime?        @map("approved_at") @db.Timestamptz(6)
+  sentAt          DateTime?        @map("sent_at") @db.Timestamptz(6)
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  sender     User?              @relation(fields: [senderUserId], references: [id], onDelete: SetNull)
-  report     AiReport?          @relation(fields: [reportId], references: [id], onDelete: SetNull)
-  recipients MessageRecipient[]
+  sender        User?              @relation("MessageSender", fields: [senderUserId], references: [id], onDelete: SetNull)
+  author        User?              @relation("MessageAuthor", fields: [authorUserId], references: [id], onDelete: SetNull)
+  approver      User?              @relation("MessageApprover", fields: [approverUserId], references: [id], onDelete: SetNull)
+  report        AiReport?          @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  targetStudent Student?           @relation("MessageTargetStudent", fields: [targetStudentId], references: [id], onDelete: SetNull)
+  targetClass   Class?             @relation("MessageTargetClass", fields: [targetClassId], references: [id], onDelete: SetNull)
+  recipients    MessageRecipient[]
 
   @@index([createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([authorUserId, status, createdAt(sort: Desc)])
   @@map("messages")
 }
 

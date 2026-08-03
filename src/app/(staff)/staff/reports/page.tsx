@@ -1,14 +1,30 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import {
+    enrollmentScopeWhere,
+    getStaffScope,
+    studentUserScopeWhere,
+} from "@/lib/staff-scope";
 import StaffReportsScreen from "@/app/(staff)/staff/reports/StaffReportsScreen";
 import type { StaffReportStudent } from "@/app/(staff)/staff/reports/StaffReportsScreen";
 
 export const dynamic = "force-dynamic";
 
 export default async function StaffReportsPage() {
+    const session = await auth();
+    if (!session?.user?.id) redirect("/login");
+    if (session.user.role !== "TEACHER" && session.user.role !== "STAFF") {
+        redirect("/post-login");
+    }
+
+    const scope = await getStaffScope(session.user.id);
+
     const users = await prisma.user.findMany({
         where: {
             role: "STUDENT",
             status: "ACTIVE",
+            ...studentUserScopeWhere(scope),
         },
         select: {
             id: true,
@@ -20,7 +36,7 @@ export default async function StaffReportsPage() {
                 select: {
                     id: true,
                     enrollments: {
-                        where: { status: "ACTIVE", endedAt: null },
+                        where: enrollmentScopeWhere(scope),
                         select: {
                             class: {
                                 select: {

@@ -1,0 +1,196 @@
+.page {
+    animation: screen-enter 360ms cubic-bezier(.22, 1, .36, 1) both;
+  }
+  
+  .heading {
+    margin-bottom: 20px;
+  }
+  
+  .heading > div > span {
+    color: #0066cc;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: .12em;
+  }
+  
+  .heading h1 {
+    margin: 8px 0;
+    font-family: "SF Pro Display", system-ui, sans-serif;
+    font-size: clamp(31px, 5vw, 42px);
+    line-height: 1.08;
+    letter-spacing: -.045em;
+  }
+  
+  .heading p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 15px;
+  }
+  
+  .empty,
+  .hero,
+  .dayCard,
+  .dayToday,
+  .panel {
+    border: 1px solid rgb(0 0 0 / 7%);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 9px 30px rgb(0 0 0 / 5%);
+  }
+  
+  .empty {
+    padding: 28px 24px;
+    text-align: center;
+  }
+  
+  .empty h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+  }
+  
+  .empty p,
+  .muted {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 13px;
+  }
+  
+  .hero {
+    padding: 22px;
+    margin-bottom: 18px;
+    background: linear-gradient(180deg, #f5f9ff 0%, #fff 55%);
+  }
+  
+  .hero h2 {
+    margin: 12px 0 6px;
+    font-size: 22px;
+  }
+  
+  .hero > p {
+    margin: 0 0 12px;
+    color: #6e6e73;
+    font-size: 14px;
+  }
+  
+  .todayList,
+  .slotList,
+  .classList {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  .todayList li,
+  .classList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-top: 1px solid #ededf0;
+  }
+  
+  .todayList li:first-child,
+  .classList li:first-child,
+  .slotList li:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  
+  .todayList strong,
+  .slotList strong,
+  .classList strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+  }
+  
+  .todayList span,
+  .slotList span,
+  .slotList small,
+  .classList span {
+    color: #6e6e73;
+    font-size: 12px;
+  }
+  
+  .weekGrid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  
+  .dayCard,
+  .dayToday {
+    padding: 14px;
+    min-height: 140px;
+  }
+  
+  .dayToday {
+    border-color: rgb(0 113 227 / 28%);
+    background: #f7fbff;
+  }
+  
+  .dayHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  
+  .dayHead strong {
+    font-size: 14px;
+  }
+  
+  .dayHead span {
+    color: #86868b;
+    font-size: 11px;
+  }
+  
+  .slotList li {
+    padding: 8px 0;
+    border-top: 1px solid #ededf0;
+    display: grid;
+    gap: 4px;
+  }
+  
+  .panel {
+    padding: 22px;
+    margin-bottom: 18px;
+  }
+  
+  .panelHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .panelHead h2 {
+    margin: 0;
+    font-size: 17px;
+  }
+  
+  @keyframes screen-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 960px) {
+    .weekGrid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  
+  @media (max-width: 520px) {
+    .weekGrid {
+      grid-template-columns: 1fr;
+    }
+  }

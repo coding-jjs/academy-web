@@ -1,0 +1,323 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { userHasPermission } from "@/lib/permission-guard";
+
+const ALLOWED = [
+    "PRESENT",
+    "LATE",
+    "ABSENT",
+    "EXCUSED",
+    "EARLY_LEAVE",
+] as const;
+
+type AttendanceStatus = (typeof ALLOWED)[number];
+
+export type SaveAttendanceState = {
+    status: "idle" | "error" | "success";
+    message: string;
+};
+
+export type AbsenceActionResult =
+    | { ok: true; message: string }
+    | { ok: false; message: string };
+
+function isStatus(value: string): value is AttendanceStatus {
+    return (ALLOWED as readonly string[]).includes(value);
+}
+
+async function requireStaffOrTeacher() {
+    const session = await auth();
+    if (
+        !session?.user?.id ||
+        (session.user.role !== "TEACHER" && session.user.role !== "STAFF")
+    ) {
+        return null;
+    }
+    return session;
+}
+
+async function assertCanEditSession(
+    userId: string,
+    sessionId: string,
+): Promise<
+    | {
+          ok: true;
+          teacherUserId: string | null;
+          allowedStudentIds: Set<string>;
+      }
+    | { ok: false; message: string }
+> {
+    const classSession = await prisma.classSession.findFirst({
+        where: { id: sessionId },
+        select: {
+            id: true,
+            class: {
+                select: {
+                    teacherUserId: true,
+                    enrollments: {
+                        where: { status: "ACTIVE", endedAt: null },
+                        select: { studentId: true },
+                    },
+                },
+            },
+        },
+    });
+
+    if (!classSession) {
+        return { ok: false, message: "수업을 찾을 수 없습니다." };
+    }
+
+    const isOwnClass = classSession.class.teacherUserId === userId;
+
+    if (isOwnClass) {
+        const allowed = await userHasPermission(
+            userId,
+            "ownClassAttendanceGrade",
+        );
+        if (!allowed) {
+            return {
+                ok: false,
+                message:
+                    "담당반 출결 입력 권한이 없습니다. 원장에게 권한 부여를 요청하세요.",
+            };
+        }
+    } else {
+        const allowed = await userHasPermission(
+            userId,
+            "otherTeacherAttendanceGrade",
+        );
+        if (!allowed) {
+            return {
+                ok: false,
+                message:
+                    "타 교사반 출결 입력 권한이 없습니다. 원장에게 권한 부여를 요청하세요.",
+            };
+        }
+    }
+
+    return {
+        ok: true,
+        teacherUserId: classSession.class.teacherUserId,
+        allowedStudentIds: new Set(
+            classSession.class.enrollments.map((e) => e.studentId),
+        ),
+    };
+}
+
+export async function saveSessionAttendance(
+    _prev: SaveAttendanceState,
+    formData: FormData,
+): Promise<SaveAttendanceState> {
+    const session = await requireStaffOrTeacher();
+    if (!session) {
+        return { status: "error", message: "교직원 로그인이 필요합니다." };
+    }
+
+    const sessionId = String(formData.get("sessionId") ?? "").trim();
+    const payloadRaw = String(formData.get("payload") ?? "").trim();
+    if (!sessionId || !payloadRaw) {
+        return { status: "error", message: "저장할 출결 정보가 없습니다." };
+    }
+
+    let rows: { studentId: string; status: string }[] = [];
+    try {
+        rows = JSON.parse(payloadRaw) as {
+            studentId: string;
+            status: string;
+        }[];
+    } catch {
+        return {
+            status: "error",
+            message: "출결 데이터 형식이 올바르지 않습니다.",
+        };
+    }
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+        return { status: "error", message: "저장할 학생이 없습니다." };
+    }
+
+    const access = await assertCanEditSession(session.user.id, sessionId);
+    if (!access.ok) {
+        return { status: "error", message: access.message };
+    }
+
+    const now = new Date();
+
+    try {
+        await prisma.$transaction(
+            rows
+                .filter(
+                    (row) =>
+                        access.allowedStudentIds.has(row.studentId) &&
+                        isStatus(row.status),
+                )
+                .map((row) => {
+                    const status = row.status as AttendanceStatus;
+                    const checkInAt =
+                        status === "PRESENT" || status === "LATE"
+                            ? now
+                            : null;
+
+                    return prisma.attendanceRecord.upsert({
+                        where: {
+                            studentId_sessionId: {
+                                studentId: row.studentId,
+                                sessionId,
+                            },
+                        },
+                        create: {
+                            studentId: row.studentId,
+                            sessionId,
+                            status,
+                            checkInAt,
+                            updatedBy: session.user.id,
+                        },
+                        update: {
+                            status,
+                            checkInAt:
+                                status === "PRESENT" || status === "LATE"
+                                    ? now
+                                    : null,
+                            checkOutAt:
+                                status === "EARLY_LEAVE" ? now : null,
+                            updatedBy: session.user.id,
+                        },
+                    });
+                }),
+        );
+
+        revalidatePath("/staff/attendance");
+        return { status: "success", message: "출결이 저장되었습니다." };
+    } catch {
+        return { status: "error", message: "출결 저장에 실패했습니다." };
+    }
+}
+
+/** 사유 결석 승인 → 출결 EXCUSED */
+export async function approveAbsenceRequest(input: {
+    absenceRequestId: string;
+}): Promise<AbsenceActionResult> {
+    const session = await requireStaffOrTeacher();
+    if (!session) {
+        return { ok: false, message: "교직원 로그인이 필요합니다." };
+    }
+
+    const absenceRequestId = String(input.absenceRequestId ?? "").trim();
+    if (!absenceRequestId) {
+        return { ok: false, message: "결석 신청 ID가 없습니다." };
+    }
+
+    const request = await prisma.absenceRequest.findUnique({
+        where: { id: absenceRequestId },
+        select: {
+            id: true,
+            studentId: true,
+            sessionId: true,
+            reason: true,
+            cancelledAt: true,
+        },
+    });
+
+    if (!request || request.cancelledAt) {
+        return { ok: false, message: "처리할 결석 신청을 찾을 수 없습니다." };
+    }
+
+    const access = await assertCanEditSession(
+        session.user.id,
+        request.sessionId,
+    );
+    if (!access.ok) {
+        return { ok: false, message: access.message };
+    }
+    if (!access.allowedStudentIds.has(request.studentId)) {
+        return { ok: false, message: "해당 반 학생이 아닙니다." };
+    }
+
+    const note = `사유 결석 승인: ${request.reason}`.slice(0, 500);
+
+    await prisma.$transaction([
+        prisma.attendanceRecord.upsert({
+            where: {
+                studentId_sessionId: {
+                    studentId: request.studentId,
+                    sessionId: request.sessionId,
+                },
+            },
+            create: {
+                studentId: request.studentId,
+                sessionId: request.sessionId,
+                status: "EXCUSED",
+                note,
+                updatedBy: session.user.id,
+            },
+            update: {
+                status: "EXCUSED",
+                checkInAt: null,
+                checkOutAt: null,
+                note,
+                updatedBy: session.user.id,
+            },
+        }),
+    ]);
+
+    revalidatePath("/staff/attendance");
+    revalidatePath("/parent/attendance");
+
+    return {
+        ok: true,
+        message: "결석을 승인하고 공결(EXCUSED)로 반영했습니다.",
+    };
+}
+
+/** 사유 결석 반려 */
+export async function rejectAbsenceRequest(input: {
+    absenceRequestId: string;
+}): Promise<AbsenceActionResult> {
+    const session = await requireStaffOrTeacher();
+    if (!session) {
+        return { ok: false, message: "교직원 로그인이 필요합니다." };
+    }
+
+    const absenceRequestId = String(input.absenceRequestId ?? "").trim();
+    if (!absenceRequestId) {
+        return { ok: false, message: "결석 신청 ID가 없습니다." };
+    }
+
+    const request = await prisma.absenceRequest.findUnique({
+        where: { id: absenceRequestId },
+        select: {
+            id: true,
+            studentId: true,
+            sessionId: true,
+            cancelledAt: true,
+        },
+    });
+
+    if (!request || request.cancelledAt) {
+        return { ok: false, message: "처리할 결석 신청을 찾을 수 없습니다." };
+    }
+
+    const access = await assertCanEditSession(
+        session.user.id,
+        request.sessionId,
+    );
+    if (!access.ok) {
+        return { ok: false, message: access.message };
+    }
+    if (!access.allowedStudentIds.has(request.studentId)) {
+        return { ok: false, message: "해당 반 학생이 아닙니다." };
+    }
+
+    await prisma.absenceRequest.update({
+        where: { id: request.id },
+        data: { cancelledAt: new Date() },
+    });
+
+    revalidatePath("/staff/attendance");
+    revalidatePath("/parent/attendance");
+
+    return { ok: true, message: "결석 신청을 반려했습니다." };
+}

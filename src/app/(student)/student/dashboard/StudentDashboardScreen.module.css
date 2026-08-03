@@ -1,0 +1,243 @@
+.page {
+    animation: screen-enter 360ms cubic-bezier(.22, 1, .36, 1) both;
+  }
+  
+  .heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .heading > div > span {
+    color: #0066cc;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: .12em;
+  }
+  
+  .heading h1 {
+    margin: 8px 0;
+    font-family: "SF Pro Display", system-ui, sans-serif;
+    font-size: clamp(31px, 5vw, 42px);
+    line-height: 1.08;
+    letter-spacing: -.045em;
+  }
+  
+  .heading p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 15px;
+  }
+  
+  .alertLink {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    color: #fff;
+    background: #c9342d;
+    font-size: 12px;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  
+  .empty,
+  .hero,
+  .panel,
+  .metrics article {
+    border: 1px solid rgb(0 0 0 / 7%);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 9px 30px rgb(0 0 0 / 5%);
+  }
+  
+  .empty {
+    padding: 28px 24px;
+    text-align: center;
+  }
+  
+  .empty h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+  }
+  
+  .empty p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 14px;
+  }
+  
+  .hero {
+    padding: 24px;
+    margin-bottom: 14px;
+    background: linear-gradient(180deg, #f5f9ff 0%, #fff 55%);
+  }
+  
+  .hero h2 {
+    margin: 12px 0 8px;
+    font-size: 24px;
+    letter-spacing: -.03em;
+  }
+  
+  .hero p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 14px;
+  }
+  
+  .quick {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  
+  .quick a {
+    display: grid;
+    place-items: center;
+    min-height: 44px;
+    border-radius: 13px;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    font-size: 13px;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  
+  .metrics article {
+    padding: 18px;
+  }
+  
+  .metrics article span {
+    color: #86868b;
+    font-size: 12px;
+    font-weight: 650;
+  }
+  
+  .metrics article strong {
+    display: block;
+    margin: 10px 0 4px;
+    font-size: 28px;
+    letter-spacing: -.04em;
+  }
+  
+  .metrics article p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 12px;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  
+  .panel {
+    padding: 22px;
+    margin-bottom: 18px;
+  }
+  
+  .grid .panel {
+    margin-bottom: 0;
+  }
+  
+  .panelHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .panelHead h2 {
+    margin: 0;
+    font-size: 17px;
+  }
+  
+  .panelHead a {
+    color: #0066cc;
+    font-size: 12px;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  
+  .muted {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 13px;
+  }
+  
+  .list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  .list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid #ededf0;
+  }
+  
+  .list li:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  
+  .list strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+  }
+  
+  .list span,
+  .date {
+    color: #6e6e73;
+    font-size: 12px;
+  }
+  
+  @keyframes screen-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 800px) {
+    .heading {
+      align-items: start;
+      flex-direction: column;
+    }
+  
+    .grid,
+    .metrics,
+    .quick {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  @media (max-width: 520px) {
+    .metrics,
+    .quick,
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }

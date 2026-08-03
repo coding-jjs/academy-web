@@ -1,0 +1,219 @@
+import Link from "next/link";
+import StatusChip from "@/components/ui/StatusChip";
+import styles from "./DirectorDashboardScreen.module.css";
+
+export type DirectorDashboardMetrics = {
+    pendingReports: number;
+    openChurn: number;
+    overdueInvoices: number;
+    newInquiries: number;
+    enrolledStudents: number;
+    guestUsers: number;
+    todayAttendanceRate: number | null;
+    todaySessionCount: number;
+};
+
+type MetricCard = {
+    label: string;
+    value: string;
+    detail: string;
+    tone: "neutral" | "success" | "warning" | "danger";
+    href?: string;
+};
+
+type QueueItem = {
+    label: string;
+    detail: string;
+    href: string;
+    count: number;
+    tone: "neutral" | "success" | "warning" | "danger";
+};
+
+export default function DirectorDashboardScreen({
+    metrics,
+}: {
+    metrics: DirectorDashboardMetrics;
+}) {
+    const cards: MetricCard[] = [
+        {
+            label: "승인 대기",
+            value: String(metrics.pendingReports),
+            detail: "AI 리포트",
+            tone: metrics.pendingReports > 0 ? "warning" : "success",
+            href: "/director/reports",
+        },
+        {
+            label: "이탈 위험",
+            value: String(metrics.openChurn),
+            detail: "감지·상담 중",
+            tone: metrics.openChurn > 0 ? "danger" : "success",
+            href: "/director/churn",
+        },
+        {
+            label: "미납",
+            value: String(metrics.overdueInvoices),
+            detail: "연체 청구서",
+            tone: metrics.overdueInvoices > 0 ? "danger" : "neutral",
+        },
+        {
+            label: "신규 문의",
+            value: String(metrics.newInquiries),
+            detail: "미처리",
+            tone: metrics.newInquiries > 0 ? "warning" : "neutral",
+        },
+        {
+            label: "재원 학생",
+            value: String(metrics.enrolledStudents),
+            detail: "등록 상태",
+            tone: "neutral",
+            href: "/director/students",
+        },
+        {
+            label: "오늘 출석",
+            value:
+                metrics.todayAttendanceRate == null
+                    ? "—"
+                    : `${metrics.todayAttendanceRate}%`,
+            detail:
+                metrics.todaySessionCount > 0
+                    ? `오늘 세션 ${metrics.todaySessionCount}건`
+                    : "오늘 세션 없음",
+            tone: "neutral",
+        },
+    ];
+
+    const queue: QueueItem[] = [
+        {
+            label: "AI 리포트",
+            detail: "승인 후 학부모 발송",
+            href: "/director/reports",
+            count: metrics.pendingReports,
+            tone: metrics.pendingReports > 0 ? "warning" : "success",
+        },
+        {
+            label: "이탈 위험",
+            detail: "상담·조치 필요",
+            href: "/director/churn",
+            count: metrics.openChurn,
+            tone: metrics.openChurn > 0 ? "danger" : "success",
+        },
+        {
+            label: "가입 대기",
+            detail: "역할 미배정 GUEST",
+            href: "/director/users",
+            count: metrics.guestUsers,
+            tone: metrics.guestUsers > 0 ? "warning" : "neutral",
+        },
+        {
+            label: "학부모 연결",
+            detail: "자녀 연결 관리",
+            href: "/director/parents",
+            count: metrics.enrolledStudents,
+            tone: "neutral",
+        },
+    ];
+
+    const primaryHref =
+        metrics.pendingReports > 0
+            ? "/director/reports"
+            : metrics.openChurn > 0
+              ? "/director/churn"
+              : "/director/students";
+
+    const primaryLabel =
+        metrics.pendingReports > 0
+            ? "승인 대기 확인"
+            : metrics.openChurn > 0
+              ? "이탈 위험 확인"
+              : "학생 목록";
+
+    return (
+        <section className={styles.page}>
+            <header className={styles.heading}>
+                <div>
+                    <span>DIRECTOR</span>
+                    <h1>운영 대시보드</h1>
+                    <p>
+                        승인·이탈·미납·문의와 오늘 출결 요약을 한눈에 확인합니다.
+                    </p>
+                </div>
+                <Link href={primaryHref} className={styles.primaryBtn}>
+                    {primaryLabel}
+                </Link>
+            </header>
+
+            <div className={styles.metrics}>
+                {cards.map((card) => {
+                    const body = (
+                        <>
+                            <StatusChip tone={card.tone}>{card.label}</StatusChip>
+                            <strong>{card.value}</strong>
+                            <p>{card.detail}</p>
+                        </>
+                    );
+
+                    return card.href ? (
+                        <Link
+                            key={card.label}
+                            href={card.href}
+                            className={styles.metricCard}
+                        >
+                            {body}
+                        </Link>
+                    ) : (
+                        <article key={card.label} className={styles.metricCard}>
+                            {body}
+                        </article>
+                    );
+                })}
+            </div>
+
+            <div className={styles.grid}>
+                <article className={styles.panel}>
+                    <div className={styles.panelHead}>
+                        <h2>확인할 업무</h2>
+                        <StatusChip
+                            tone={
+                                metrics.pendingReports + metrics.openChurn > 0
+                                    ? "warning"
+                                    : "success"
+                            }
+                        >
+                            {metrics.pendingReports + metrics.openChurn > 0
+                                ? "조치 필요"
+                                : "정상"}
+                        </StatusChip>
+                    </div>
+                    <ul>
+                        {queue.map((item) => (
+                            <li key={item.label}>
+                                <strong>{item.label}</strong>
+                                <span>{item.detail}</span>
+                                <Link href={item.href} className={styles.queueLink}>
+                                    <StatusChip tone={item.tone}>
+                                        {item.count}
+                                    </StatusChip>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </article>
+
+                <article className={styles.panel}>
+                    <div className={styles.panelHead}>
+                        <h2>빠른 이동</h2>
+                        <StatusChip>원장</StatusChip>
+                    </div>
+                    <div className={styles.shortcuts}>
+                        <Link href="/director/reports">AI 리포트</Link>
+                        <Link href="/director/churn">이탈 위험</Link>
+                        <Link href="/director/students">학생</Link>
+                        <Link href="/director/parents">학부모</Link>
+                        <Link href="/director/users">가입 사용자</Link>
+                        <Link href="/director/permissions">권한</Link>
+                    </div>
+                </article>
+            </div>
+        </section>
+    );
+}
