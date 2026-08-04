@@ -130,31 +130,31 @@
     overflow-x: auto;
 }
 
-table {
+.tableWrap table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
 }
 
-th,
-td {
+.tableWrap th,
+.tableWrap td {
     padding: 12px 10px;
     border-top: 1px solid #ededf0;
     text-align: left;
     vertical-align: middle;
 }
 
-th {
+.tableWrap th {
     color: #86868b;
     font-weight: 600;
     border-top: 0;
 }
 
-td strong {
+.tableWrap td strong {
     display: block;
 }
 
-td small {
+.tableWrap td small {
     color: #a1a1a6;
 }
 
@@ -358,21 +358,4 @@ td small {
         align-items: start;
         flex-direction: column;
     }
-}
-
-.statusRow {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-}
-
-.statusSelect {
-    min-height: 36px;
-    padding: 0 10px;
-    border: 1px solid #d2d2d7;
-    border-radius: 10px;
-    background: #fbfbfd;
-    font: inherit;
-    font-size: 13px;
 }

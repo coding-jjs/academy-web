@@ -93,31 +93,31 @@
     overflow-x: auto;
   }
   
-  table {
+  .tableWrap table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
   }
   
-  th,
-  td {
+  .tableWrap th,
+  .tableWrap td {
     padding: 12px 10px;
     border-top: 1px solid #ededf0;
     text-align: left;
     vertical-align: middle;
   }
   
-  th {
+  .tableWrap th {
     color: #86868b;
     font-weight: 600;
     border-top: 0;
   }
   
-  td strong {
+  .tableWrap td strong {
     display: block;
   }
   
-  td small {
+  .tableWrap td small {
     color: #a1a1a6;
   }
   
