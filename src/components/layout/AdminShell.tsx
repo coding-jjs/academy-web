@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { roleNavigation } from "@/lib/dummy-data";
+import { roleNavigation } from "@/lib/navigation";
 import type { RolePrefix } from "@/types/roles";
 import { auth } from "@/lib/auth";
 import NavLink from "./NavLink";
@@ -28,14 +28,6 @@ export default async function AdminShell({
                     </div>
                 </Link>
                 <div className={styles.headerTools}>
-                    <label className={styles.search}>
-                        <span aria-hidden="true">⌕</span>
-                        <input
-                            type="search"
-                            placeholder="학생 검색"
-                            aria-label="학생 검색"
-                        />
-                    </label>
                     {session?.user ? (
                         <span className={styles.userName}>
                             {userName} {role === "director" ? "원장" : "교직원"}

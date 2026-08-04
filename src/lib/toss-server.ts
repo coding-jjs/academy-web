@@ -1,7 +1,4 @@
-/**
- * Toss 서버 전용 (confirm / secret)
- * 클라이언트 컴포넌트에서 import 금지
- */
+import "server-only";
 
 export function getTossSecretKey() {
     const key = process.env.TOSS_SECRET_KEY?.trim();

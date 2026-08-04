@@ -1,4 +1,3 @@
-import { prisma } from "@/lib/db";
 import { userHasPermission } from "@/lib/permission-guard";
 
 export type StaffScope = {
@@ -8,16 +7,6 @@ export type StaffScope = {
 
 /** 로그인 staff/teacher의 학생·반 조회 범위 */
 export async function getStaffScope(userId: string): Promise<StaffScope> {
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { role: true },
-    });
-
-    // 사무 직원(STAFF): 담임 여부와 무관하게 전체 학생
-    if (user?.role === "STAFF") {
-        return { userId, viewAllStudents: true };
-    }
-
     const viewAllStudents = await userHasPermission(
         userId,
         "viewAllStudents",

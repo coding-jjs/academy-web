@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import GradesManagementScreen from "@/features/grades/GradesManagementScreen";
 import type {
@@ -12,9 +11,7 @@ import type {
 export const dynamic = "force-dynamic";
 
 export default async function DirectorGradesPage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "DIRECTOR") redirect("/post-login");
+    await requireRole("DIRECTOR");
 
     const [studentsRaw, gradesRaw, wrongsRaw] = await Promise.all([
         prisma.student.findMany({

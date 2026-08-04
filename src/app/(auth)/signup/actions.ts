@@ -69,10 +69,6 @@ export async function completeSignup(
         };
     }
 
-    const directorEmail = process.env.DIRECTOR_EMAIL?.trim().toLowerCase();
-
-    const isDirector = email === directorEmail;
-
     try {
         const user = await prisma.user.findUnique({
             where: { email },
@@ -94,7 +90,7 @@ export async function completeSignup(
                 schoolName: school || null,
                 grade: grade || null,
                 phone: phone || null,
-                role: isDirector ? "DIRECTOR" : "GUEST",
+                role: "GUEST",
                 onboardingCompleteAt: new Date(),
             },
         });

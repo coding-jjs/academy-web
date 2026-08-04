@@ -5,28 +5,47 @@ import styles from "./page.module.css";
 export const dynamic = "force-dynamic";
 
 export default async function DirectorUsersPage() {
-    const users = await prisma.user.findMany({
-        where: {
-            role: "GUEST",
-            status: "ACTIVE",
-            onboardingCompleteAt: {
-                not: null,
+    const [users, unlinkedStudents] = await Promise.all([
+        prisma.user.findMany({
+            where: {
+                role: "GUEST",
+                status: "ACTIVE",
+                onboardingCompleteAt: {
+                    not: null,
+                },
             },
-        },
-        select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            address: true,
-            schoolName: true,
-            grade: true,
-            createdAt: true,
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                address: true,
+                schoolName: true,
+                grade: true,
+                createdAt: true,
+                studentProfile: {
+                    select: { id: true, status: true },
+                },
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        }),
+        prisma.student.findMany({
+            where: {
+                userId: null,
+                status: { in: ["ENROLLED", "PAUSED"] },
+            },
+            select: {
+                id: true,
+                name: true,
+                schoolName: true,
+                grade: true,
+                status: true,
+            },
+            orderBy: { name: "asc" },
+        }),
+    ]);
 
     return (
         <section className={styles.page}>
@@ -130,6 +149,10 @@ export default async function DirectorUsersPage() {
                                 <RoleAssignmentForm
                                     userId={user.id}
                                     userName={user.name}
+                                    students={unlinkedStudents}
+                                    hasStudentProfile={Boolean(
+                                        user.studentProfile,
+                                    )}
                                 />
                             </li>
                         ))}

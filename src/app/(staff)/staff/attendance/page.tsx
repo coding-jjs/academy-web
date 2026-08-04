@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { formatKstTime, getKstDayRange } from "@/lib/date-kst";
 import {
@@ -15,11 +14,7 @@ import type {
 export const dynamic = "force-dynamic";
 
 export default async function StaffAttendancePage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "TEACHER" && session.user.role !== "STAFF") {
-        redirect("/post-login");
-    }
+    const session = await requireRole("STAFF", "TEACHER");
 
     const scope = await getStaffScope(session.user.id);
     const { startOfToday, endOfToday } = getKstDayRange();
@@ -71,10 +66,8 @@ export default async function StaffAttendancePage() {
             absenceRequests: {
                 where: { cancelledAt: null },
                 select: {
-                    id: true,
                     studentId: true,
                     reason: true,
-                    requestedAt: true,
                 },
             },
         },
@@ -112,9 +105,7 @@ export default async function StaffAttendancePage() {
                     note: att?.note ?? null,
                     absenceRequest: absence
                         ? {
-                              id: absence.id,
                               reason: absence.reason,
-                              requestedAt: absence.requestedAt.toISOString(),
                           }
                         : null,
                 };

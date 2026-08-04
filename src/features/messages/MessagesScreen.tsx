@@ -9,7 +9,7 @@ import {
     rejectMessage,
     submitMessageForApproval,
     type MessageListItem,
-} from "@/lib/message-actions";
+} from "@/features/messages/actions";
 import styles from "./MessagesScreen.module.css";
 
 type Mode = "director" | "staff";
@@ -78,7 +78,10 @@ export default function MessagesScreen({
     const directorAudiences = ["ALL", "STAFF", "PARENT", "STUDENT"] as const;
     const staffAudiences = ["PARENT", "STUDENT"] as const;
 
-    const list = tab === "pending" ? pending : tab === "mine" ? mine : [];
+    const list = useMemo(
+        () => (tab === "pending" ? pending : tab === "mine" ? mine : []),
+        [mine, pending, tab],
+    );
     const active = useMemo(
         () => list.find((m) => m.id === activeId) ?? list[0] ?? null,
         [activeId, list],

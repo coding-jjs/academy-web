@@ -243,36 +243,3 @@
     line-height: 1.35;
     word-break: break-word;
 }
-
-.absenceActions {
-    display: flex;
-    gap: 6px;
-}
-
-.miniPrimary,
-.miniSecondary {
-    min-height: 30px;
-    padding: 0 10px;
-    border: 0;
-    border-radius: 8px;
-    font: inherit;
-    font-size: 12px;
-    font-weight: 650;
-    cursor: pointer;
-}
-
-.miniPrimary {
-    color: #fff;
-    background: #0071e3;
-}
-
-.miniSecondary {
-    color: #1d1d1f;
-    background: #e8e8ed;
-}
-
-.miniPrimary:disabled,
-.miniSecondary:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-}

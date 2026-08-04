@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import DirectorChurnScreen from "./DirectorChurnScreen";
 import type {
@@ -32,9 +31,7 @@ function formatReason(
 }
 
 export default async function DirectorChurnPage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "DIRECTOR") redirect("/post-login");
+    await requireRole("DIRECTOR");
 
     const [students, thresholdRow] = await Promise.all([
         prisma.student.findMany({

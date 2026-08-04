@@ -289,19 +289,19 @@ model Student {
   createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  user            User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
-  parentLinks     ParentStudentLink[]
-  enrollments     ClassEnrollment[]
-  attendance      AttendanceRecord[]
-  absenceRequests AbsenceRequest[]
-  learningRecords LearningRecord[]
-  gradeRecords    GradeRecord[]
-  wrongNotes      WrongNote[]
-  counselingMemos CounselingMemo[]
-  churnCases      ChurnCase[]
-  invoices        Invoice[]
-  reports         AiReport[]
-  targetedMessages Message[] @relation("MessageTargetStudent")
+  user             User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  parentLinks      ParentStudentLink[]
+  enrollments      ClassEnrollment[]
+  attendance       AttendanceRecord[]
+  absenceRequests  AbsenceRequest[]
+  learningRecords  LearningRecord[]
+  gradeRecords     GradeRecord[]
+  wrongNotes       WrongNote[]
+  counselingMemos  CounselingMemo[]
+  churnCases       ChurnCase[]
+  invoices         Invoice[]
+  reports          AiReport[]
+  targetedMessages Message[]           @relation("MessageTargetStudent")
 
   @@index([status, name])
   @@map("students")
@@ -325,6 +325,8 @@ model ParentStudentLink {
 
   @@index([parentUserId, studentId])
   @@index([studentId, endedAt])
+  @@index([linkedBy])
+  @@index([endedBy])
   @@map("parent_student_links")
 }
 
@@ -338,13 +340,13 @@ model Class {
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  teacher         User?             @relation(fields: [teacherUserId], references: [id], onDelete: SetNull)
-  enrollments     ClassEnrollment[]
-  sessions        ClassSession[]
-  learningRecords LearningRecord[]
-  gradeRecords    GradeRecord[]
-  wrongNotes      WrongNote[]
-  targetedMessages Message[] @relation("MessageTargetClass")
+  teacher          User?             @relation(fields: [teacherUserId], references: [id], onDelete: SetNull)
+  enrollments      ClassEnrollment[]
+  sessions         ClassSession[]
+  learningRecords  LearningRecord[]
+  gradeRecords     GradeRecord[]
+  wrongNotes       WrongNote[]
+  targetedMessages Message[]         @relation("MessageTargetClass")
 
   @@index([teacherUserId, active])
   @@map("classes")
@@ -406,6 +408,7 @@ model AttendanceRecord {
   @@unique([studentId, sessionId])
   @@index([sessionId, status])
   @@index([studentId, createdAt(sort: Desc)])
+  @@index([updatedBy])
   @@map("attendance_records")
 }
 
@@ -423,6 +426,8 @@ model AbsenceRequest {
   requester User         @relation(fields: [requestedBy], references: [id])
 
   @@unique([studentId, sessionId])
+  @@index([sessionId])
+  @@index([requestedBy])
   @@index([requestedAt(sort: Desc)])
   @@map("absence_requests")
 }
@@ -444,6 +449,8 @@ model LearningRecord {
   author  User    @relation(fields: [authorUserId], references: [id])
 
   @@index([studentId, recordDate(sort: Desc)])
+  @@index([classId])
+  @@index([authorUserId])
   @@map("learning_records")
 }
 
@@ -466,6 +473,8 @@ model GradeRecord {
   wrongNotes WrongNote[]
 
   @@index([studentId, subject, assessedAt(sort: Desc)])
+  @@index([classId])
+  @@index([createdBy])
   @@map("grade_records")
 }
 
@@ -491,6 +500,9 @@ model WrongNote {
   images      WrongNoteImage[]
 
   @@index([studentId, status, createdAt(sort: Desc)])
+  @@index([gradeRecordId])
+  @@index([classId])
+  @@index([authorUserId])
   @@map("wrong_notes")
 }
 
@@ -522,6 +534,7 @@ model CounselingMemo {
   author  User    @relation(fields: [authorUserId], references: [id])
 
   @@index([studentId, counseledAt(sort: Desc)])
+  @@index([authorUserId])
   @@map("counseling_memos")
 }
 
@@ -549,6 +562,8 @@ model AiReport {
 
   @@index([studentId, status, createdAt(sort: Desc)])
   @@index([status, createdAt])
+  @@index([authorUserId])
+  @@index([approverUserId])
   @@map("ai_reports")
 }
 
@@ -569,6 +584,7 @@ model ChurnCase {
 
   @@index([status, detectedAt(sort: Desc)])
   @@index([studentId, status])
+  @@index([assignedUserId])
   @@map("churn_cases")
 }
 
@@ -598,6 +614,7 @@ model ChurnThresholdConfig {
 
   updater User? @relation(fields: [updatedBy], references: [id], onDelete: SetNull)
 
+  @@index([updatedBy])
   @@map("churn_threshold_configs")
 }
 
@@ -621,6 +638,7 @@ model Invoice {
 
   @@index([studentId, status])
   @@index([dueDate, status])
+  @@index([parentUserId, status, dueDate(sort: Desc)])
   @@map("invoices")
 }
 
@@ -647,6 +665,7 @@ model Payment {
   payer   User?   @relation(fields: [payerUserId], references: [id], onDelete: SetNull)
 
   @@index([invoiceId, status])
+  @@index([payerUserId])
   @@map("payments")
 }
 
@@ -681,6 +700,11 @@ model Message {
   @@index([createdAt(sort: Desc)])
   @@index([status, createdAt(sort: Desc)])
   @@index([authorUserId, status, createdAt(sort: Desc)])
+  @@index([senderUserId])
+  @@index([approverUserId])
+  @@index([reportId])
+  @@index([targetStudentId])
+  @@index([targetClassId])
   @@map("messages")
 }
 
@@ -757,6 +781,7 @@ model NewsItem {
   creator User? @relation(fields: [createdBy], references: [id], onDelete: SetNull)
 
   @@index([published, audience, category, sortOrder])
+  @@index([createdBy])
   @@map("news_items")
 }
 
@@ -777,6 +802,7 @@ model Inquiry {
   assignee User? @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
 
   @@index([status, createdAt(sort: Desc)])
+  @@index([assignedUserId])
   @@map("inquiries")
 }
 

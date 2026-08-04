@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
+import { getAuditRequestMetadata } from "@/lib/audit";
 import { prisma } from "@/lib/db";
+import { transitionStudentStatus } from "@/lib/student-lifecycle";
 
 export type EnrollmentActionResult = {
     ok: boolean;
@@ -175,57 +177,32 @@ export async function updateStudentStatus(input: {
             return { ok: false, message: "학생 상태가 올바르지 않습니다." };
         }
 
-        const student = await prisma.student.findUnique({
-            where: { id: studentId },
-            select: { id: true, status: true, name: true },
+        const now = new Date();
+        const metadata = await getAuditRequestMetadata();
+
+        const result = await prisma.$transaction(async (tx) => {
+            return transitionStudentStatus(tx, {
+                studentId,
+                status,
+                actorUserId: session.user.id,
+                metadata,
+                now,
+            });
         });
-        if (!student) {
-            return { ok: false, message: "학생을 찾을 수 없습니다." };
-        }
-        if (student.status === status) {
+
+        if (!result.changed) {
             return { ok: true, message: "이미 같은 상태입니다." };
         }
 
-        const now = new Date();
-
-        await prisma.$transaction(async (tx) => {
-            await tx.student.update({
-                where: { id: studentId },
-                data: {
-                    status,
-                    withdrawnAt: status === "WITHDRAWN" ? now : null,
-                },
-            });
-
-            // 퇴원 시 활성 수강 전부 해제
-            if (status === "WITHDRAWN") {
-                await tx.classEnrollment.updateMany({
-                    where: {
-                        studentId,
-                        status: "ACTIVE",
-                        endedAt: null,
-                    },
-                    data: {
-                        status: "CANCELLED",
-                        endedAt: now,
-                    },
-                });
-
-                // 진행 중 이탈 케이스가 있으면 퇴원으로 맞춤
-                await tx.churnCase.updateMany({
-                    where: {
-                        studentId,
-                        status: { in: ["DETECTED", "COUNSELING"] },
-                    },
-                    data: {
-                        status: "WITHDRAWN",
-                        resolvedAt: now,
-                    },
-                });
-            }
-        });
-
         revalidateStudentPaths();
+        revalidatePath("/director/parents");
+        revalidatePath("/director/users");
+        revalidatePath("/parent/dashboard");
+        revalidatePath("/parent/attendance");
+        revalidatePath("/parent/grades");
+        revalidatePath("/parent/reports");
+        revalidatePath("/parent/timetable");
+        revalidatePath("/student/dashboard");
 
         const label =
             status === "ENROLLED"
@@ -238,8 +215,8 @@ export async function updateStudentStatus(input: {
             ok: true,
             message:
                 status === "WITHDRAWN"
-                    ? `${student.name} 학생을 퇴원 처리했습니다. 활성 수강이 해제되었습니다.`
-                    : `${student.name} 학생 상태를 ${label}(으)로 변경했습니다.`,
+                    ? `${result.student.name} 학생을 퇴원 처리했습니다. 계정과 활성 수강 및 가족 연결이 정리되었습니다.`
+                    : `${result.student.name} 학생 상태를 ${label}(으)로 변경했습니다.`,
         };
     } catch (error) {
         console.error(error);

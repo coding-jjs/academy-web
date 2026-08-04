@@ -7,7 +7,7 @@ import {
     cancelInvoice,
     createInvoice,
     issueInvoice,
-} from "@/lib/billing-actions";
+} from "@/features/billing/actions";
 import styles from "./BillingManagementScreen.module.css";
 
 export type InvoiceStatus =

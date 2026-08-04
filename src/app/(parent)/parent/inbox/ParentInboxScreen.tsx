@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect, useMemo, useState, useTransition } from "react";
+import { useActionState, useMemo, useState, useTransition } from "react";
 import StatusChip from "@/components/ui/StatusChip";
 import {
     markAllMessagesRead,
     markMessageRead,
     type InboxActionState,
-} from "./actions";
+} from "@/features/messages/inbox-actions";
 import styles from "./ParentInboxScreen.module.css";
 
 export type ParentInboxMessage = {
@@ -70,12 +70,6 @@ export default function ParentInboxScreen({
         filtered.find((m) => m.recipientId === activeId) ??
         filtered[0] ??
         null;
-
-    useEffect(() => {
-        if (!active && filtered[0]) {
-            setActiveId(filtered[0].recipientId);
-        }
-    }, [active, filtered]);
 
     function handleSelect(recipientId: string) {
         setActiveId(recipientId);

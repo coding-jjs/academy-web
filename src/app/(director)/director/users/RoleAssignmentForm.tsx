@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { assignUserRole } from "./actions";
 import styles from "./page.module.css";
@@ -7,11 +8,23 @@ import styles from "./page.module.css";
 export default function RoleAssignmentForm({
     userId,
     userName,
+    students,
+    hasStudentProfile,
 }: {
     userId: string;
     userName: string;
+    hasStudentProfile: boolean;
+    students: Array<{
+        id: string;
+        name: string;
+        schoolName: string | null;
+        grade: string | null;
+        status: "ENROLLED" | "PAUSED" | "WITHDRAWN";
+    }>;
 }) {
     const selectId = `role-${userId}`;
+    const studentSelectId = `student-${userId}`;
+    const [role, setRole] = useState("");
 
     return (
         <form action={assignUserRole} className={styles.roleForm}>
@@ -22,6 +35,7 @@ export default function RoleAssignmentForm({
                     id={selectId}
                     name="role"
                     defaultValue=""
+                    onChange={(event) => setRole(event.target.value)}
                     aria-label={`${userName} 역할 선택`}
                     required
                 >
@@ -31,12 +45,55 @@ export default function RoleAssignmentForm({
                     <option value="TEACHER">선생님</option>
                     <option value="STAFF">교직원</option>
                     <option value="PARENT">학부모</option>
-                    <option value="STUDENT">학생</option>
+                    <option
+                        value="STUDENT"
+                        disabled={students.length === 0 || hasStudentProfile}
+                    >
+                        학생
+                    </option>
                 </select>
                 <AssignButton />
             </div>
+            {role === "STUDENT" && (
+                <div className={styles.studentLinkField}>
+                    <label htmlFor={studentSelectId}>연결할 기존 학생</label>
+                    <select
+                        id={studentSelectId}
+                        name="studentId"
+                        defaultValue=""
+                        required
+                    >
+                        <option value="" disabled>
+                            학생을 선택하세요
+                        </option>
+                        {students.map((student) => (
+                            <option key={student.id} value={student.id}>
+                                {formatStudentOption(student)}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
+            {hasStudentProfile && (
+                <p className={styles.roleHint}>
+                    기존 학생 계정의 재등록은 학생 관리에서 처리하세요.
+                </p>
+            )}
         </form>
     );
+}
+
+function formatStudentOption(student: {
+    name: string;
+    schoolName: string | null;
+    grade: string | null;
+    status: "ENROLLED" | "PAUSED" | "WITHDRAWN";
+}) {
+    const profile = [student.schoolName, student.grade && `${student.grade}학년`]
+        .filter(Boolean)
+        .join(" · ");
+    const status = student.status === "PAUSED" ? "휴원" : "재원";
+    return `${student.name}${profile ? ` · ${profile}` : ""} (${status})`;
 }
 
 function AssignButton() {

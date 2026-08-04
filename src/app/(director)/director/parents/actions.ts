@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getAuditRequestMetadata, writeAuditLog } from "@/lib/audit";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
@@ -18,7 +19,6 @@ const allowedRelationships = new Set([
 
 const allowedEndReasons = new Set([
     "잘못된 연결",
-    "학생 퇴원",
     "보호자 변경",
     "원장 수동 해제",
 ]);
@@ -69,6 +69,7 @@ export async function linkParentStudent(
     }
 
     try {
+        const metadata = await getAuditRequestMetadata();
         await prisma.$transaction(async (tx) => {
             const [parent, student, activeLink] = await Promise.all([
                 tx.user.findFirst({
@@ -114,13 +115,27 @@ export async function linkParentStudent(
                 throw new Error("이미 학부모가 연결된 학생입니다.");
             }
 
-            await tx.parentStudentLink.create({
+            const link = await tx.parentStudentLink.create({
                 data: {
                     parentUserId: parent.id,
                     studentId: student.id,
                     relationship,
                     linkedBy: session.user.id,
                 },
+                select: { id: true },
+            });
+
+            await writeAuditLog(tx, {
+                actorUserId: session.user.id,
+                action: "PARENT_STUDENT_LINKED",
+                targetType: "PARENT_STUDENT_LINK",
+                targetId: link.id,
+                details: {
+                    parentUserId: parent.id,
+                    studentId: student.id,
+                    relationship,
+                },
+                metadata,
             });
         });
 
@@ -175,6 +190,7 @@ export async function unlinkParentStudent(
     }
 
     try {
+        const metadata = await getAuditRequestMetadata();
         await prisma.$transaction(async (tx) => {
             const link = await tx.parentStudentLink.findFirst({
                 where: {
@@ -184,11 +200,7 @@ export async function unlinkParentStudent(
                 select: {
                     id: true,
                     parentUserId: true,
-                    student: {
-                        select: {
-                            userId: true,
-                        },
-                    },
+                    studentId: true,
                 },
             });
 
@@ -222,15 +234,18 @@ export async function unlinkParentStudent(
                 });
             }
 
-            if (link.student.userId) {
-                await tx.user.updateMany({
-                    where: {
-                        id: link.student.userId,
-                        role: "STUDENT",
-                    },
-                    data: { role: "GUEST" },
-                });
-            }
+            await writeAuditLog(tx, {
+                actorUserId: session.user.id,
+                action: "PARENT_STUDENT_UNLINKED",
+                targetType: "PARENT_STUDENT_LINK",
+                targetId: link.id,
+                details: {
+                    parentUserId: link.parentUserId,
+                    studentId: link.studentId,
+                    reason,
+                },
+                metadata,
+            });
         });
 
         revalidatePath("/director/parents");

@@ -14,7 +14,7 @@ export const PERMISSION_KEYS = [
 ] as const satisfies readonly PermissionKey[];
 
 export const staffPermissionPreset: Record<PermissionKey, boolean> = {
-    viewAllStudents: true,
+    viewAllStudents: false,
     viewParentContact: true,
     editLifeCounseling: false,
     writeAiReport: false,
@@ -67,11 +67,6 @@ export function resolvePermissions(
         }
     }
 
-    // 직원은 학원 전체 학생 조회가 기본 (청구·성적·상담 등)
-    if (role === "STAFF") {
-        next.viewAllStudents = true;
-    }
-    // 교사는 수납 불가
     if (role === "TEACHER") {
         next.billing = false;
     }

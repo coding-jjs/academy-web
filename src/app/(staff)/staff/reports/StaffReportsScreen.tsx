@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
 import {
@@ -94,17 +94,13 @@ export default function StaffReportsScreen({
     );
     const [keyword, setKeyword] = useState(keywordOptions[0]);
     const [tone, setTone] = useState(toneOptions[0]);
-    const [content, setContent] = useState("");
+    const [content, setContent] = useState(
+        students[0]?.report?.content ?? "",
+    );
     const [feedback, setFeedback] = useState<string | null>(null);
 
-    useEffect(() => {
-        setActiveId((prev) => {
-            if (prev && students.some((s) => s.id === prev)) return prev;
-            return students[0]?.id ?? null;
-        });
-    }, [students]);
-
-    const active = students.find((s) => s.id === activeId) ?? null;
+    const active =
+        students.find((s) => s.id === activeId) ?? students[0] ?? null;
     const activeStatus = active ? getStatus(active) : null;
 
     const canEdit =
@@ -112,22 +108,13 @@ export default function StaffReportsScreen({
         activeStatus === "DRAFTING" ||
         activeStatus === "REJECTED";
 
-    useEffect(() => {
-        if (!active) {
-            setContent("");
-            setFeedback(null);
-            return;
-        }
-
-        setContent(active.report?.content ?? "");
-        if (active.report?.keywords[0]) {
-            setKeyword(active.report.keywords[0]);
-        } else {
-            setKeyword(keywordOptions[0]);
-        }
+    function selectStudent(student: StaffReportStudent) {
+        setActiveId(student.id);
+        setContent(student.report?.content ?? "");
+        setKeyword(student.report?.keywords[0] ?? keywordOptions[0]);
         setTone(toneOptions[0]);
         setFeedback(null);
-    }, [active]);
+    }
 
     const stats = useMemo(() => {
         const counts = {
@@ -363,9 +350,7 @@ export default function StaffReportsScreen({
                                                     ? styles.activeStudent
                                                     : undefined
                                             }
-                                            onClick={() =>
-                                                setActiveId(student.id)
-                                            }
+                                            onClick={() => selectStudent(student)}
                                         >
                                             <span>
                                                 <strong>{student.name}</strong>

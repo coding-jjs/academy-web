@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { formatKstTime, getKstDayRange } from "@/lib/date-kst";
 import ParentDashboardScreen from "@/app/(parent)/parent/dashboard/ParentDashboardScreen";
@@ -11,9 +10,7 @@ import type {
 export const dynamic = "force-dynamic";
 
 export default async function ParentDashboardPage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "PARENT") redirect("/post-login");
+    const session = await requireRole("PARENT");
 
     const { startOfToday, endOfToday } = getKstDayRange();
 
@@ -88,49 +85,56 @@ export default async function ParentDashboardPage() {
         }),
     ]);
 
-    const children: ParentDashboardChild[] = await Promise.all(
-        links.map(async ({ student }) => {
-            const classIds = student.enrollments.map((e) => e.class.id);
-            const enrollment = student.enrollments[0];
-
-            const sessions =
-                classIds.length === 0
-                    ? []
-                    : await prisma.classSession.findMany({
-                          where: {
-                              classId: { in: classIds },
-                              startsAt: {
-                                  gte: startOfToday,
-                                  lt: endOfToday,
-                              },
-                              status: { in: ["SCHEDULED", "COMPLETED"] },
-                          },
-                          orderBy: { startsAt: "asc" },
+    const studentIds = links.map(({ student }) => student.id);
+    const classIds = [
+        ...new Set(
+            links.flatMap(({ student }) =>
+                student.enrollments.map((enrollment) => enrollment.class.id),
+            ),
+        ),
+    ];
+    const allSessions =
+        classIds.length === 0
+            ? []
+            : await prisma.classSession.findMany({
+                  where: {
+                      classId: { in: classIds },
+                      startsAt: { gte: startOfToday, lt: endOfToday },
+                      status: { in: ["SCHEDULED", "COMPLETED"] },
+                  },
+                  orderBy: { startsAt: "asc" },
+                  select: {
+                      id: true,
+                      classId: true,
+                      startsAt: true,
+                      endsAt: true,
+                      classroom: true,
+                      class: { select: { name: true, subject: true } },
+                      attendance: {
+                          where: { studentId: { in: studentIds } },
                           select: {
-                              id: true,
-                              startsAt: true,
-                              endsAt: true,
-                              classroom: true,
-                              class: {
-                                  select: {
-                                      name: true,
-                                      subject: true,
-                                  },
-                              },
-                              attendance: {
-                                  where: { studentId: student.id },
-                                  take: 1,
-                                  select: {
-                                      status: true,
-                                      checkInAt: true,
-                                      checkOutAt: true,
-                                  },
-                              },
+                              studentId: true,
+                              status: true,
+                              checkInAt: true,
+                              checkOutAt: true,
                           },
-                      });
+                      },
+                  },
+              });
+
+    const children: ParentDashboardChild[] = links.map(({ student }) => {
+            const enrolledClassIds = new Set(
+                student.enrollments.map((enrollment) => enrollment.class.id),
+            );
+            const enrollment = student.enrollments[0];
+            const sessions = allSessions.filter((classSession) =>
+                enrolledClassIds.has(classSession.classId),
+            );
 
             const first = sessions[0];
-            const att = first?.attendance[0];
+            const att = first?.attendance.find(
+                (row) => row.studentId === student.id,
+            );
 
             return {
                 id: student.id,
@@ -145,7 +149,9 @@ export default async function ParentDashboardPage() {
                     subject: s.class.subject,
                     timeLabel: `${formatKstTime(s.startsAt)}~${formatKstTime(s.endsAt)}`,
                     classroom: s.classroom,
-                    attendanceStatus: (s.attendance[0]?.status as
+                    attendanceStatus: (s.attendance.find(
+                        (row) => row.studentId === student.id,
+                    )?.status as
                         | AttendanceStatus
                         | null) ?? null,
                 })),
@@ -172,8 +178,7 @@ export default async function ParentDashboardPage() {
                     periodEnd: r.periodEnd.toISOString(),
                 })),
             };
-        }),
-    );
+        });
 
     return (
         <ParentDashboardScreen

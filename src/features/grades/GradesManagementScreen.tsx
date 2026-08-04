@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
 import {
@@ -8,7 +8,7 @@ import {
     createWrongNote,
     updateGradeRecord,
     updateWrongNote,
-} from "@/lib/grades-actions";
+} from "@/features/grades/actions";
 import styles from "./GradesManagementScreen.module.css";
 
 export type WrongNoteStatus = "OPEN" | "REVIEWED" | "MASTERED";
@@ -116,13 +116,13 @@ export default function GradesManagementScreen({
     const [wExplain, setWExplain] = useState("");
     const [wStatus, setWStatus] = useState<WrongNoteStatus>("OPEN");
 
-    useEffect(() => {
+    function selectStudent(id: string) {
+        setStudentId(id);
         setEditingGradeId(null);
         setEditingWrongId(null);
         setWGradeId("");
         setFeedback(null);
-    }, [studentId]);
-
+    }
     function resetGradeForm() {
         setEditingGradeId(null);
         setGTitle("주간 테스트");
@@ -274,7 +274,7 @@ export default function GradesManagementScreen({
                                                 ? styles.studentActive
                                                 : styles.studentBtn
                                         }
-                                        onClick={() => setStudentId(s.id)}
+                                        onClick={() => selectStudent(s.id)}
                                     >
                                         <strong>{s.name}</strong>
                                         <small>{s.className ?? "미배정"}</small>

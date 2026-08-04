@@ -3,7 +3,6 @@
 import Link from "next/link";
 import {
     useActionState,
-    useEffect,
     useMemo,
     useState,
     useTransition,
@@ -13,7 +12,7 @@ import {
     markAllMessagesRead,
     markMessageRead,
     type InboxActionState,
-} from "./actions";
+} from "@/features/messages/inbox-actions";
 import styles from "./StudentInboxScreen.module.css";
 
 export type StudentInboxMessage = {
@@ -98,10 +97,6 @@ export default function StudentInboxScreen({
 
     const activeNews =
         news.find((n) => n.id === activeNewsId) ?? news[0] ?? null;
-
-    useEffect(() => {
-        if (!active && filtered[0]) setActiveId(filtered[0].recipientId);
-    }, [active, filtered]);
 
     function handleMarkAll() {
         startAllTransition(async () => {

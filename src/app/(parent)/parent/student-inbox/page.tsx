@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import ParentStudentInboxScreen from "./ParentStudentInboxScreen";
 import type {
@@ -11,9 +10,7 @@ import type {
 export const dynamic = "force-dynamic";
 
 export default async function ParentStudentInboxPage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "PARENT") redirect("/post-login");
+    const session = await requireRole("PARENT");
 
     const now = new Date();
 
@@ -74,39 +71,44 @@ export default async function ParentStudentInboxPage() {
         createdAt: row.createdAt.toISOString(),
     }));
 
-    const children: ParentStudentInboxChild[] = await Promise.all(
-        links.map(async ({ student }) => {
+    const studentUserIds = links
+        .map(({ student }) => student.userId)
+        .filter((userId): userId is string => Boolean(userId));
+    const recipientRows =
+        studentUserIds.length === 0
+            ? []
+            : await prisma.messageRecipient.findMany({
+                  where: { recipientUserId: { in: studentUserIds } },
+                  orderBy: { createdAt: "desc" },
+                  select: {
+                      id: true,
+                      recipientUserId: true,
+                      readAt: true,
+                      createdAt: true,
+                      message: {
+                          select: {
+                              id: true,
+                              title: true,
+                              content: true,
+                              createdAt: true,
+                              sender: { select: { name: true, role: true } },
+                          },
+                      },
+                  },
+              });
+    const recipientsByUser = Map.groupBy(
+        recipientRows,
+        (row) => row.recipientUserId,
+    );
+
+    const children: ParentStudentInboxChild[] = links.map(({ student }) => {
             const enrollment = student.enrollments[0];
             let messages: StudentInboxMessage[] = [];
 
             if (student.userId) {
-                const recipients = await prisma.messageRecipient.findMany({
-                    where: { recipientUserId: student.userId },
-                    orderBy: { createdAt: "desc" },
-                    take: 40,
-                    select: {
-                        id: true,
-                        readAt: true,
-                        createdAt: true,
-                        message: {
-                            select: {
-                                id: true,
-                                title: true,
-                                content: true,
-                                deepLink: true,
-                                createdAt: true,
-                                sender: {
-                                    select: {
-                                        name: true,
-                                        role: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                });
-
-                messages = recipients.map((row) => ({
+                messages = (recipientsByUser.get(student.userId) ?? [])
+                    .slice(0, 40)
+                    .map((row) => ({
                     recipientId: row.id,
                     messageId: row.message.id,
                     title: row.message.title,
@@ -117,7 +119,7 @@ export default async function ParentStudentInboxPage() {
                     readAt: row.readAt?.toISOString() ?? null,
                     senderName: row.message.sender?.name ?? "A학원",
                     senderRole: row.message.sender?.role ?? null,
-                }));
+                    }));
             }
 
             return {
@@ -129,8 +131,7 @@ export default async function ParentStudentInboxPage() {
                 hasStudentAccount: Boolean(student.userId),
                 messages,
             };
-        }),
-    );
+        });
 
     return (
         <ParentStudentInboxScreen childList={children} news={news} />

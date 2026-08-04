@@ -1,7 +1,6 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
-import { syncOverdueInvoices } from "@/lib/billing-actions";
+import { syncOverdueInvoices } from "@/features/billing/overdue";
 import ParentPaymentsScreen from "./ParentPaymentsScreen";
 import type {
     InvoiceStatus,
@@ -33,9 +32,7 @@ function parseItems(items: unknown): { name: string; amount: number }[] {
 }
 
 export default async function ParentPaymentsPage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "PARENT") redirect("/post-login");
+    const session = await requireRole("PARENT");
 
     await syncOverdueInvoices();
 

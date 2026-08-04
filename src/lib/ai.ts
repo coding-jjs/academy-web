@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-// npm install @google/generative-ai <-- 설치 필요
+import "server-only";
 
 const GEMINI_MODEL =
     process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash";

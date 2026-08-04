@@ -1,3 +1,43 @@
+.page {
+    animation: screen-enter 360ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.heading > div:first-child > span {
+    color: #0066cc;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: .12em;
+}
+
+.heading h1 {
+    margin: 8px 0;
+    font-family: "SF Pro Display", system-ui, sans-serif;
+    font-size: clamp(31px, 5vw, 45px);
+    line-height: 1.08;
+    letter-spacing: -.045em;
+}
+
+.heading p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 15px;
+}
+
+.headerActions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
 .thresholdBtn,
 .actionBtn {
     min-height: 42px;
@@ -6,18 +46,12 @@
     border-radius: 12px;
     font-size: 13px;
     font-weight: 650;
+    white-space: nowrap;
     cursor: pointer;
-}
-
-.thresholdBtn {
-    color: #1d1d1f;
-    background: #e8e8ed;
-}
-
-.thresholdBtn:disabled,
-.actionBtn:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
+    transition:
+        transform 120ms ease,
+        background 140ms ease,
+        box-shadow 140ms ease;
 }
 
 .actionBtn {
@@ -25,57 +59,374 @@
     background: #0071e3;
 }
 
-.thresholdBar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-    color: #6e6e73;
-    font-size: 13px;
+.actionBtn:hover:not(:disabled) {
+    background: #0068d1;
+    box-shadow: 0 5px 14px rgb(0 113 227 / 18%);
 }
+
+.thresholdBtn {
+    color: #1d1d1f;
+    background: #e8e8ed;
+}
+
+.thresholdBtn:hover:not(:disabled) {
+    background: #dedee3;
+}
+
+.thresholdBtn:active:not(:disabled),
+.actionBtn:active:not(:disabled) {
+    transform: scale(.98);
+}
+
+.thresholdBtn:disabled,
+.actionBtn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.thresholdBtn:focus-visible,
+.actionBtn:focus-visible,
+.thresholdForm input:focus-visible {
+    outline: 2px solid #0071e3;
+    outline-offset: 2px;
+}
+
+.thresholdForm {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(120px, 1fr)) auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 18px;
+    padding: 20px;
+    border: 1px solid rgb(0 0 0 / 7%);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 9px 30px rgb(0 0 0 / 5%);
+    animation: form-enter 240ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.thresholdForm label {
+    min-width: 0;
+    display: grid;
+    gap: 7px;
+    color: #6e6e73;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.thresholdForm input {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    padding: 0 12px;
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    color: #1d1d1f;
+    background: #fff;
+    font: inherit;
+    transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.thresholdForm input:hover:not(:disabled) {
+    border-color: #a8a8ad;
+}
+
+.thresholdForm input:focus-visible {
+    border-color: #0071e3;
+    box-shadow: 0 0 0 3px rgb(0 113 227 / 13%);
+    outline: 0;
+}
+
+.thresholdForm input:disabled {
+    color: #86868b;
+    background: #f5f5f7;
+}
+
+.metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.metrics article,
+.tablePanel {
+    border: 1px solid rgb(0 0 0 / 7%);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 9px 30px rgb(0 0 0 / 5%);
+}
+
+.metrics article {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.metrics article::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    background: #d2d2d7;
+    content: "";
+}
+
+.metrics article:nth-child(1)::before { background: #ff453a; }
+.metrics article:nth-child(2)::before { background: #ff9f0a; }
+.metrics article:nth-child(3)::before { background: #34c759; }
 
 .metrics article > span {
     color: #86868b;
     font-size: 12px;
     font-weight: 650;
 }
-.thresholdForm {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
-    align-items: end;
-    margin-bottom: 18px;
-    padding: 16px;
-    border: 1px solid rgb(0 0 0 / 7%);
-    border-radius: 16px;
-    background: #fff;
+
+.metrics article > strong {
+    display: block;
+    margin: 18px 0 4px;
+    font-size: 31px;
+    letter-spacing: -.04em;
 }
 
-.thresholdForm label {
-    display: grid;
-    gap: 6px;
+.metrics article p {
+    margin: 0;
+    color: #86868b;
     font-size: 12px;
-    font-weight: 650;
-    color: #6e6e73;
 }
 
-.thresholdForm input {
-    min-height: 40px;
-    padding: 8px 10px;
-    border: 1px solid #d2d2d7;
-    border-radius: 10px;
-    font: inherit;
-    color: #1d1d1f;
+.tablePanel {
+    padding: 22px;
 }
 
-.feedback {
-    margin-top: 14px;
-    color: #1d1d1f;
+.thresholdBar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    margin-bottom: 16px;
+    padding: 9px 12px;
+    border-radius: 12px;
+    color: #515154;
+    background: #f5f5f7;
+    font-size: 12px;
+}
+
+.thresholdBar > span:last-child {
+    min-width: 0;
+    line-height: 1.5;
+}
+
+.tableWrap {
+    overflow-x: auto;
+    border-radius: 12px;
+}
+
+.tableWrap table {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: collapse;
     font-size: 13px;
 }
 
-.headerActions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+.tableWrap th,
+.tableWrap td {
+    padding: 13px 10px;
+    border-top: 1px solid #ededf0;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.tableWrap th {
+    border-top: 0;
+    color: #86868b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.tableWrap tbody tr {
+    transition: background 120ms ease;
+}
+
+.tableWrap tbody tr:hover {
+    background: #f8f8fa;
+}
+
+.tableWrap td {
+    color: #515154;
+}
+
+.tableWrap td strong {
+    display: block;
+    color: #1d1d1f;
+    font-size: 14px;
+}
+
+.tableWrap td small {
+    display: block;
+    margin-top: 2px;
+    color: #a1a1a6;
+    font-size: 11px;
+}
+
+.tableWrap td:last-child {
+    width: 112px;
+    text-align: right;
+}
+
+.tableWrap td:last-child .actionBtn {
+    min-height: 34px;
+    padding: 0 13px;
+    font-size: 12px;
+}
+
+.emptyPanel {
+    padding: 54px 24px 46px;
+    border-top: 1px solid #ededf0;
+    text-align: center;
+}
+
+.emptyPanel::before {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 16px;
+    border-radius: 15px;
+    color: #0066cc;
+    background: #edf5ff;
+    font-size: 22px;
+    font-weight: 700;
+    content: "✓";
+}
+
+.emptyPanel h2 {
+    margin: 0 0 7px;
+    font-size: 19px;
+    letter-spacing: -.025em;
+}
+
+.emptyPanel p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 13px;
+}
+
+.feedback {
+    width: fit-content;
+    margin: 14px 0 0;
+    padding: 9px 12px;
+    border: 1px solid #d9e8fb;
+    border-radius: 11px;
+    color: #305b87;
+    background: #f4f9ff;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+@keyframes screen-enter {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes form-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 1100px) {
+    .thresholdForm {
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+    }
+
+    .thresholdForm .actionBtn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 800px) {
+    .heading {
+        align-items: start;
+        flex-direction: column;
+    }
+
+    .headerActions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .metrics {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 520px) {
+    .heading {
+        margin-bottom: 22px;
+    }
+
+    .heading p {
+        font-size: 14px;
+    }
+
+    .headerActions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .headerActions button {
+        width: 100%;
+        padding-inline: 10px;
+    }
+
+    .thresholdForm {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+
+    .metrics article,
+    .tablePanel {
+        border-radius: 17px;
+    }
+
+    .tablePanel {
+        padding: 16px;
+    }
+
+    .thresholdBar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .emptyPanel {
+        padding-inline: 10px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page,
+    .thresholdForm {
+        animation: none;
+    }
+
+    .thresholdBtn,
+    .actionBtn,
+    .tableWrap tbody tr {
+        transition: none;
+    }
 }

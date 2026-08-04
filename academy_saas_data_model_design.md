@@ -1,7 +1,7 @@
 # A학원 SaaS 데이터 모델 설계
 
 > 기준 문서: `academy_saas_unified_spec.md` 9번  
-> 구현 원본: `web/prisma/schema.prisma`
+> 구현 원본: `prisma/schema.prisma`
 
 ## 1. 목적
 
@@ -107,14 +107,14 @@ Prisma가 직접 표현하지 못하는 활성 행 부분 unique 인덱스와 �
 2. 모든 변경은 새 Prisma migration으로 생성한다.
 3. 부분 인덱스·체크 제약 등은 생성된 migration SQL에 추가한다.
 4. `prisma migrate deploy`로 운영 DB에 적용한다.
-5. `prisma/sql/schema.sql`은 빈 DB 구조 확인과 비상 초기화용 참조본으로만 유지한다.
+5. 초기 SQL을 별도로 복제하지 않고 migration을 유일한 적용 이력으로 사용한다.
 6. 운영 DB를 직접 수정한 경우 `prisma db pull`로 덮어쓰기 전에 migration으로 변경 내용을 먼저 기록한다.
 
 ## 7. 적용 시 주의사항
 
 현재 프로젝트의 로컬 PostgreSQL이 실행되지 않아 기존 데이터 변환은 수행하지 않았다. 추가된 migration은 빈 데이터베이스를 기준으로 한 최초 migration이다.
 
-이미 기존 `schema.sql`이 적용된 데이터베이스가 있다면 이 migration을 그대로 실행하면 안 된다. 다음 항목을 포함한 별도의 전환 migration이 필요하다.
+이미 별도 초기 SQL로 만들어진 데이터베이스가 있다면 최초 migration을 그대로 실행하면 안 된다. 다음 항목을 포함한 별도의 전환 migration이 필요하다.
 
 - 기존 `attendance`를 `ClassSession`과 `AttendanceRecord`로 변환
 - `learning_records.WRONG_ANSWER`를 `WrongNote`로 이동

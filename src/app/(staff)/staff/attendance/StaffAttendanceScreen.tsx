@@ -2,16 +2,11 @@
 
 import {
     useActionState,
-    useEffect,
     useMemo,
     useState,
-    useTransition,
 } from "react";
-import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
 import {
-    approveAbsenceRequest,
-    rejectAbsenceRequest,
     saveSessionAttendance,
     type SaveAttendanceState,
 } from "./actions";
@@ -34,9 +29,7 @@ export type StaffAttendanceStudent = {
     checkOutAt: string | null;
     note: string | null;
     absenceRequest: {
-        id: string;
         reason: string;
-        requestedAt: string;
     } | null;
 };
 
@@ -76,6 +69,13 @@ function formatCheckIn(iso: string | null) {
     }).format(new Date(iso));
 }
 
+function attendanceDraft(session: StaffAttendanceSession | undefined) {
+    if (!session) return {};
+    return Object.fromEntries(
+        session.students.map((student) => [student.id, student.status ?? ""]),
+    ) as Record<string, AttendanceStatus | "">;
+}
+
 export default function StaffAttendanceScreen({
     sessions,
     role,
@@ -83,12 +83,6 @@ export default function StaffAttendanceScreen({
     sessions: StaffAttendanceSession[];
     role: "TEACHER" | "STAFF";
 }) {
-    const router = useRouter();
-    const [absencePending, startAbsenceTransition] = useTransition();
-    const [absenceFeedback, setAbsenceFeedback] = useState<string | null>(
-        null,
-    );
-
     const [activeSessionId, setActiveSessionId] = useState(
         sessions[0]?.id ?? "",
     );
@@ -96,25 +90,17 @@ export default function StaffAttendanceScreen({
         sessions.find((s) => s.id === activeSessionId) ?? sessions[0] ?? null;
 
     const [draft, setDraft] = useState<Record<string, AttendanceStatus | "">>(
-        {},
+        () => attendanceDraft(sessions[0]),
     );
     const [state, formAction, pending] = useActionState(
         saveSessionAttendance,
         initialState,
     );
 
-    useEffect(() => {
-        if (!active) {
-            setDraft({});
-            return;
-        }
-        const next: Record<string, AttendanceStatus | ""> = {};
-        for (const student of active.students) {
-            next[student.id] = student.status ?? "";
-        }
-        setDraft(next);
-        setAbsenceFeedback(null);
-    }, [active]);
+    function selectSession(session: StaffAttendanceSession) {
+        setActiveSessionId(session.id);
+        setDraft(attendanceDraft(session));
+    }
 
     const uncheckedCount = useMemo(() => {
         if (!active) return 0;
@@ -142,28 +128,7 @@ export default function StaffAttendanceScreen({
         );
     }, [active, draft]);
 
-    function handleApprove(absenceRequestId: string, studentId: string) {
-        setAbsenceFeedback(null);
-        startAbsenceTransition(async () => {
-            const result = await approveAbsenceRequest({ absenceRequestId });
-            setAbsenceFeedback(result.message);
-            if (result.ok) {
-                setDraft((prev) => ({ ...prev, [studentId]: "EXCUSED" }));
-                router.refresh();
-            }
-        });
-    }
-
-    function handleReject(absenceRequestId: string) {
-        setAbsenceFeedback(null);
-        startAbsenceTransition(async () => {
-            const result = await rejectAbsenceRequest({ absenceRequestId });
-            setAbsenceFeedback(result.message);
-            if (result.ok) router.refresh();
-        });
-    }
-
-    const busy = pending || absencePending;
+    const busy = pending;
 
     return (
         <section className={styles.page}>
@@ -199,7 +164,7 @@ export default function StaffAttendanceScreen({
                                         ? styles.sessionActive
                                         : styles.sessionBtn
                                 }
-                                onClick={() => setActiveSessionId(item.id)}
+                                onClick={() => selectSession(item)}
                             >
                                 <strong>{item.className}</strong>
                                 <span>{item.timeLabel}</span>
@@ -261,21 +226,16 @@ export default function StaffAttendanceScreen({
                                 </div>
                             </div>
 
-                            {(state.message || absenceFeedback) && (
+                            {state.message && (
                                 <p
                                     className={
-                                        state.status === "success" ||
-                                        (absenceFeedback &&
-                                            !absenceFeedback.includes("실패") &&
-                                            !absenceFeedback.includes("없"))
+                                        state.status === "success"
                                             ? styles.success
-                                            : state.status === "error"
-                                              ? styles.error
-                                              : styles.success
+                                            : styles.error
                                     }
                                     role="alert"
                                 >
-                                    {absenceFeedback || state.message}
+                                    {state.message}
                                 </p>
                             )}
 
@@ -317,7 +277,7 @@ export default function StaffAttendanceScreen({
                                                                 }
                                                             >
                                                                 <StatusChip tone="warning">
-                                                                    신청
+                                                                    사유 접수
                                                                 </StatusChip>
                                                                 <small>
                                                                     {
@@ -326,49 +286,6 @@ export default function StaffAttendanceScreen({
                                                                             .reason
                                                                     }
                                                                 </small>
-                                                                <div
-                                                                    className={
-                                                                        styles.absenceActions
-                                                                    }
-                                                                >
-                                                                    <button
-                                                                        type="button"
-                                                                        className={
-                                                                            styles.miniPrimary
-                                                                        }
-                                                                        disabled={
-                                                                            busy
-                                                                        }
-                                                                        onClick={() =>
-                                                                            handleApprove(
-                                                                                student
-                                                                                    .absenceRequest!
-                                                                                    .id,
-                                                                                student.id,
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        승인
-                                                                    </button>
-                                                                    <button
-                                                                        type="button"
-                                                                        className={
-                                                                            styles.miniSecondary
-                                                                        }
-                                                                        disabled={
-                                                                            busy
-                                                                        }
-                                                                        onClick={() =>
-                                                                            handleReject(
-                                                                                student
-                                                                                    .absenceRequest!
-                                                                                    .id,
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        반려
-                                                                    </button>
-                                                                </div>
                                                             </div>
                                                         ) : (
                                                             <span

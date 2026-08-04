@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
 import styles from "./ParentTimetableScreen.module.css";
 
@@ -75,13 +75,6 @@ export default function ParentTimetableScreen({
     weekDays: WeekDay[];
 }) {
     const [activeChildId, setActiveChildId] = useState(childList[0]?.id ?? "");
-
-    useEffect(() => {
-        setActiveChildId((prev) => {
-            if (prev && childList.some((item) => item.id === prev)) return prev;
-            return childList[0]?.id ?? "";
-        });
-    }, [childList]);
 
     const child =
         childList.find((item) => item.id === activeChildId) ??

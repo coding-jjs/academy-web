@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import ParentReportsScreen from "@/app/(parent)/parent/reports/ParentReportsScreen";
 import type { ParentReportChild } from "@/app/(parent)/parent/reports/ParentReportsScreen";
@@ -7,15 +6,7 @@ import type { ParentReportChild } from "@/app/(parent)/parent/reports/ParentRepo
 export const dynamic = "force-dynamic";
 
 export default async function ParentReportsPage() {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-        redirect("/login");
-    }
-
-    if (session.user.role !== "PARENT") {
-        redirect("/post-login");
-    }
+    const session = await requireRole("PARENT");
 
     const links = await prisma.parentStudentLink.findMany({
         where: {

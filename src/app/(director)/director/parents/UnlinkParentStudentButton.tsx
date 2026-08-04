@@ -111,8 +111,8 @@ export default function UnlinkParentStudentButton({
                     <div className={styles.unlinkNotice}>
                         <span aria-hidden="true">i</span>
                         <p>
-                            학생 계정은 게스트로 변경됩니다. 학부모는 다른
-                            연결된 자녀가 없을 때 게스트로 변경됩니다.
+                            학생의 재원 상태와 계정 역할은 유지됩니다. 학부모는
+                            다른 연결된 자녀가 없을 때 게스트로 변경됩니다.
                         </p>
                     </div>
 
@@ -132,7 +132,6 @@ export default function UnlinkParentStudentButton({
                                     해제 사유를 선택해 주세요
                                 </option>
                                 <option value="잘못된 연결">잘못된 연결</option>
-                                <option value="학생 퇴원">학생 퇴원</option>
                                 <option value="보호자 변경">보호자 변경</option>
                                 <option value="원장 수동 해제">
                                     기타 운영 사유

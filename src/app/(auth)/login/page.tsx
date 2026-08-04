@@ -62,8 +62,8 @@ export default async function LoginPage({
                         <Link href="/signup">회원가입</Link>
                     </p>
 
-                    <Link href="/preview" className={styles.backLink}>
-                        와이어프레임으로 돌아가기
+                    <Link href="/" className={styles.backLink}>
+                        메인으로 돌아가기
                     </Link>
                 </div>
             </section>

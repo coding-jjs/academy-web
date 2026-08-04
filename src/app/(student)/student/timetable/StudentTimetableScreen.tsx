@@ -112,7 +112,7 @@ export default function StudentTimetableScreen({
             map[session.dayKey]?.push(session);
         }
         return map;
-    }, [data.sessions, weekDays]);
+    }, [data, weekDays]);
 
     const todaySessions = data.sessions.filter((s) => s.isToday);
 

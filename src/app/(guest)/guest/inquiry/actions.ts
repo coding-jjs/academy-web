@@ -1,5 +1,6 @@
 "use server";
 
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export type InquiryField =
@@ -20,6 +21,15 @@ export async function createInquiry(
     _previousState: InquiryState,
     formData: FormData,
 ): Promise<InquiryState> {
+    const session = await auth();
+    if (!session?.user?.id || session.user.role !== "GUEST") {
+        return {
+            status: "error",
+            message: "게스트 로그인이 필요합니다.",
+            errors: {},
+        };
+    }
+
     const guardianName = readText(formData, "guardianName");
     const phone = readText(formData, "phone");
     const studentGrade = readText(formData, "studentGrade");

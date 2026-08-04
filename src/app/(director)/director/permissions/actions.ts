@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getAuditRequestMetadata, writeAuditLog } from "@/lib/audit";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PERMISSION_KEYS } from "@/lib/permissions";
@@ -62,15 +63,22 @@ export async function saveMemberPermissions(input: {
         data.billing = false;
     }
 
-    // 직원은 전체 학생 조회 고정 (청구·성적 등 사무 업무)
-    if (user.role === "STAFF") {
-        data.viewAllStudents = true;
-    }
+    const metadata = await getAuditRequestMetadata();
+    await prisma.$transaction(async (tx) => {
+        await tx.permissionGrant.upsert({
+            where: { userId },
+            create: { userId, ...data },
+            update: { ...data },
+        });
 
-    await prisma.permissionGrant.upsert({
-        where: { userId },
-        create: { userId, ...data },
-        update: { ...data },
+        await writeAuditLog(tx, {
+            actorUserId: session.user.id,
+            action: "PERMISSION_CHANGED",
+            targetType: "USER",
+            targetId: userId,
+            details: { role: user.role, permissions: data },
+            metadata,
+        });
     });
 
     revalidatePath("/director/permissions");

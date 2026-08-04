@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { detectChurnCases } from "@/lib/churn-detect";
 import { prisma } from "@/lib/db";
-import { expandParentRecipients } from "@/lib/message-actions";
+import { expandParentRecipients } from "@/features/messages/recipients";
 
 export type ChurnActionResult =
     | { ok: true; message: string }

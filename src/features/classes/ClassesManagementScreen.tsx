@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
 import {
@@ -8,7 +8,7 @@ import {
     createClass,
     createClassSession,
     updateClass,
-} from "@/app/(director)/director/classes/actions";
+} from "@/features/classes/actions";
 import styles from "./ClassesManagementScreen.module.css";
 
 export type TeacherOption = {
@@ -105,33 +105,28 @@ export default function ClassesManagementScreen({
         [classes, activeId],
     );
 
-    const [editing, setEditing] = useState(false);
-    const [name, setName] = useState("");
-    const [subject, setSubject] = useState("수학");
-    const [teacherUserId, setTeacherUserId] = useState("");
-    const [activeFlag, setActiveFlag] = useState(true);
+    const [editing, setEditing] = useState(classes.length > 0);
+    const [name, setName] = useState(classes[0]?.name ?? "");
+    const [subject, setSubject] = useState(classes[0]?.subject ?? "수학");
+    const [teacherUserId, setTeacherUserId] = useState(
+        classes[0]?.teacherUserId ?? "",
+    );
+    const [activeFlag, setActiveFlag] = useState(classes[0]?.active ?? true);
 
     const range = defaultSessionRange();
     const [startsAt, setStartsAt] = useState(range.startsAt);
     const [endsAt, setEndsAt] = useState(range.endsAt);
     const [classroom, setClassroom] = useState("");
 
-    useEffect(() => {
-        if (!active) {
-            setEditing(false);
-            setName("");
-            setSubject("수학");
-            setTeacherUserId("");
-            setActiveFlag(true);
-            return;
-        }
+    function selectClass(selected: ClassRow) {
+        setActiveId(selected.id);
         setEditing(true);
-        setName(active.name);
-        setSubject(active.subject);
-        setTeacherUserId(active.teacherUserId ?? "");
-        setActiveFlag(active.active);
+        setName(selected.name);
+        setSubject(selected.subject);
+        setTeacherUserId(selected.teacherUserId ?? "");
+        setActiveFlag(selected.active);
         setFeedback(null);
-    }, [active]);
+    }
 
     function startCreate() {
         setActiveId("");
@@ -238,7 +233,7 @@ export default function ClassesManagementScreen({
                                                 ? styles.itemActive
                                                 : styles.itemBtn
                                         }
-                                        onClick={() => setActiveId(c.id)}
+                                        onClick={() => selectClass(c)}
                                     >
                                         <strong>
                                             {c.name}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
 import { createLearningRecord, type LearningRecordState } from "./actions";
 import styles from "./StaffStudentsScreen.module.css";
@@ -116,19 +116,6 @@ export default function StaffStudentsScreen({
         createLearningRecord,
         initialState,
     );
-
-    useEffect(() => {
-        setActiveId((prev) => {
-            if (prev && students.some((s) => s.id === prev)) return prev;
-            return students[0]?.id ?? "";
-        });
-    }, [students]);
-
-    useEffect(() => {
-        if (state.status === "success") {
-            setShowForm(false);
-        }
-    }, [state]);
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();

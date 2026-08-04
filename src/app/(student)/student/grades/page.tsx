@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import StudentGradesScreen from "./StudentGradesScreen";
 import type {
@@ -10,9 +9,7 @@ import type {
 export const dynamic = "force-dynamic";
 
 export default async function StudentGradesPage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "STUDENT") redirect("/post-login");
+    const session = await requireRole("STUDENT");
 
     const student = await prisma.student.findFirst({
         where: { userId: session.user.id },

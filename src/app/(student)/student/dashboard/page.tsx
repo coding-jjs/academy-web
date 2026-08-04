@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { formatKstTime, getKstDayRange } from "@/lib/date-kst";
 import StudentDashboardScreen from "./StudentDashboardScreen";
@@ -11,9 +10,7 @@ import type {
 export const dynamic = "force-dynamic";
 
 export default async function StudentDashboardPage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "STUDENT") redirect("/post-login");
+    const session = await requireRole("STUDENT");
 
     const { startOfToday, endOfToday } = getKstDayRange();
     const now = new Date();

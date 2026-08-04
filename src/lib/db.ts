@@ -1,9 +1,5 @@
-/**
- * Prisma 설치 전 데이터베이스 연결 경계입니다.
- *
- * Prisma Client를 생성한 뒤 이 파일에서 싱글턴 인스턴스를 내보내면
- * Server Action과 Route Handler가 동일한 연결 방식을 사용하게 됩니다.
- */
+import "server-only";
+
 import { PrismaClient } from "@/generate/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 

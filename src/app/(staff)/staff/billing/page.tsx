@@ -1,7 +1,6 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
-import { syncOverdueInvoices } from "@/lib/billing-actions";
+import { syncOverdueInvoices } from "@/features/billing/overdue";
 import { userHasPermission } from "@/lib/permission-guard";
 import { getStaffScope, studentScopeWhere } from "@/lib/staff-scope";
 import BillingManagementScreen from "@/features/billing/BillingManagementScreen";
@@ -14,11 +13,7 @@ import type {
 export const dynamic = "force-dynamic";
 
 export default async function StaffBillingPage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "TEACHER" && session.user.role !== "STAFF") {
-        redirect("/post-login");
-    }
+    const session = await requireRole("STAFF", "TEACHER");
 
     const canManage = await userHasPermission(session.user.id, "billing");
     if (!canManage) {

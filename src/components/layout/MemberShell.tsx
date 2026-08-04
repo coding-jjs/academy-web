@@ -1,15 +1,17 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { roleNavigation } from "@/lib/dummy-data";
+import { roleNavigation } from "@/lib/navigation";
 import type { RolePrefix } from "@/types/roles";
 import NavLink from "./NavLink";
 import styles from "./Shells.module.css";
 
 export default function MemberShell({
     role,
+    userName,
     children,
 }: {
     role: Extract<RolePrefix, "parent" | "student" | "guest">;
+    userName: string | null | undefined;
     children: ReactNode;
 }) {
     return (
@@ -27,9 +29,9 @@ export default function MemberShell({
                         <NavLink item={item} compact key={item.href} />
                     ))}
                 </nav>
-                <Link href="/login" className={styles.sessionLink}>
-                    로그인
-                </Link>
+                <span className={styles.userName}>
+                    {userName ?? memberLabel(role)}
+                </span>
             </header>
             <main className={styles.memberContent}>{children}</main>
             <nav className={styles.mobileNav} aria-label="하단 메뉴">

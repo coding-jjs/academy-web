@@ -86,7 +86,7 @@ export async function requestAbsence(
         revalidatePath("/parent/attendance");
         return {
             status: "success",
-            message: "사유 결석이 접수되었습니다. 담당 교사가 승인하면 공결로 반영됩니다.",
+            message: "사유 결석이 접수되었습니다. 담당 교사가 출결 기록 시 확인합니다.",
         };
     } catch {
         return { status: "error", message: "신청에 실패했습니다." };

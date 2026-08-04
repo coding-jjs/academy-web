@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { PermissionKey } from "@/types/roles";
 import { presetForRole } from "@/lib/permissions";
@@ -43,26 +43,17 @@ export default function PermissionManagementScreen({
     );
     const [feedback, setFeedback] = useState<string | null>(null);
 
-    useEffect(() => {
-        setMembers(initialMembers);
-        setSelectedMemberId((prev) => {
-            if (prev && initialMembers.some((m) => m.id === prev)) return prev;
-            return initialMembers[0]?.id ?? null;
-        });
-    }, [initialMembers]);
-
     const selectedMember = useMemo(
-        () => members.find((m) => m.id === selectedMemberId) ?? null,
+        () =>
+            members.find((m) => m.id === selectedMemberId) ??
+            members[0] ??
+            null,
         [members, selectedMemberId],
     );
 
     function togglePermission(key: PermissionKey) {
         if (!selectedMember) return;
         if (selectedMember.role === "TEACHER" && key === "billing") return;
-        if (selectedMember.role === "STAFF" && key === "viewAllStudents") {
-            return;
-        }
-
         setFeedback(null);
         setMembers((prev) =>
             prev.map((member) =>
@@ -194,13 +185,6 @@ export default function PermissionManagementScreen({
                                     const teacherBillingLocked =
                                         selectedMember.role === "TEACHER" &&
                                         key === "billing";
-                                    const staffViewAllLocked =
-                                        selectedMember.role === "STAFF" &&
-                                        key === "viewAllStudents";
-                                    const locked =
-                                        teacherBillingLocked ||
-                                        staffViewAllLocked;
-
                                     return (
                                         <li key={key}>
                                             <label>
@@ -208,9 +192,6 @@ export default function PermissionManagementScreen({
                                                     {permissionLabels[key]}
                                                     {teacherBillingLocked
                                                         ? " (교사 불가)"
-                                                        : ""}
-                                                    {staffViewAllLocked
-                                                        ? " (직원 필수)"
                                                         : ""}
                                                 </span>
                                                 <input
@@ -220,7 +201,8 @@ export default function PermissionManagementScreen({
                                                             .permissions[key]
                                                     }
                                                     disabled={
-                                                        locked || isPending
+                                                        teacherBillingLocked ||
+                                                        isPending
                                                     }
                                                     onChange={() =>
                                                         togglePermission(key)

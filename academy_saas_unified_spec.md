@@ -232,7 +232,7 @@ PWA(Manifest·SW·홈화면 추가)는 모바일 푸시·설치 강화용.
 ├── 게스트 /guest/
 │   ├── waiting (학원 소개), inquiry
 │
-└── 공개 /about, 마이페이지, 동명이인 검색, 404
+└── 공개 /, 미리보기 /preview, 404
 ```
 
 ### 주요 화면 요약
@@ -284,7 +284,7 @@ Sent = 학부모 공개 + 쪽지 생성 + 푸시 시도 완료. `parentReadAt`�
 
 | 구분 | 기술 |
 |------|------|
-| 앱 | Next.js App Router + API Routes (`web/`) |
+| 앱 | Next.js App Router + Route Handlers |
 | ORM/DB | Prisma + PostgreSQL (로컬 Docker / 운영 Lightsail Managed 또는 RDS) |
 | 파일 | AWS S3 |
 | AI | OpenAI 또는 Claude |
@@ -297,7 +297,7 @@ Sent = 학부모 공개 + 쪽지 생성 + 푸시 시도 완료. `parentReadAt`�
 
 - 최초 가입 role = `GUEST`
 - `middleware`: 역할 prefix 보호. 퇴원·연동 해제 후는 `GUEST` 홈(`/guest/waiting`)
-- `PREVIEW_MODE=true`: 미로그인 미리보기 허용 (**운영은 false**)
+- 공개 와이어프레임은 `/preview`만 허용하고 역할별 운영 라우트는 항상 인증한다.
 
 ### 원장 초기 설정
 
@@ -427,9 +427,9 @@ ChurnThresholdConfig (단일 설정 행)
 
 ### 9.3 물리 스키마
 
-- Prisma: `web/prisma/schema.prisma`
-- 최초 migration: `web/prisma/migrations/20260729120000_final_data_structure/migration.sql`
-- 빈 DB 초기화용 SQL: `web/prisma/sql/schema.sql`
+- Prisma: `prisma/schema.prisma`
+- 최초 migration: `prisma/migrations/20260729050000_initial_schema/migration.sql`
+- DB 적용 이력: `prisma/migrations/` (중복 초기 SQL은 관리하지 않음)
 - 실제 운영 변경은 migration을 사용하고 초기화 SQL은 동일 구조의 참조본으로 유지한다.
 
 ---
@@ -494,7 +494,7 @@ ChurnThresholdConfig (단일 설정 행)
 
 ### 구현 현황 (요약)
 
-**됨:** UI 뼈대(네이버 톤, 역할 화면·더미), Member/Admin 셸, GUEST 소개, 권한 모달, Prisma 스키마, Auth.js·가드·원장 초기 설정·`/api/me`, Docker Compose.
+**됨:** 전 역할 화면, Member/Admin 셸, GUEST 소개·문의, 권한 관리, Prisma 스키마·마이그레이션, Auth.js·역할 가드, 최초 원장 설정, `/api/me`, 출결·성적·리포트·쪽지·청구 흐름.
 
 **미완:** 연결/출결/성적/AI/청구/쪽지/푸시 실연동, 권한 DB 저장, 이양 UI, 퇴원 배치, PWA·약관·운영 키·Lightsail.
 
@@ -502,7 +502,7 @@ ChurnThresholdConfig (단일 설정 행)
 
 ```
 1. DB up → migrate
-2. AUTH_SECRET · Google · PREVIEW_MODE
+2. DATABASE_URL · DIRECT_URL · AUTH_SECRET · Google OAuth
 3. npm run dev
 4. Google 로그인(GUEST) → 원장 초기 설정(`bootstrap:director`) → 재로그인
 5. 권한·학부모↔자녀 연결 → 일상 운영

@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { formatKstTime, getKstWeekRange } from "@/lib/date-kst";
 import ParentTimetableScreen from "./ParentTimetableScreen";
@@ -82,9 +81,7 @@ function parseRecurringSchedule(schedule: unknown) {
 }
 
 export default async function ParentTimetablePage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "PARENT") redirect("/post-login");
+    const session = await requireRole("PARENT");
 
     const { startOfToday, startOfWeek, endOfWeek } = getKstWeekRange();
 
@@ -130,78 +127,89 @@ export default async function ParentTimetablePage() {
         },
     });
 
-    const children: ParentTimetableChild[] = await Promise.all(
-        links.map(async ({ student }) => {
-            const classIds = student.enrollments.map((e) => e.class.id);
-
-            const sessions =
-                classIds.length === 0
-                    ? []
-                    : await prisma.classSession.findMany({
-                          where: {
-                              classId: { in: classIds },
-                              startsAt: { gte: startOfWeek, lt: endOfWeek },
-                              status: { in: ["SCHEDULED", "COMPLETED"] },
-                          },
-                          orderBy: { startsAt: "asc" },
+    const classIds = [
+        ...new Set(
+            links.flatMap(({ student }) =>
+                student.enrollments.map((enrollment) => enrollment.class.id),
+            ),
+        ),
+    ];
+    const allSessions =
+        classIds.length === 0
+            ? []
+            : await prisma.classSession.findMany({
+                  where: {
+                      classId: { in: classIds },
+                      startsAt: { gte: startOfWeek, lt: endOfWeek },
+                      status: { in: ["SCHEDULED", "COMPLETED"] },
+                  },
+                  orderBy: { startsAt: "asc" },
+                  select: {
+                      id: true,
+                      classId: true,
+                      startsAt: true,
+                      endsAt: true,
+                      classroom: true,
+                      status: true,
+                      class: {
                           select: {
-                              id: true,
-                              startsAt: true,
-                              endsAt: true,
-                              classroom: true,
-                              status: true,
-                              class: {
-                                  select: {
-                                      name: true,
-                                      subject: true,
-                                      teacher: { select: { name: true } },
-                                  },
-                              },
+                              name: true,
+                              subject: true,
+                              teacher: { select: { name: true } },
                           },
-                      });
-
-            const recurring = student.enrollments.flatMap((enrollment) => {
-                const slots = parseRecurringSchedule(enrollment.class.schedule);
-                return slots.map((slot) => ({
-                    classId: enrollment.class.id,
-                    className: enrollment.class.name,
-                    subject: enrollment.class.subject,
-                    teacherName: enrollment.class.teacher?.name ?? null,
-                    ...slot,
-                }));
-            });
-
-            return {
-                id: student.id,
-                name: student.name,
-                schoolName: student.schoolName,
-                grade: student.grade,
-                classes: student.enrollments.map((e) => ({
-                    id: e.class.id,
-                    name: e.class.name,
-                    subject: e.class.subject,
-                    teacherName: e.class.teacher?.name ?? null,
-                })),
-                sessions: sessions.map((s) => ({
-                    id: s.id,
-                    className: s.class.name,
-                    subject: s.class.subject,
-                    teacherName: s.class.teacher?.name ?? null,
-                    classroom: s.classroom,
-                    dayKey: toWeekDayKey(s.startsAt),
-                    timeLabel: `${formatKstTime(s.startsAt)}~${formatKstTime(s.endsAt)}`,
-                    startsAt: s.startsAt.toISOString(),
-                    endsAt: s.endsAt.toISOString(),
-                    isToday:
-                        s.startsAt >= startOfToday &&
-                        s.startsAt <
-                            new Date(startOfToday.getTime() + 86400000),
-                    status: s.status,
-                })),
-                recurring,
-            };
-        }),
+                      },
+                  },
+              });
+    const sessionsByClass = Map.groupBy(
+        allSessions,
+        (classSession) => classSession.classId,
     );
+
+    const children: ParentTimetableChild[] = links.map(({ student }) => {
+        const sessions = student.enrollments.flatMap(
+            (enrollment) => sessionsByClass.get(enrollment.class.id) ?? [],
+        );
+
+        const recurring = student.enrollments.flatMap((enrollment) => {
+            const slots = parseRecurringSchedule(enrollment.class.schedule);
+            return slots.map((slot) => ({
+                classId: enrollment.class.id,
+                className: enrollment.class.name,
+                subject: enrollment.class.subject,
+                teacherName: enrollment.class.teacher?.name ?? null,
+                ...slot,
+            }));
+        });
+
+        return {
+            id: student.id,
+            name: student.name,
+            schoolName: student.schoolName,
+            grade: student.grade,
+            classes: student.enrollments.map((e) => ({
+                id: e.class.id,
+                name: e.class.name,
+                subject: e.class.subject,
+                teacherName: e.class.teacher?.name ?? null,
+            })),
+            sessions: sessions.map((s) => ({
+                id: s.id,
+                className: s.class.name,
+                subject: s.class.subject,
+                teacherName: s.class.teacher?.name ?? null,
+                classroom: s.classroom,
+                dayKey: toWeekDayKey(s.startsAt),
+                timeLabel: `${formatKstTime(s.startsAt)}~${formatKstTime(s.endsAt)}`,
+                startsAt: s.startsAt.toISOString(),
+                endsAt: s.endsAt.toISOString(),
+                isToday:
+                    s.startsAt >= startOfToday &&
+                    s.startsAt < new Date(startOfToday.getTime() + 86400000),
+                status: s.status,
+            })),
+            recurring,
+        };
+    });
 
     return (
         <ParentTimetableScreen childList={children} weekDays={weekDays} />

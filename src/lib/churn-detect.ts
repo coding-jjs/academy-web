@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getKstDayRange } from "@/lib/date-kst";
+import type { Prisma } from "@/generate/prisma/client";
 
 export type DetectedSignal = {
     type:
@@ -9,7 +10,7 @@ export type DetectedSignal = {
         | "UNPAID_DAYS";
     value: number | null;
     threshold: number | null;
-    details: Record<string, unknown>;
+    details: Prisma.InputJsonValue;
 };
 
 type Threshold = {

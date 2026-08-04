@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { formatKstTime, getKstWeekRange } from "@/lib/date-kst";
 import StudentTimetableScreen from "./StudentTimetableScreen";
@@ -82,9 +81,7 @@ function parseRecurringSchedule(schedule: unknown) {
 }
 
 export default async function StudentTimetablePage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "STUDENT") redirect("/post-login");
+    const session = await requireRole("STUDENT");
 
     const { startOfToday, startOfWeek, endOfWeek } = getKstWeekRange();
 

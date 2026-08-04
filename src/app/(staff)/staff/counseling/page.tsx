@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import {
     enrollmentScopeWhere,
@@ -17,11 +16,7 @@ import type {
 export const dynamic = "force-dynamic";
 
 export default async function StaffCounselingPage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "TEACHER" && session.user.role !== "STAFF") {
-        redirect("/post-login");
-    }
+    const session = await requireRole("STAFF", "TEACHER");
 
     const scope = await getStaffScope(session.user.id);
     const isStaff = session.user.role === "STAFF";

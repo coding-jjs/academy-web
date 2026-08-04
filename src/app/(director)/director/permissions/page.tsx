@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { resolvePermissions } from "@/lib/permissions";
 import PermissionManagementScreen from "./PermissionManagementScreen";
@@ -8,9 +7,7 @@ import type { PermissionMember } from "./PermissionManagementScreen";
 export const dynamic = "force-dynamic";
 
 export default async function DirectorPermissionsPage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "DIRECTOR") redirect("/post-login");
+    await requireRole("DIRECTOR");
 
     const users = await prisma.user.findMany({
         where: {

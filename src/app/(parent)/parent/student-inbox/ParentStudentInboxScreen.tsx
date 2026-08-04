@@ -77,7 +77,7 @@ export default function ParentStudentInboxScreen({
         childList[0] ??
         null;
 
-    const messages = child?.messages ?? [];
+    const messages = useMemo(() => child?.messages ?? [], [child]);
     const activeMessage = useMemo(() => {
         return (
             messages.find((m) => m.recipientId === activeMessageId) ??

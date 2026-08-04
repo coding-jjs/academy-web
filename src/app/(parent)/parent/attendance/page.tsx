@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import ParentAttendanceScreen from "@/app/(parent)/parent/attendance/ParentAttendanceScreen";
 import type {
@@ -38,9 +37,7 @@ function formatTime(date: Date) {
 }
 
 export default async function ParentAttendancePage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "PARENT") redirect("/post-login");
+    const session = await requireRole("PARENT");
 
     const { startOfToday, endOfToday, startOfMonth, endOfWeek } =
         getKstRanges();
@@ -72,126 +69,158 @@ export default async function ParentAttendancePage() {
         },
     });
 
-    const children: ParentAttendanceChild[] = await Promise.all(
-        links.map(async ({ student }) => {
-            const classIds = student.enrollments.map((e) => e.class.id);
-            const enrollment = student.enrollments[0];
+    const studentIds = links.map(({ student }) => student.id);
+    const classIds = [
+        ...new Set(
+            links.flatMap(({ student }) =>
+                student.enrollments.map((enrollment) => enrollment.class.id),
+            ),
+        ),
+    ];
 
-            const [sessions, monthAttendance] = await Promise.all([
-                classIds.length === 0
-                    ? Promise.resolve([])
-                    : prisma.classSession.findMany({
-                          where: {
-                              classId: { in: classIds },
-                              startsAt: { gte: startOfToday, lt: endOfWeek },
-                              status: { in: ["SCHEDULED", "COMPLETED"] },
+    const [allSessions, allMonthAttendance] = await Promise.all([
+        classIds.length === 0
+            ? Promise.resolve([])
+            : prisma.classSession.findMany({
+                  where: {
+                      classId: { in: classIds },
+                      startsAt: { gte: startOfToday, lt: endOfWeek },
+                      status: { in: ["SCHEDULED", "COMPLETED"] },
+                  },
+                  orderBy: { startsAt: "asc" },
+                  select: {
+                      id: true,
+                      classId: true,
+                      startsAt: true,
+                      endsAt: true,
+                      classroom: true,
+                      class: {
+                          select: {
+                              name: true,
+                              subject: true,
+                              teacher: { select: { name: true } },
                           },
-                          orderBy: { startsAt: "asc" },
+                      },
+                      attendance: {
+                          where: { studentId: { in: studentIds } },
+                          select: {
+                              studentId: true,
+                              status: true,
+                              checkInAt: true,
+                              checkOutAt: true,
+                          },
+                      },
+                      absenceRequests: {
+                          where: {
+                              studentId: { in: studentIds },
+                              cancelledAt: null,
+                          },
                           select: {
                               id: true,
-                              startsAt: true,
-                              endsAt: true,
-                              classroom: true,
-                              class: {
-                                  select: {
-                                      name: true,
-                                      subject: true,
-                                      teacher: { select: { name: true } },
-                                  },
-                              },
-                              attendance: {
-                                  where: { studentId: student.id },
-                                  take: 1,
-                                  select: {
-                                      status: true,
-                                      checkInAt: true,
-                                      checkOutAt: true,
-                                  },
-                              },
-                              absenceRequests: {
-                                  where: {
-                                      studentId: student.id,
-                                      cancelledAt: null,
-                                  },
-                                  take: 1,
-                                  select: {
-                                      id: true,
-                                      reason: true,
-                                      requestedAt: true,
-                                  },
-                              },
+                              studentId: true,
+                              reason: true,
+                              requestedAt: true,
                           },
-                      }),
-                prisma.attendanceRecord.findMany({
-                    where: {
-                        studentId: student.id,
-                        session: {
-                            startsAt: { gte: startOfMonth, lt: endOfToday },
-                        },
-                    },
-                    select: { status: true },
-                }),
-            ]);
+                      },
+                  },
+              }),
+        prisma.attendanceRecord.findMany({
+            where: {
+                studentId: { in: studentIds },
+                session: {
+                    startsAt: { gte: startOfMonth, lt: endOfToday },
+                },
+            },
+            select: { studentId: true, status: true },
+        }),
+    ]);
+    const monthAttendanceByStudent = Map.groupBy(
+        allMonthAttendance,
+        (row) => row.studentId,
+    );
 
-            const counts = { present: 0, late: 0, absent: 0, earlyLeave: 0 };
-            for (const row of monthAttendance) {
-                if (row.status === "PRESENT") counts.present += 1;
-                else if (row.status === "LATE") counts.late += 1;
-                else if (row.status === "EARLY_LEAVE") counts.earlyLeave += 1;
-                else counts.absent += 1;
-            }
+    const children: ParentAttendanceChild[] = links.map(({ student }) => {
+        const enrolledClassIds = new Set(
+            student.enrollments.map((enrollment) => enrollment.class.id),
+        );
+        const sessions = allSessions.filter((classSession) =>
+            enrolledClassIds.has(classSession.classId),
+        );
+        const enrollment = student.enrollments[0];
+        const monthAttendance =
+            monthAttendanceByStudent.get(student.id) ?? [];
 
-            const today = sessions.find(
-                (s) => s.startsAt >= startOfToday && s.startsAt < endOfToday,
-            );
+        const counts = { present: 0, late: 0, absent: 0, earlyLeave: 0 };
+        for (const row of monthAttendance) {
+            if (row.status === "PRESENT") counts.present += 1;
+            else if (row.status === "LATE") counts.late += 1;
+            else if (row.status === "EARLY_LEAVE") counts.earlyLeave += 1;
+            else counts.absent += 1;
+        }
 
-            return {
-                id: student.id,
-                name: student.name,
-                schoolName: student.schoolName,
-                grade: student.grade,
-                className: enrollment?.class.name ?? null,
-                teacherName: enrollment?.class.teacher?.name ?? null,
-                monthCounts: counts,
-                todayHighlight: today
-                    ? {
-                          className: today.class.name,
-                          timeLabel: `${formatTime(today.startsAt)}~${formatTime(today.endsAt)}`,
-                          classroom: today.classroom,
-                          status: (today.attendance[0]?.status as
-                              | AttendanceStatus
-                              | null) ?? null,
-                      }
-                    : null,
-                sessions: sessions.map((s) => ({
-                    id: s.id,
-                    className: s.class.name,
-                    subject: s.class.subject,
-                    teacherName: s.class.teacher?.name ?? null,
-                    classroom: s.classroom,
-                    startsAt: s.startsAt.toISOString(),
-                    endsAt: s.endsAt.toISOString(),
-                    timeLabel: `${formatTime(s.startsAt)}~${formatTime(s.endsAt)}`,
+        const today = sessions.find(
+            (classSession) =>
+                classSession.startsAt >= startOfToday &&
+                classSession.startsAt < endOfToday,
+        );
+        const todayAttendance = today?.attendance.find(
+            (row) => row.studentId === student.id,
+        );
+
+        return {
+            id: student.id,
+            name: student.name,
+            schoolName: student.schoolName,
+            grade: student.grade,
+            className: enrollment?.class.name ?? null,
+            teacherName: enrollment?.class.teacher?.name ?? null,
+            monthCounts: counts,
+            todayHighlight: today
+                ? {
+                      className: today.class.name,
+                      timeLabel: `${formatTime(today.startsAt)}~${formatTime(today.endsAt)}`,
+                      classroom: today.classroom,
+                      status:
+                          (todayAttendance?.status as AttendanceStatus | null) ??
+                          null,
+                  }
+                : null,
+            sessions: sessions.map((classSession) => {
+                const attendance = classSession.attendance.find(
+                    (row) => row.studentId === student.id,
+                );
+                const absenceRequest = classSession.absenceRequests.find(
+                    (row) => row.studentId === student.id,
+                );
+
+                return {
+                    id: classSession.id,
+                    className: classSession.class.name,
+                    subject: classSession.class.subject,
+                    teacherName: classSession.class.teacher?.name ?? null,
+                    classroom: classSession.classroom,
+                    startsAt: classSession.startsAt.toISOString(),
+                    endsAt: classSession.endsAt.toISOString(),
+                    timeLabel: `${formatTime(classSession.startsAt)}~${formatTime(classSession.endsAt)}`,
                     isToday:
-                        s.startsAt >= startOfToday && s.startsAt < endOfToday,
-                    attendanceStatus: (s.attendance[0]?.status as
-                        | AttendanceStatus
-                        | null) ?? null,
-                    checkInAt: s.attendance[0]?.checkInAt?.toISOString() ?? null,
-                    checkOutAt:
-                        s.attendance[0]?.checkOutAt?.toISOString() ?? null,
-                    absenceRequest: s.absenceRequests[0]
+                        classSession.startsAt >= startOfToday &&
+                        classSession.startsAt < endOfToday,
+                    attendanceStatus:
+                        (attendance?.status as AttendanceStatus | null) ?? null,
+                    checkInAt: attendance?.checkInAt?.toISOString() ?? null,
+                    checkOutAt: attendance?.checkOutAt?.toISOString() ?? null,
+                    absenceRequest: absenceRequest
                         ? {
-                              id: s.absenceRequests[0].id,
-                              reason: s.absenceRequests[0].reason,
+                              id: absenceRequest.id,
+                              reason: absenceRequest.reason,
                               requestedAt:
-                                  s.absenceRequests[0].requestedAt.toISOString(),
+                                  absenceRequest.requestedAt.toISOString(),
                           }
                         : null,
-                })),
-            };
-        }),
-    );
+                };
+            }),
+        };
+    });
 
     return <ParentAttendanceScreen childList={children} />;
 }

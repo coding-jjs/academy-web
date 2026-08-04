@@ -1,8 +1,7 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import MessagesScreen from "@/features/messages/MessagesScreen";
-import type { MessageListItem } from "@/lib/message-actions";
+import type { MessageListItem } from "@/features/messages/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -36,9 +35,7 @@ function mapRow(row: {
 }
 
 export default async function DirectorMessagesPage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "DIRECTOR") redirect("/post-login");
+    await requireRole("DIRECTOR");
 
     const [students, classes, pendingRaw, sentRaw] = await Promise.all([
         prisma.student.findMany({

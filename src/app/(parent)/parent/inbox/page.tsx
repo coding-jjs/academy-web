@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import ParentInboxScreen from "@/app/(parent)/parent/inbox/ParentInboxScreen";
 import type { ParentInboxMessage } from "@/app/(parent)/parent/inbox/ParentInboxScreen";
@@ -7,9 +6,7 @@ import type { ParentInboxMessage } from "@/app/(parent)/parent/inbox/ParentInbox
 export const dynamic = "force-dynamic";
 
 export default async function ParentInboxPage() {
-    const session = await auth();
-    if (!session?.user?.id) redirect("/login");
-    if (session.user.role !== "PARENT") redirect("/post-login");
+    const session = await requireRole("PARENT");
 
     const recipients = await prisma.messageRecipient.findMany({
         where: { recipientUserId: session.user.id },

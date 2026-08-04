@@ -1,6 +1,6 @@
 # A학원 SaaS · Next.js
 
-학원 SaaS 폴더 구조 V3를 기준으로 구성한 단일 Next.js 풀스택 프로젝트입니다.
+원장, 교사·직원, 학부모, 학생, 게스트가 사용하는 단일 Next.js 풀스택 프로젝트입니다.
 
 ## 실행
 
@@ -23,12 +23,12 @@ npm run dev
 
 ## 주요 기능
 
-- `/director`, `/staff`, `/parent`, `/student`, `/guest` 역할별 라우트
+- `/director`, `/staff`, `/parent`, `/student`, `/guest` 역할별 접근 제어 라우트
 - 교직원용 `AdminShell`, 회원용 `MemberShell`
 - Auth.js 기반 Google OAuth 로그인
 - Google 인증 후 추가 정보를 입력하는 회원가입 흐름
 - Apple 디자인 토큰 기반의 반응형 UI
-- PostgreSQL 초기 SQL 및 Prisma 연결 스키마
+- Prisma 마이그레이션으로 관리하는 PostgreSQL 스키마
 - `/preview`에서 기존 전체 역할 와이어프레임 제공
 
 ## 주요 구조
@@ -36,15 +36,15 @@ npm run dev
 ```text
 prisma/                     PostgreSQL·Prisma 스키마
 scripts/                    운영 스크립트
-src/app/(auth)/             로그인·회원가입·차단
+src/app/(auth)/             로그인·회원가입·로그인 후 역할 분기
 src/app/(director)/         원장 라우트
 src/app/(staff)/            교직원 라우트
 src/app/(parent)/           학부모 라우트
 src/app/(student)/          학생 라우트
 src/app/(guest)/            게스트 라우트
 src/components/layout/      AdminShell·MemberShell
-src/features/               화면 단위 기능
-src/lib/                    인증·DB·권한·미리보기 데이터
+src/features/               여러 역할이 공유하는 도메인 화면·액션
+src/lib/                    인증·DB·권한·공통 서버 로직
 src/types/                  공통 역할·권한 타입
 ```
 
@@ -54,9 +54,25 @@ Next.js 16에서는 `middleware.ts`가 폐기되어 동일한 역할을 하는
 ## 데이터베이스
 
 ```bash
-docker compose up -d
-psql "$DATABASE_URL" -f prisma/sql/schema.sql
+npx prisma migrate dev      # 로컬 개발 DB
+npx prisma migrate deploy   # 배포 DB
 ```
 
-`prisma/schema.prisma`는 인증 및 학부모·학생 연결의 핵심 모델부터 정의되어
-있습니다. 전체 MVP 테이블 원본은 `prisma/sql/schema.sql`에 있습니다.
+`prisma/schema.prisma`가 애플리케이션의 기준 스키마이며, 변경 이력은
+`prisma/migrations`에서 관리합니다. 초기 SQL을 별도로 복제해 관리하지 않습니다.
+
+## 최초 원장 설정
+
+Google 로그인과 회원가입을 마친 GUEST 계정을 최초 원장으로 한 번만 승격합니다.
+
+```bash
+npm run bootstrap:director -- director@example.com
+```
+
+`BOOTSTRAP_SECRET`이 필요하며, 이미 원장이 존재하면 요청을 거부합니다.
+
+## 검사
+
+```bash
+npm run validate
+```
