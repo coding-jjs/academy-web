@@ -12,7 +12,7 @@ import { userHasPermission } from "@/lib/permission-guard";
 import { getStaffScope, studentScopeWhere } from "@/lib/staff-scope";
 
 type ActionResult =
-    | { ok: true; reportId?: string; message?: string }
+    | { ok: true; reportId?: string; content?: string; message?: string }
     | { ok: false; message: string };
 
 type StaffSession = {
@@ -343,6 +343,7 @@ export async function regenerateDraftWithAi(input: {
         return {
             ok: true,
             reportId: report.id,
+            content: draft.content,
             message: "AI 초안을 생성했습니다.",
         };
     }
@@ -350,6 +351,7 @@ export async function regenerateDraftWithAi(input: {
     return {
         ok: true,
         reportId: report.id,
+        content: draft.content,
         message: draft.fallbackReason
             ? `템플릿 초안을 사용했습니다. (${draft.fallbackReason})`
             : "템플릿 초안을 사용했습니다.",

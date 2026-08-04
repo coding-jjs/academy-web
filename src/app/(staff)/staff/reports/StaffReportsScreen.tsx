@@ -238,6 +238,9 @@ export default function StaffReportsScreen({
                 return;
             }
 
+            if (result.content) {
+                setContent(result.content);
+            }
             setFeedback(result.message ?? "AI 초안을 생성했습니다.");
             router.refresh();
         });

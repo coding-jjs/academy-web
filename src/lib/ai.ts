@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import "server-only";
 
 const GEMINI_MODEL =
-    process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash";
+    process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
 
 export class AiUnavailableError extends Error {
     constructor(message: string) {
