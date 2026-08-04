@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
+import { getKstDayRange } from "@/lib/date-kst";
 import { prisma } from "@/lib/db";
 import { userHasPermission } from "@/lib/permission-guard";
 import { getStaffScope, studentScopeWhere } from "@/lib/staff-scope";
@@ -42,7 +43,12 @@ function parseDateOnly(value: string): Date | null {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return null;
     const date = new Date(`${trimmed}T00:00:00.000Z`);
     if (Number.isNaN(date.getTime())) return null;
+    if (date.toISOString().slice(0, 10) !== trimmed) return null;
     return date;
+}
+
+function isFutureKstDate(value: string) {
+    return value > getKstDayRange().day;
 }
 
 function revalidateGrades() {
@@ -136,7 +142,8 @@ export async function createGradeRecord(input: {
     const subject = String(input.subject ?? "").trim();
     const score = Number(input.score);
     const maxScore = Number(input.maxScore);
-    const assessedAt = parseDateOnly(input.assessedAt);
+    const assessedAtValue = String(input.assessedAt ?? "").trim();
+    const assessedAt = parseDateOnly(assessedAtValue);
     const classId = input.classId?.trim() || null;
 
     if (!studentId) return { ok: false, message: "학생을 선택해 주세요." };
@@ -157,6 +164,12 @@ export async function createGradeRecord(input: {
     }
     if (!assessedAt) {
         return { ok: false, message: "평가일이 올바르지 않습니다." };
+    }
+    if (isFutureKstDate(assessedAtValue)) {
+        return {
+            ok: false,
+            message: "평가일은 오늘 이후로 지정할 수 없습니다.",
+        };
     }
 
     const accessError = await assertCanWriteStudent(actor, studentId);
@@ -207,7 +220,8 @@ export async function updateGradeRecord(input: {
     const subject = String(input.subject ?? "").trim();
     const score = Number(input.score);
     const maxScore = Number(input.maxScore);
-    const assessedAt = parseDateOnly(input.assessedAt);
+    const assessedAtValue = String(input.assessedAt ?? "").trim();
+    const assessedAt = parseDateOnly(assessedAtValue);
 
     if (!gradeId) return { ok: false, message: "성적 ID가 없습니다." };
     if (!title || title.length > 120) {
@@ -227,6 +241,12 @@ export async function updateGradeRecord(input: {
     }
     if (!assessedAt) {
         return { ok: false, message: "평가일이 올바르지 않습니다." };
+    }
+    if (isFutureKstDate(assessedAtValue)) {
+        return {
+            ok: false,
+            message: "평가일은 오늘 이후로 지정할 수 없습니다.",
+        };
     }
 
     const existing = await prisma.gradeRecord.findUnique({

@@ -11,6 +11,7 @@
         "validate": "npm run lint && npm run typecheck && prisma validate && next build",
         "bootstrap:director": "node --env-file=.env.local scripts/bootstrap-director.mjs",
         "db:reset:keep-director": "node --env-file=.env.local scripts/reset-data-keep-director.mjs",
+        "db:seed:test": "node --env-file=.env.local scripts/seed-test-data.mjs",
         "postinstall": "prisma generate"
     },
     "dependencies": {

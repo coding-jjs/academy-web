@@ -116,6 +116,10 @@ export default function StaffStudentsScreen({
         createLearningRecord,
         initialState,
     );
+    const writableClassIds = useMemo(
+        () => new Set(classes.map((classItem) => classItem.id)),
+        [classes],
+    );
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -217,13 +221,22 @@ export default function StaffStudentsScreen({
                                             }}
                                         >
                                             <strong>{s.name}</strong>
-                                            <span>
-                                                {s.classes[0]?.name ??
-                                                    "반 없음"}
-                                                {s.grade
-                                                    ? ` · ${s.grade}`
-                                                    : ""}
-                                            </span>
+                                            <div className={styles.classChips}>
+                                                {s.classes.length > 0 ? (
+                                                    s.classes.map((classItem) => (
+                                                        <span key={classItem.id}>
+                                                            {classItem.name}
+                                                        </span>
+                                                    ))
+                                                ) : (
+                                                    <span>반 없음</span>
+                                                )}
+                                            </div>
+                                            {s.grade && (
+                                                <span className={styles.studentGrade}>
+                                                    {s.grade}
+                                                </span>
+                                            )}
                                             <div className={styles.itemMeta}>
                                                 <StatusChip
                                                     tone={
@@ -342,14 +355,20 @@ export default function StaffStudentsScreen({
                                                 defaultValue=""
                                             >
                                                 <option value="">없음</option>
-                                                {active.classes.map((c) => (
-                                                    <option
-                                                        key={c.id}
-                                                        value={c.id}
-                                                    >
-                                                        {c.name}
-                                                    </option>
-                                                ))}
+                                                {active.classes
+                                                    .filter((activeClass) =>
+                                                        writableClassIds.has(
+                                                            activeClass.id,
+                                                        ),
+                                                    )
+                                                    .map((c) => (
+                                                        <option
+                                                            key={c.id}
+                                                            value={c.id}
+                                                        >
+                                                            {c.name}
+                                                        </option>
+                                                    ))}
                                             </select>
                                         </label>
                                         <label className={styles.field}>

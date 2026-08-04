@@ -63,7 +63,13 @@ const steps = [
     ["상담", "기록을 바탕으로 다음 성장을 함께 계획합니다."],
 ];
 
-export default function HomeScreen() {
+type HomeViewer = {
+    name: string;
+    roleLabel: string;
+    dashboardHref: string;
+};
+
+export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
     const [noticeIndex, setNoticeIndex] = useState(0);
     const [bannerIndex, setBannerIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
@@ -118,12 +124,31 @@ export default function HomeScreen() {
                 </nav>
 
                 <div className={styles.authActions}>
-                    <Link href="/login" className={styles.loginButton}>
-                        로그인
-                    </Link>
-                    <Link href="/signup" className={styles.signupButton}>
-                        회원가입
-                    </Link>
+                    {viewer ? (
+                        <>
+                            <div className={styles.profileSummary} title={`${viewer.name} · ${viewer.roleLabel}`}>
+                                <span className={styles.profileAvatar} aria-hidden="true">
+                                    {viewer.name.slice(0, 1)}
+                                </span>
+                                <span className={styles.profileText}>
+                                    <strong>{viewer.name}</strong>
+                                    <small>{viewer.roleLabel}</small>
+                                </span>
+                            </div>
+                            <Link href={viewer.dashboardHref} className={styles.dashboardButton}>
+                                대시보드 <span aria-hidden="true">→</span>
+                            </Link>
+                        </>
+                    ) : (
+                        <>
+                            <Link href="/login" className={styles.loginButton}>
+                                로그인
+                            </Link>
+                            <Link href="/signup" className={styles.signupButton}>
+                                회원가입
+                            </Link>
+                        </>
+                    )}
                 </div>
             </header>
 

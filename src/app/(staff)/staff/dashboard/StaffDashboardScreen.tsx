@@ -53,9 +53,6 @@ export default function StaffDashboardScreen({
                         {staffName}님, 오늘 담당 수업과 학생 현황을 확인하세요.
                     </p>
                 </div>
-                <Link href="/staff/attendance" className={styles.primaryBtn}>
-                    출석 체크
-                </Link>
             </header>
 
             <div className={styles.metrics}>
@@ -83,16 +80,16 @@ export default function StaffDashboardScreen({
                     <p>작성·승인대기·반려</p>
                 </article>
                 <article>
-                    <span>{role === "TEACHER" ? "담당 학생" : "상담 문의"}</span>
+                    <span>
+                        {role === "TEACHER" ? "담당 학생" : "상담 문의"}
+                    </span>
                     <strong>
                         {role === "TEACHER"
                             ? `${metrics.myStudentCount}명`
                             : `${metrics.openInquiries}건`}
                     </strong>
                     <p>
-                        {role === "TEACHER"
-                            ? "재원 학생"
-                            : "신규·진행중 문의"}
+                        {role === "TEACHER" ? "재원 학생" : "신규·진행중 문의"}
                     </p>
                 </article>
             </div>

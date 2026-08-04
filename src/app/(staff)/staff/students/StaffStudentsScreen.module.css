@@ -136,6 +136,35 @@
     color: #6e6e73;
     font-size: 12px;
   }
+
+  .classChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .item .classChips span,
+  .itemActive .classChips span {
+    display: inline-flex;
+    min-height: 24px;
+    align-items: center;
+    padding: 0 8px;
+    border-radius: 999px;
+    color: #515154;
+    background: #f2f2f7;
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  .itemActive .classChips span {
+    color: #0058b0;
+    background: #dcecff;
+  }
+
+  .studentGrade {
+    display: block;
+    margin-top: 6px;
+  }
   
   .itemMeta {
     display: flex;

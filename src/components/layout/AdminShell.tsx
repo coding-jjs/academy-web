@@ -24,7 +24,7 @@ export default async function AdminShell({
                     <span>A</span>
                     <div>
                         <strong>A학원</strong>
-                        <small>{roleLabel} 관리</small>
+                        <small>{roleLabel} 페이지</small>
                     </div>
                 </Link>
                 <div className={styles.headerTools}>

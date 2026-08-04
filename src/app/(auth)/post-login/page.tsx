@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { getRoleHomePath } from "@/lib/role-routes";
 
 export default async function PostLoginPage() {
     const session = await auth();
@@ -9,20 +10,5 @@ export default async function PostLoginPage() {
         redirect("/login");
     }
 
-    // 가입 완료 사용자는 역할별 화면으로 이동
-    switch (session.user.role) {
-        case "DIRECTOR":
-            redirect("/director/dashboard");
-        case "STAFF":
-        case "TEACHER":
-            redirect("/staff/dashboard");
-        case "PARENT":
-            redirect("/parent/dashboard");
-        case "STUDENT":
-            redirect("/student/dashboard");
-        case "GUEST":
-            redirect("/");
-        default:
-            redirect("/");
-    }
+    redirect(getRoleHomePath(session.user.role));
 }

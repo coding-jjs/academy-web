@@ -54,10 +54,6 @@ const wrongMeta: Record<
     MASTERED: { label: "완료", tone: "success" },
 };
 
-function todayInput() {
-    return new Date().toISOString().slice(0, 10);
-}
-
 function formatDate(iso: string) {
     return new Intl.DateTimeFormat("ko-KR", {
         timeZone: "Asia/Seoul",
@@ -72,12 +68,14 @@ export default function GradesManagementScreen({
     grades,
     wrongNotes,
     canManage,
+    maxAssessedDate,
     deniedMessage,
 }: {
     students: GradesStudentOption[];
     grades: GradesGradeRow[];
     wrongNotes: GradesWrongRow[];
     canManage: boolean;
+    maxAssessedDate: string;
     deniedMessage?: string;
 }) {
     const router = useRouter();
@@ -104,7 +102,7 @@ export default function GradesManagementScreen({
     const [gSubject, setGSubject] = useState("수학");
     const [gScore, setGScore] = useState("80");
     const [gMax, setGMax] = useState("100");
-    const [gDate, setGDate] = useState(todayInput);
+    const [gDate, setGDate] = useState(maxAssessedDate);
 
     // wrong form
     const [editingWrongId, setEditingWrongId] = useState<string | null>(null);
@@ -129,7 +127,7 @@ export default function GradesManagementScreen({
         setGSubject("수학");
         setGScore("80");
         setGMax("100");
-        setGDate(todayInput());
+        setGDate(maxAssessedDate);
     }
 
     function fillGrade(row: GradesGradeRow) {
@@ -167,6 +165,10 @@ export default function GradesManagementScreen({
 
     function saveGrade() {
         if (!canManage || !activeStudent) return;
+        if (!gDate || gDate > maxAssessedDate) {
+            setFeedback("평가일은 오늘 이후로 지정할 수 없습니다.");
+            return;
+        }
         setFeedback(null);
         startTransition(async () => {
             const result = editingGradeId
@@ -369,6 +371,7 @@ export default function GradesManagementScreen({
                                         <input
                                             type="date"
                                             value={gDate}
+                                            max={maxAssessedDate}
                                             onChange={(e) =>
                                                 setGDate(e.target.value)
                                             }

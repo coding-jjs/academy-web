@@ -3,7 +3,6 @@ import { prisma } from "@/lib/db";
 import { getKstRecentRange } from "@/lib/date-kst";
 import {
     classScopeWhere,
-    enrollmentScopeWhere,
     getStaffScope,
     studentScopeWhere,
 } from "@/lib/staff-scope";
@@ -37,7 +36,8 @@ export default async function StaffStudentsPage() {
                 status: true,
                 user: { select: { id: true, email: true } },
                 enrollments: {
-                    where: enrollmentScopeWhere(scope),
+                    where: { status: "ACTIVE", endedAt: null },
+                    orderBy: { class: { name: "asc" } },
                     select: {
                         class: {
                             select: {

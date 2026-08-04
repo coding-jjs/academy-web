@@ -89,10 +89,12 @@
     justify-self: end;
     align-items: center;
     gap: 8px;
+    min-width: 0;
 }
 
 .loginButton,
-.signupButton {
+.signupButton,
+.dashboardButton {
     display: inline-flex;
     min-height: 38px;
     align-items: center;
@@ -117,14 +119,67 @@
     background: #0071e3;
 }
 
+.profileSummary {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 4px 3px 3px;
+}
+
+.profileAvatar {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 50%;
+    color: #0066cc;
+    background: #edf5ff;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.profileText {
+    display: grid;
+    min-width: 0;
+    line-height: 1.15;
+}
+
+.profileText strong {
+    overflow: hidden;
+    max-width: 112px;
+    font-size: 12px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profileText small {
+    margin-top: 3px;
+    color: #86868b;
+    font-size: 9px;
+    font-weight: 650;
+}
+
+.dashboardButton {
+    gap: 12px;
+    color: #fff;
+    background: #0071e3;
+}
+
 .loginButton:hover {
     background: #e2efff;
 }
 .signupButton:hover {
     background: #0068d1;
 }
+.dashboardButton:hover {
+    background: #0068d1;
+}
 .loginButton:active,
-.signupButton:active {
+.signupButton:active,
+.dashboardButton:active {
     transform: scale(0.97);
 }
 
@@ -748,10 +803,21 @@
         gap: 6px;
     }
     .loginButton,
-    .signupButton {
+    .signupButton,
+    .dashboardButton {
         min-height: 34px;
         padding: 0 11px;
         font-size: 11px;
+    }
+    .profileText {
+        display: none;
+    }
+    .profileSummary {
+        padding-right: 0;
+    }
+    .profileAvatar {
+        width: 30px;
+        height: 30px;
     }
 
     .noticeInner,
@@ -889,8 +955,12 @@
 
 @media (max-width: 390px) {
     .loginButton,
-    .signupButton {
+    .signupButton,
+    .dashboardButton {
         padding: 0 9px;
+    }
+    .dashboardButton span {
+        display: none;
     }
     .hero h1 {
         font-size: 35px;

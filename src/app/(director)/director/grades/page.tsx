@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/auth-guard";
+import { getKstDayRange } from "@/lib/date-kst";
 import { prisma } from "@/lib/db";
 import GradesManagementScreen from "@/features/grades/GradesManagementScreen";
 import type {
@@ -12,6 +13,7 @@ export const dynamic = "force-dynamic";
 
 export default async function DirectorGradesPage() {
     await requireRole("DIRECTOR");
+    const { day: todayKst } = getKstDayRange();
 
     const [studentsRaw, gradesRaw, wrongsRaw] = await Promise.all([
         prisma.student.findMany({
@@ -101,6 +103,7 @@ export default async function DirectorGradesPage() {
             grades={grades}
             wrongNotes={wrongNotes}
             canManage
+            maxAssessedDate={todayKst}
         />
     );
 }

@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/auth-guard";
+import { getKstDayRange } from "@/lib/date-kst";
 import { prisma } from "@/lib/db";
 import { userHasPermission } from "@/lib/permission-guard";
 import { getStaffScope, studentScopeWhere } from "@/lib/staff-scope";
@@ -14,6 +15,7 @@ export const dynamic = "force-dynamic";
 
 export default async function StaffGradesPage() {
     const session = await requireRole("STAFF", "TEACHER");
+    const { day: todayKst } = getKstDayRange();
 
     const [canOwn, canOther] = await Promise.all([
         userHasPermission(session.user.id, "ownClassAttendanceGrade"),
@@ -28,6 +30,7 @@ export default async function StaffGradesPage() {
                 grades={[]}
                 wrongNotes={[]}
                 canManage={false}
+                maxAssessedDate={todayKst}
                 deniedMessage="성적 입력 권한이 없습니다. 원장에게 권한 부여를 요청하세요."
             />
         );
@@ -129,6 +132,7 @@ export default async function StaffGradesPage() {
             grades={grades}
             wrongNotes={wrongNotes}
             canManage
+            maxAssessedDate={todayKst}
         />
     );
 }

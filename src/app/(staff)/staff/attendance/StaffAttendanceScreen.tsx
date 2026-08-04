@@ -1,15 +1,8 @@
 "use client";
 
-import {
-    useActionState,
-    useMemo,
-    useState,
-} from "react";
+import { useActionState, useMemo, useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
-import {
-    saveSessionAttendance,
-    type SaveAttendanceState,
-} from "./actions";
+import { saveSessionAttendance, type SaveAttendanceState } from "./actions";
 import styles from "./StaffAttendanceScreen.module.css";
 
 export type AttendanceStatus =
@@ -116,17 +109,19 @@ export default function StaffAttendanceScreen({
         setDraft(next);
     }
 
-    const payload = useMemo(() => {
-        if (!active) return "[]";
-        return JSON.stringify(
-            active.students
-                .filter((s) => draft[s.id])
-                .map((s) => ({
-                    studentId: s.id,
-                    status: draft[s.id],
-                })),
-        );
+    const changedRows = useMemo(() => {
+        if (!active) return [];
+        return active.students
+            .filter((student) => {
+                const nextStatus = draft[student.id];
+                return nextStatus && nextStatus !== student.status;
+            })
+            .map((student) => ({
+                studentId: student.id,
+                status: draft[student.id],
+            }));
     }, [active, draft]);
+    const payload = JSON.stringify(changedRows);
 
     const busy = pending;
 
@@ -138,9 +133,6 @@ export default function StaffAttendanceScreen({
                     <h1>출석 체크</h1>
                     <p>등원, 지각, 결석과 하원 상태를 기록합니다.</p>
                 </div>
-                <StatusChip>
-                    {role === "TEACHER" ? "담당 반" : "전체 수업"}
-                </StatusChip>
             </header>
 
             {sessions.length === 0 ? (
@@ -216,11 +208,15 @@ export default function StaffAttendanceScreen({
                                         <button
                                             type="submit"
                                             className={styles.primaryBtn}
-                                            disabled={busy}
+                                            disabled={
+                                                busy || changedRows.length === 0
+                                            }
                                         >
                                             {pending
                                                 ? "저장 중…"
-                                                : "출석 저장"}
+                                                : changedRows.length === 0
+                                                  ? "변경 없음"
+                                                  : `출석 저장 (${changedRows.length})`}
                                         </button>
                                     </form>
                                 </div>

@@ -140,53 +140,85 @@ export async function saveSessionAttendance(
         return { status: "error", message: access.message };
     }
 
-    const now = new Date();
-
-    try {
-        await prisma.$transaction(
+    const validRows = Array.from(
+        new Map(
             rows
                 .filter(
                     (row) =>
                         access.allowedStudentIds.has(row.studentId) &&
                         isStatus(row.status),
                 )
-                .map((row) => {
-                    const status = row.status as AttendanceStatus;
-                    const checkInAt =
-                        status === "PRESENT" || status === "LATE"
-                            ? now
-                            : null;
+                .map((row) => [row.studentId, row] as const),
+        ).values(),
+    ) as { studentId: string; status: AttendanceStatus }[];
 
-                    return prisma.attendanceRecord.upsert({
-                        where: {
-                            studentId_sessionId: {
-                                studentId: row.studentId,
-                                sessionId,
-                            },
-                        },
-                        create: {
+    if (validRows.length === 0) {
+        return { status: "error", message: "저장할 학생이 없습니다." };
+    }
+
+    const existingRecords = await prisma.attendanceRecord.findMany({
+        where: {
+            sessionId,
+            studentId: { in: validRows.map((row) => row.studentId) },
+        },
+        select: {
+            studentId: true,
+            status: true,
+            checkInAt: true,
+        },
+    });
+    const existingByStudent = new Map(
+        existingRecords.map((record) => [record.studentId, record]),
+    );
+    const changedRows = validRows.filter(
+        (row) => existingByStudent.get(row.studentId)?.status !== row.status,
+    );
+
+    if (changedRows.length === 0) {
+        return { status: "success", message: "변경된 출결이 없습니다." };
+    }
+
+    const now = new Date();
+
+    try {
+        await prisma.$transaction(
+            changedRows.map((row) => {
+                const existing = existingByStudent.get(row.studentId);
+                const checkInAt =
+                    row.status === "PRESENT" || row.status === "LATE"
+                        ? existing?.checkInAt ?? now
+                        : null;
+
+                return prisma.attendanceRecord.upsert({
+                    where: {
+                        studentId_sessionId: {
                             studentId: row.studentId,
                             sessionId,
-                            status,
-                            checkInAt,
-                            updatedBy: session.user.id,
                         },
-                        update: {
-                            status,
-                            checkInAt:
-                                status === "PRESENT" || status === "LATE"
-                                    ? now
-                                    : null,
-                            checkOutAt:
-                                status === "EARLY_LEAVE" ? now : null,
-                            updatedBy: session.user.id,
-                        },
-                    });
-                }),
+                    },
+                    create: {
+                        studentId: row.studentId,
+                        sessionId,
+                        status: row.status,
+                        checkInAt,
+                        updatedBy: session.user.id,
+                    },
+                    update: {
+                        status: row.status,
+                        checkInAt,
+                        checkOutAt:
+                            row.status === "EARLY_LEAVE" ? now : null,
+                        updatedBy: session.user.id,
+                    },
+                });
+            }),
         );
 
         revalidatePath("/staff/attendance");
-        return { status: "success", message: "출결이 저장되었습니다." };
+        return {
+            status: "success",
+            message: `${changedRows.length}명의 출결이 저장되었습니다.`,
+        };
     } catch {
         return { status: "error", message: "출결 저장에 실패했습니다." };
     }
