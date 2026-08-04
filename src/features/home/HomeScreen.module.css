@@ -109,6 +109,32 @@
         background 140ms ease;
 }
 
+.logoutButton {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 13px;
+    border: 1px solid #d2d2d7;
+    border-radius: 11px;
+    color: #515154;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.logoutButton:hover {
+    color: #c9342d;
+    border-color: #f0b8b4;
+    background: #fff5f4;
+}
+
+.logoutButton:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
 .loginButton {
     color: #0066cc;
     background: #edf5ff;
@@ -950,6 +976,11 @@
         grid-template-columns: 1fr;
         min-height: auto;
         gap: 22px;
+    }
+    .logoutButton {
+        min-height: 34px;
+        padding: 0 9px;
+        font-size: 11px;
     }
 }
 

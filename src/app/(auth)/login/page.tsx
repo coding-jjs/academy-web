@@ -1,8 +1,43 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { AuthError } from "next-auth";
 import { signIn } from "@/lib/auth";
+import {
+    DEV_LOGIN_PROVIDER_ID,
+    DEV_LOGIN_ROLES,
+    isDevLoginEnabled,
+    parseDevTestEmail,
+} from "@/lib/dev-login";
+import { prisma } from "@/lib/db";
+import { roleLabels } from "@/lib/role-routes";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
+
+async function signInAsTestUser(formData: FormData) {
+    "use server";
+
+    if (!isDevLoginEnabled()) {
+        redirect("/login");
+    }
+
+    const email = parseDevTestEmail(formData.get("email"));
+    if (!email) {
+        redirect("/login?error=CredentialsSignin");
+    }
+
+    try {
+        await signIn(DEV_LOGIN_PROVIDER_ID, {
+            email,
+            redirectTo: "/post-login",
+        });
+    } catch (error) {
+        if (error instanceof AuthError) {
+            redirect("/login?error=CredentialsSignin");
+        }
+        throw error;
+    }
+}
 
 export default async function LoginPage({
     searchParams,
@@ -10,6 +45,18 @@ export default async function LoginPage({
     searchParams: Promise<{ error?: string }>;
 }) {
     const params = await searchParams;
+    const devLoginEnabled = isDevLoginEnabled();
+    const testUsers = devLoginEnabled
+        ? await prisma.user.findMany({
+              where: {
+                  status: "ACTIVE",
+                  email: { endsWith: "@test.local" },
+                  role: { in: [...DEV_LOGIN_ROLES] },
+              },
+              orderBy: [{ role: "asc" }, { name: "asc" }],
+              select: { email: true, name: true, role: true },
+          })
+        : [];
 
     return (
         <main className={styles.page}>
@@ -51,6 +98,70 @@ export default async function LoginPage({
                             <span>Google로 계속하기</span>
                         </button>
                     </form>
+
+                    {devLoginEnabled && (
+                        <section className={styles.devLogin}>
+                            <div className={styles.divider}>
+                                <span>개발 테스트</span>
+                            </div>
+                            <div className={styles.devLoginBox}>
+                                <span className={styles.devBadge}>
+                                    DEVELOPMENT ONLY
+                                </span>
+                                <h2>역할별 테스트 로그인</h2>
+                                <p>
+                                    테스트 계정을 선택하면 해당 역할의 화면으로
+                                    바로 이동합니다.
+                                </p>
+
+                                {testUsers.length > 0 ? (
+                                    <form action={signInAsTestUser}>
+                                        <label className={styles.devField}>
+                                            <span>테스트 계정</span>
+                                            <select name="email" required defaultValue="">
+                                                <option value="" disabled>
+                                                    역할과 계정을 선택하세요
+                                                </option>
+                                                {DEV_LOGIN_ROLES.map((role) => {
+                                                    const users = testUsers.filter(
+                                                        (user) => user.role === role,
+                                                    );
+                                                    if (users.length === 0) return null;
+
+                                                    return (
+                                                        <optgroup
+                                                            key={role}
+                                                            label={roleLabels[role]}
+                                                        >
+                                                            {users.map((user) => (
+                                                                <option
+                                                                    key={user.email}
+                                                                    value={user.email}
+                                                                >
+                                                                    {user.name} · {user.email}
+                                                                </option>
+                                                            ))}
+                                                        </optgroup>
+                                                    );
+                                                })}
+                                            </select>
+                                        </label>
+                                        <button
+                                            type="submit"
+                                            className={styles.devLoginButton}
+                                        >
+                                            선택한 계정으로 로그인
+                                        </button>
+                                    </form>
+                                ) : (
+                                    <p className={styles.devEmpty}>
+                                        활성 테스트 계정이 없습니다. 테스트 시드를 먼저
+                                        생성해 주세요.
+                                    </p>
+                                )}
+                            </div>
+                        </section>
+                    )}
 
                     <p className={styles.notice}>
                         로그인하면 A학원의 서비스 이용약관과 개인정보 처리방침에

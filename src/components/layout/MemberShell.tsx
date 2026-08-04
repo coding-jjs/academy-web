@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { roleNavigation } from "@/lib/navigation";
 import type { RolePrefix } from "@/types/roles";
+import LogoutButton from "@/components/auth/LogoutButton";
 import NavLink from "./NavLink";
 import styles from "./Shells.module.css";
 
@@ -29,9 +30,12 @@ export default function MemberShell({
                         <NavLink item={item} compact key={item.href} />
                     ))}
                 </nav>
-                <span className={styles.userName}>
-                    {userName ?? memberLabel(role)}
-                </span>
+                <div className={styles.memberTools}>
+                    <span className={styles.userName}>
+                        {userName ?? memberLabel(role)}
+                    </span>
+                    <LogoutButton className={styles.logoutButton} />
+                </div>
             </header>
             <main className={styles.memberContent}>{children}</main>
             <nav className={styles.mobileNav} aria-label="하단 메뉴">

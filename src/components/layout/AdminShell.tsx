@@ -5,6 +5,7 @@ import type { RolePrefix } from "@/types/roles";
 import { auth } from "@/lib/auth";
 import NavLink from "./NavLink";
 import styles from "./Shells.module.css";
+import LogoutButton from "../auth/LogoutButton";
 
 export default async function AdminShell({
     role,
@@ -29,9 +30,13 @@ export default async function AdminShell({
                 </Link>
                 <div className={styles.headerTools}>
                     {session?.user ? (
-                        <span className={styles.userName}>
-                            {userName} {role === "director" ? "원장" : "교직원"}
-                        </span>
+                        <>
+                            <span className={styles.userName}>
+                                {userName}{" "}
+                                {role === "director" ? "원장" : "교직원"}
+                            </span>
+                            <LogoutButton className={styles.logoutButton} />
+                        </>
                     ) : (
                         <Link href="/login" className={styles.sessionLink}>
                             로그인
