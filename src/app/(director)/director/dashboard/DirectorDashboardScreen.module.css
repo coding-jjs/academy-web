@@ -1,0 +1,201 @@
+.page {
+    animation: screen-enter 360ms cubic-bezier(.22, 1, .36, 1) both;
+  }
+  
+  .heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  
+  .heading > div > span {
+    color: #0066cc;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: .12em;
+  }
+  
+  .heading h1 {
+    margin: 8px 0 8px;
+    font-family: "SF Pro Display", system-ui, sans-serif;
+    font-size: clamp(31px, 5vw, 45px);
+    line-height: 1.08;
+    letter-spacing: -.045em;
+  }
+  
+  .heading p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 15px;
+  }
+  
+  .primaryBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 17px;
+    border-radius: 12px;
+    color: #fff;
+    background: #0071e3;
+    font-size: 13px;
+    font-weight: 650;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  
+  .metricCard,
+  .panel {
+    border: 1px solid rgb(0 0 0 / 7%);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 9px 30px rgb(0 0 0 / 5%);
+  }
+  
+  .metricCard {
+    display: block;
+    padding: 20px;
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  a.metricCard:hover {
+    border-color: rgb(0 113 227 / 28%);
+  }
+  
+  .metricCard > strong {
+    display: block;
+    margin: 18px 0 4px;
+    font-size: 31px;
+    letter-spacing: -.04em;
+  }
+  
+  .metricCard p {
+    margin: 0;
+    color: #86868b;
+    font-size: 12px;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(260px, .8fr);
+    gap: 18px;
+  }
+  
+  .panel {
+    padding: 22px;
+  }
+  
+  .panelHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .panelHead h2 {
+    margin: 0;
+    font-size: 17px;
+  }
+  
+  .panel ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  .panel li {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 0;
+    border-top: 1px solid #ededf0;
+    font-size: 13px;
+  }
+  
+  .panel li span {
+    color: #515154;
+  }
+  
+  .queueLink {
+    text-decoration: none;
+  }
+  
+  .shortcuts {
+    display: grid;
+    gap: 10px;
+  }
+  
+  .shortcuts a {
+    display: block;
+    padding: 14px;
+    border-radius: 13px;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  
+  .shortcuts a:hover {
+    background: #ebebf0;
+  }
+  
+  @keyframes screen-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 960px) {
+    .metrics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  
+  @media (max-width: 800px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 520px) {
+    .heading {
+      align-items: start;
+      flex-direction: column;
+    }
+  
+    .primaryBtn {
+      width: 100%;
+    }
+  
+    .metrics {
+      grid-template-columns: 1fr;
+    }
+  
+    .panel li {
+      grid-template-columns: 1fr auto;
+    }
+  
+    .panel li span {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+  }

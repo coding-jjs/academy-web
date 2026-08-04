@@ -20,7 +20,7 @@ export type ReportStatus =
 
 export type StaffReportStudent = {
     id: string;
-    studentProfileId: string | null; // Student.id (현재 page.tsx 매핑 기준)
+    studentProfileId: string | null;
     name: string;
     email: string;
     schoolName: string | null;
@@ -96,6 +96,13 @@ export default function StaffReportsScreen({
     const [tone, setTone] = useState(toneOptions[0]);
     const [content, setContent] = useState("");
     const [feedback, setFeedback] = useState<string | null>(null);
+
+    useEffect(() => {
+        setActiveId((prev) => {
+            if (prev && students.some((s) => s.id === prev)) return prev;
+            return students[0]?.id ?? null;
+        });
+    }, [students]);
 
     const active = students.find((s) => s.id === activeId) ?? null;
     const activeStatus = active ? getStatus(active) : null;
@@ -188,6 +195,11 @@ export default function StaffReportsScreen({
             return;
         }
 
+        if (!content.trim()) {
+            setFeedback("본문을 입력해 주세요.");
+            return;
+        }
+
         const { periodStart, periodEnd } = getActivePeriod();
         setFeedback(null);
 
@@ -205,7 +217,7 @@ export default function StaffReportsScreen({
                 return;
             }
 
-            setFeedback("초안을 저장했습니다.");
+            setFeedback(result.message ?? "초안을 저장했습니다.");
             router.refresh();
         });
     }
@@ -239,7 +251,7 @@ export default function StaffReportsScreen({
                 return;
             }
 
-            setFeedback("AI 초안을 생성했습니다.");
+            setFeedback(result.message ?? "AI 초안을 생성했습니다.");
             router.refresh();
         });
     }
@@ -247,12 +259,16 @@ export default function StaffReportsScreen({
     function handleRequestApproval() {
         if (!active || !canEdit) return;
 
+        if (!content.trim()) {
+            setFeedback("본문이 비어 있어 승인 요청할 수 없습니다.");
+            return;
+        }
+
         setFeedback(null);
 
         startTransition(async () => {
             let reportId = active.report?.id;
 
-            // report row가 없으면 먼저 저장
             if (!reportId) {
                 const studentId = active.studentProfileId;
                 if (!studentId) {
@@ -278,6 +294,13 @@ export default function StaffReportsScreen({
                 reportId = saveResult.reportId;
             }
 
+            if (!reportId) {
+                setFeedback(
+                    "저장된 리포트 ID를 확인하지 못했습니다. 다시 시도해 주세요.",
+                );
+                return;
+            }
+
             const result = await requestReportApproval({ reportId });
 
             if (!result.ok) {
@@ -285,7 +308,7 @@ export default function StaffReportsScreen({
                 return;
             }
 
-            setFeedback("승인 요청을 보냈습니다.");
+            setFeedback(result.message ?? "승인 요청을 보냈습니다.");
             router.refresh();
         });
     }
@@ -313,7 +336,10 @@ export default function StaffReportsScreen({
             {students.length === 0 ? (
                 <div className={styles.emptyPanel}>
                     <h2>표시할 학생이 없습니다</h2>
-                    <p>가입 사용자에서 역할을 학생으로 부여하면 이곳에 나타납니다.</p>
+                    <p>
+                        가입 사용자에서 역할을 학생으로 부여하면 이곳에
+                        나타납니다.
+                    </p>
                 </div>
             ) : (
                 <div className={styles.layout}>
@@ -337,7 +363,9 @@ export default function StaffReportsScreen({
                                                     ? styles.activeStudent
                                                     : undefined
                                             }
-                                            onClick={() => setActiveId(student.id)}
+                                            onClick={() =>
+                                                setActiveId(student.id)
+                                            }
                                         >
                                             <span>
                                                 <strong>{student.name}</strong>
@@ -361,9 +389,15 @@ export default function StaffReportsScreen({
 
                     <article className={styles.editorPanel}>
                         <div className={styles.panelHead}>
-                            <h2>{active ? `${active.name} 보고서` : "보고서 작성"}</h2>
+                            <h2>
+                                {active
+                                    ? `${active.name} 보고서`
+                                    : "보고서 작성"}
+                            </h2>
                             {activeStatus && (
-                                <StatusChip tone={statusMeta[activeStatus].tone}>
+                                <StatusChip
+                                    tone={statusMeta[activeStatus].tone}
+                                >
                                     {statusMeta[activeStatus].label}
                                 </StatusChip>
                             )}
@@ -385,7 +419,9 @@ export default function StaffReportsScreen({
                                     </div>
                                     <div>
                                         <span>반</span>
-                                        <strong>{active.className ?? "미배정"}</strong>
+                                        <strong>
+                                            {active.className ?? "미배정"}
+                                        </strong>
                                     </div>
                                 </div>
 
@@ -400,11 +436,16 @@ export default function StaffReportsScreen({
                                     평가 키워드
                                     <select
                                         value={keyword}
-                                        onChange={(e) => setKeyword(e.target.value)}
+                                        onChange={(e) =>
+                                            setKeyword(e.target.value)
+                                        }
                                         disabled={!canEdit || isPending}
                                     >
                                         {keywordOptions.map((option) => (
-                                            <option key={option} value={option}>
+                                            <option
+                                                key={option}
+                                                value={option}
+                                            >
                                                 {option}
                                             </option>
                                         ))}
@@ -415,11 +456,16 @@ export default function StaffReportsScreen({
                                     톤
                                     <select
                                         value={tone}
-                                        onChange={(e) => setTone(e.target.value)}
+                                        onChange={(e) =>
+                                            setTone(e.target.value)
+                                        }
                                         disabled={!canEdit || isPending}
                                     >
                                         {toneOptions.map((option) => (
-                                            <option key={option} value={option}>
+                                            <option
+                                                key={option}
+                                                value={option}
+                                            >
                                                 {option}
                                             </option>
                                         ))}
@@ -430,7 +476,9 @@ export default function StaffReportsScreen({
                                     초안
                                     <textarea
                                         value={content}
-                                        onChange={(e) => setContent(e.target.value)}
+                                        onChange={(e) =>
+                                            setContent(e.target.value)
+                                        }
                                         disabled={!canEdit || isPending}
                                         rows={8}
                                         placeholder="AI 초안이 여기에 표시됩니다."
@@ -448,7 +496,9 @@ export default function StaffReportsScreen({
                                         }
                                         onClick={handleSaveDraft}
                                     >
-                                        {isPending ? "처리 중..." : "초안 저장"}
+                                        {isPending
+                                            ? "처리 중..."
+                                            : "초안 저장"}
                                     </button>
                                     <button
                                         type="button"
@@ -460,23 +510,29 @@ export default function StaffReportsScreen({
                                         }
                                         onClick={handleRegenerate}
                                     >
-                                        {isPending ? "처리 중..." : "AI 재생성"}
+                                        {isPending
+                                            ? "처리 중..."
+                                            : "AI 재생성"}
                                     </button>
                                     <button
                                         type="button"
                                         disabled={!canEdit || isPending}
                                         onClick={handleRequestApproval}
                                     >
-                                        {isPending ? "처리 중..." : "승인 요청"}
+                                        {isPending
+                                            ? "처리 중..."
+                                            : "승인 요청"}
                                     </button>
                                 </div>
 
-                                {feedback && <p className={styles.hint}>{feedback}</p>}
+                                {feedback && (
+                                    <p className={styles.hint}>{feedback}</p>
+                                )}
 
                                 {!active.studentProfileId && (
                                     <p className={styles.hint}>
-                                        students 프로필이 없어 아직 DB에 리포트를 저장할
-                                        수 없습니다.
+                                        students 프로필이 없어 아직 DB에
+                                        리포트를 저장할 수 없습니다.
                                     </p>
                                 )}
                             </>

@@ -5,8 +5,12 @@ export const roleNavigation: Record<RolePrefix, NavItem[]> = {
         { href: "/director/dashboard", label: "대시보드", icon: "▦" },
         { href: "/director/churn", label: "이탈 위험", icon: "△" },
         { href: "/director/reports", label: "AI 리포트", icon: "▤" },
+        { href: "/director/grades", label: "성적·오답", icon: "▤" },    // 성적 입력
+        { href: "/director/billing", label: "청구·수납", icon: "▰" },  // 학부모 에게 청구 요청
+        { href: "/director/classes", label: "반·수업", icon: "▣" },    // 반, 수업 설정
         { href: "/director/students", label: "학생", icon: "◉" },
         { href: "/director/parents", label: "학부모", icon: "◎" },
+        { href: "/director/messages", label: "쪽지", icon: "□" },   /// 쪽지 추가
         { href: "/director/permissions", label: "권한", icon: "◇" },
         { href: "/director/users", label: "가입 사용자", icon: "＋" },
     ],
@@ -14,7 +18,10 @@ export const roleNavigation: Record<RolePrefix, NavItem[]> = {
         { href: "/staff/dashboard", label: "내 수업", icon: "▦" },
         { href: "/staff/attendance", label: "출석 체크", icon: "✓" },
         { href: "/staff/reports", label: "AI 리포트", icon: "▤" },
+        { href: "/staff/grades", label: "성적·오답", icon: "▤" },   // 성적 입력
+        { href: "/staff/billing", label: "청구·수납", icon: "▰" },  // 학부모에게 청구 요청
         { href: "/staff/students", label: "담당 학생", icon: "◉" },
+        { href: "/staff/messages", label: "쪽지", icon: "□" },   /// 쪽지 추가
         { href: "/staff/counseling", label: "상담 관리", icon: "◎" },
     ],
     parent: [

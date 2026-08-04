@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import DirectorChurnScreen from "./DirectorChurnScreen";
 import type {
@@ -30,6 +32,10 @@ function formatReason(
 }
 
 export default async function DirectorChurnPage() {
+    const session = await auth();
+    if (!session?.user?.id) redirect("/login");
+    if (session.user.role !== "DIRECTOR") redirect("/post-login");
+
     const [students, thresholdRow] = await Promise.all([
         prisma.student.findMany({
             where: { status: "ENROLLED" },
@@ -80,7 +86,8 @@ export default async function DirectorChurnPage() {
         const churn = student.churnCases[0] ?? null;
 
         return {
-            id: churn?.id ?? student.id,
+            id: student.id,
+            churnCaseId: churn?.id ?? null,
             studentId: student.id,
             studentName: student.name,
             schoolName: student.schoolName,

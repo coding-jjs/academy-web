@@ -1,7 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
+import {
+    advanceChurnCase,
+    runChurnDetection,
+    saveChurnThreshold,
+    sendChurnParentNote,
+} from "./actions";
 import styles from "./DirectorChurnScreen.module.css";
 
 export type ChurnCaseStatus =
@@ -18,6 +25,7 @@ export type ChurnSignalType =
 
 export type DirectorChurnCase = {
     id: string;
+    churnCaseId: string | null;
     studentId: string;
     studentName: string;
     schoolName: string | null;
@@ -49,8 +57,8 @@ const statusMeta: Record<
 function actionLabel(status: ChurnCaseStatus | null) {
     if (status === "DETECTED") return "상담 시작";
     if (status === "COUNSELING") return "개선 처리";
-    if (status === null) return "—";
-    return "쪽지";
+    if (status === "IMPROVED" || status === "WITHDRAWN") return "쪽지";
+    return "—";
 }
 
 export default function DirectorChurnScreen({
@@ -60,6 +68,22 @@ export default function DirectorChurnScreen({
     cases: DirectorChurnCase[];
     threshold: ChurnThreshold;
 }) {
+    const router = useRouter();
+    const [pending, startTransition] = useTransition();
+    const [feedback, setFeedback] = useState<string | null>(null);
+    const [showThreshold, setShowThreshold] = useState(false);
+
+    const [attendanceDrop, setAttendanceDrop] = useState(
+        String(threshold.attendanceDropPercentPoint),
+    );
+    const [scoreDrop, setScoreDrop] = useState(
+        String(threshold.scoreDropPoints),
+    );
+    const [absences, setAbsences] = useState(
+        String(threshold.consecutiveAbsences),
+    );
+    const [unpaid, setUnpaid] = useState(String(threshold.unpaidDays));
+
     const stats = useMemo(() => {
         const counts = { DETECTED: 0, COUNSELING: 0, IMPROVED: 0 };
         for (const item of cases) {
@@ -86,6 +110,51 @@ export default function DirectorChurnScreen({
         ];
     }, [cases]);
 
+    function runDetect() {
+        setFeedback(null);
+        startTransition(async () => {
+            const result = await runChurnDetection();
+            setFeedback(result.message);
+            if (result.ok) router.refresh();
+        });
+    }
+
+    function runAction(item: DirectorChurnCase) {
+        if (!item.churnCaseId || !item.status) return;
+        setFeedback(null);
+
+        startTransition(async () => {
+            const result =
+                item.status === "IMPROVED" || item.status === "WITHDRAWN"
+                    ? await sendChurnParentNote({
+                          churnCaseId: item.churnCaseId!,
+                      })
+                    : await advanceChurnCase({
+                          churnCaseId: item.churnCaseId!,
+                      });
+
+            setFeedback(result.message);
+            if (result.ok) router.refresh();
+        });
+    }
+
+    function runSaveThreshold() {
+        setFeedback(null);
+        startTransition(async () => {
+            const result = await saveChurnThreshold({
+                attendanceDropPercentPoint: Number(attendanceDrop),
+                scoreDropPoints: Number(scoreDrop),
+                consecutiveAbsences: Number(absences),
+                unpaidDays: Number(unpaid),
+            });
+            setFeedback(result.message);
+            if (result.ok) {
+                setShowThreshold(false);
+                router.refresh();
+            }
+        });
+    }
+
     return (
         <section className={styles.page}>
             <header className={styles.heading}>
@@ -96,10 +165,74 @@ export default function DirectorChurnScreen({
                         출결, 성적, 연속 결석과 미납 신호를 함께 확인합니다.
                     </p>
                 </div>
-                <button type="button" className={styles.thresholdBtn} disabled>
-                    임계값 설정
-                </button>
+                <div className={styles.headerActions}>
+                    <button
+                        type="button"
+                        className={styles.actionBtn}
+                        disabled={pending}
+                        onClick={runDetect}
+                    >
+                        {pending ? "감지 중…" : "이탈 감지 실행"}
+                    </button>
+                    <button
+                        type="button"
+                        className={styles.thresholdBtn}
+                        disabled={pending}
+                        onClick={() => setShowThreshold((v) => !v)}
+                    >
+                        임계값 설정
+                    </button>
+                </div>
             </header>
+
+            {showThreshold && (
+                <div className={styles.thresholdForm}>
+                    <label>
+                        출석 하락 (%p)
+                        <input
+                            type="number"
+                            value={attendanceDrop}
+                            onChange={(e) => setAttendanceDrop(e.target.value)}
+                            disabled={pending}
+                        />
+                    </label>
+                    <label>
+                        성적 하락 (점)
+                        <input
+                            type="number"
+                            value={scoreDrop}
+                            onChange={(e) => setScoreDrop(e.target.value)}
+                            disabled={pending}
+                        />
+                    </label>
+                    <label>
+                        연속 결석 (회)
+                        <input
+                            type="number"
+                            value={absences}
+                            onChange={(e) => setAbsences(e.target.value)}
+                            disabled={pending}
+                        />
+                    </label>
+                    <label>
+                        미납 (일)
+                        <input
+                            type="number"
+                            value={unpaid}
+                            onChange={(e) => setUnpaid(e.target.value)}
+                            disabled={pending}
+                        />
+                    </label>
+                    <button
+                        type="button"
+                        className={styles.actionBtn}
+                        disabled={pending}
+                        onClick={runSaveThreshold}
+                    >
+                        {pending ? "저장 중…" : "저장"}
+                    </button>
+                </div>
+            )}
 
             <div className={styles.metrics}>
                 {stats.map((item) => (
@@ -144,6 +277,10 @@ export default function DirectorChurnScreen({
                                     const meta = item.status
                                         ? statusMeta[item.status]
                                         : null;
+                                    const canAct = Boolean(
+                                        item.churnCaseId && item.status,
+                                    );
+
                                     return (
                                         <tr key={item.id}>
                                             <td>
@@ -182,7 +319,12 @@ export default function DirectorChurnScreen({
                                                 <button
                                                     type="button"
                                                     className={styles.actionBtn}
-                                                    disabled
+                                                    disabled={
+                                                        pending || !canAct
+                                                    }
+                                                    onClick={() =>
+                                                        runAction(item)
+                                                    }
                                                 >
                                                     {actionLabel(item.status)}
                                                 </button>
@@ -195,6 +337,8 @@ export default function DirectorChurnScreen({
                     </div>
                 )}
             </div>
+
+            {feedback && <p className={styles.feedback}>{feedback}</p>}
         </section>
     );
 }

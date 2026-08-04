@@ -7,6 +7,7 @@ import StatusChip from "@/components/ui/StatusChip";
 import {
     addStudentEnrollment,
     endStudentEnrollment,
+    updateStudentStatus,
 } from "./actions";
 import styles from "./DirectorStudentsScreen.module.css";
 
@@ -177,6 +178,28 @@ export default function DirectorStudentsScreen({
             if (result.ok) {
                 router.refresh();
             }
+        });
+    }
+
+    function handleStatusChange(next: StudentStatus) {
+        if (!active || active.status === next) return;
+
+        const label = statusMeta[next].label;
+        const ok = window.confirm(
+            next === "WITHDRAWN"
+                ? `${active.name} 학생을 퇴원 처리할까요?\n활성 수강이 모두 해제됩니다.`
+                : `${active.name} 학생 상태를 "${label}"(으)로 바꿀까요?`,
+        );
+        if (!ok) return;
+
+        setFeedback(null);
+        startTransition(async () => {
+            const result = await updateStudentStatus({
+                studentId: active.id,
+                status: next,
+            });
+            setFeedback(result.message);
+            if (result.ok) router.refresh();
         });
     }
 
@@ -433,6 +456,35 @@ export default function DirectorStudentsScreen({
                                 </strong>
                             </div>
                         </div>
+
+                        <section className={styles.block}>
+                            <h3>재원 상태</h3>
+                            <div className={styles.statusRow}>
+                                <StatusChip
+                                    tone={statusMeta[active.status].tone}
+                                >
+                                    {statusMeta[active.status].label}
+                                </StatusChip>
+                                <select
+                                    className={styles.statusSelect}
+                                    value={active.status}
+                                    disabled={isPending}
+                                    onChange={(e) =>
+                                        handleStatusChange(
+                                            e.target.value as StudentStatus,
+                                        )
+                                    }
+                                >
+                                    <option value="ENROLLED">재원</option>
+                                    <option value="PAUSED">휴원</option>
+                                    <option value="WITHDRAWN">퇴원</option>
+                                </select>
+                            </div>
+                            <p className={styles.muted}>
+                                휴원·퇴원 학생은 청구·성적 등 재원 목록에서
+                                제외됩니다. 퇴원은 수강도 해제합니다.
+                            </p>
+                        </section>
 
                         <section className={styles.block}>
                             <h3>현재 수강</h3>
