@@ -1,6 +1,13 @@
 import type { NextAuthConfig } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { prisma } from "@/lib/db";
+import {
+    DEV_LOGIN_PROVIDER_ID,
+    DEV_LOGIN_ROLES,
+    isDevLoginEnabled,
+    parseDevTestEmail,
+} from "@/lib/dev-login";
 
 const authConfig = {
     trustHost: true,
@@ -12,6 +19,51 @@ const authConfig = {
                 },
             },
         }),
+        ...(isDevLoginEnabled()
+            ? [
+                  Credentials({
+                      id: DEV_LOGIN_PROVIDER_ID,
+                      name: "개발 테스트 계정",
+                      credentials: {
+                          email: { label: "테스트 계정", type: "email" },
+                      },
+                      async authorize(credentials) {
+                          if (!isDevLoginEnabled()) return null;
+
+                          const email = parseDevTestEmail(credentials.email);
+                          if (!email) return null;
+
+                          const user = await prisma.user.findFirst({
+                              where: {
+                                  email,
+                                  status: "ACTIVE",
+                                  role: { in: [...DEV_LOGIN_ROLES] },
+                              },
+                              select: {
+                                  id: true,
+                                  email: true,
+                                  name: true,
+                                  imageUrl: true,
+                              },
+                          });
+
+                          if (!user) return null;
+
+                          await prisma.user.update({
+                              where: { id: user.id },
+                              data: { lastLoginAt: new Date() },
+                          });
+
+                          return {
+                              id: user.id,
+                              email: user.email,
+                              name: user.name,
+                              image: user.imageUrl,
+                          };
+                      },
+                  }),
+              ]
+            : []),
     ],
 
     session: {
@@ -24,6 +76,13 @@ const authConfig = {
 
     callbacks: {
         async signIn({ user, account }) {
+            if (account?.provider === DEV_LOGIN_PROVIDER_ID) {
+                return (
+                    isDevLoginEnabled() &&
+                    parseDevTestEmail(user.email) !== null
+                );
+            }
+
             if (
                 !user.email ||
                 !account ||

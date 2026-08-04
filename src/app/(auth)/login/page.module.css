@@ -137,6 +137,115 @@
   height: 22px;
 }
 
+.devLogin {
+  margin-top: 24px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #86868b;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .06em;
+}
+
+.divider::before,
+.divider::after {
+  height: 1px;
+  flex: 1;
+  content: "";
+  background: #e5e5e7;
+}
+
+.devLoginBox {
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid #cfe3ff;
+  border-radius: 16px;
+  background: #f4f8ff;
+  text-align: left;
+}
+
+.devBadge {
+  display: inline-flex;
+  min-height: 22px;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: #0058b0;
+  background: #dcecff;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .08em;
+}
+
+.devLoginBox h2 {
+  margin: 12px 0 5px;
+  font-size: 17px;
+  letter-spacing: -.02em;
+}
+
+.devLoginBox > p {
+  margin: 0 0 14px;
+  color: #6e6e73;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.devField {
+  display: grid;
+  gap: 6px;
+  color: #515154;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.devField select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 11px;
+  border: 1px solid #b9d4f7;
+  border-radius: 11px;
+  color: #1d1d1f;
+  background: #fff;
+  font: inherit;
+  font-weight: 500;
+}
+
+.devLoginButton {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 11px;
+  color: #fff;
+  background: #0071e3;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.devLoginButton:hover {
+  background: #0068d1;
+}
+
+.devLoginButton:active {
+  transform: scale(.98);
+}
+
+.devLoginButton:focus-visible,
+.devField select:focus-visible {
+  outline: 2px solid #0071e3;
+  outline-offset: 2px;
+}
+
+.devEmpty {
+  margin-bottom: 0 !important;
+  color: #b42318 !important;
+}
+
 .error {
   margin: 0 0 16px;
   padding: 12px 14px;
@@ -243,6 +352,10 @@
   .loginCard {
     padding: 40px 24px 32px;
     border-radius: 22px;
+  }
+
+  .devLoginBox {
+    padding: 15px;
   }
 }
 

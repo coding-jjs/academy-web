@@ -2,6 +2,19 @@
 
 원장, 교사·직원, 학부모, 학생, 게스트가 사용하는 단일 Next.js 풀스택 프로젝트입니다.
 
+## git 명령어
+
+```bash
+git checkout main
+git pull origin main
+git checkout [본인_브랜치명]
+git merge main
+---본인 작업 후---
+git add .
+git commit -m "커밋 내용"
+git push origin [본인_브랜치명]
+```
+
 ## 실행
 
 ```bash

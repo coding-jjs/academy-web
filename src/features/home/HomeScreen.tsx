@@ -2,13 +2,22 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import LogoutButton from "@/components/auth/LogoutButton";
 import { useEffect, useState } from "react";
 import styles from "./HomeScreen.module.css";
 
 const notices = [
     { audience: "전체", title: "8월 학사 일정 및 휴원일 안내", date: "08.01" },
-    { audience: "학부모", title: "2학기 학부모 정기 상담 신청 안내", date: "07.28" },
-    { audience: "학생", title: "여름 집중 학습 프로그램 시간표 안내", date: "07.25" },
+    {
+        audience: "학부모",
+        title: "2학기 학부모 정기 상담 신청 안내",
+        date: "07.28",
+    },
+    {
+        audience: "학생",
+        title: "여름 집중 학습 프로그램 시간표 안내",
+        date: "07.25",
+    },
 ];
 
 const banners = [
@@ -75,7 +84,10 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
     const [isPaused, setIsPaused] = useState(false);
 
     useEffect(() => {
-        if (isPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        if (
+            isPaused ||
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ) {
             return;
         }
 
@@ -87,7 +99,10 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
     }, [isPaused]);
 
     useEffect(() => {
-        if (isPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        if (
+            isPaused ||
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ) {
             return;
         }
 
@@ -101,7 +116,8 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
     const activeBanner = banners[bannerIndex];
     const moveNotice = (direction: 1 | -1) => {
         setNoticeIndex(
-            (current) => (current + direction + notices.length) % notices.length,
+            (current) =>
+                (current + direction + notices.length) % notices.length,
         );
     };
 
@@ -126,8 +142,14 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
                 <div className={styles.authActions}>
                     {viewer ? (
                         <>
-                            <div className={styles.profileSummary} title={`${viewer.name} · ${viewer.roleLabel}`}>
-                                <span className={styles.profileAvatar} aria-hidden="true">
+                            <div
+                                className={styles.profileSummary}
+                                title={`${viewer.name} · ${viewer.roleLabel}`}
+                            >
+                                <span
+                                    className={styles.profileAvatar}
+                                    aria-hidden="true"
+                                >
                                     {viewer.name.slice(0, 1)}
                                 </span>
                                 <span className={styles.profileText}>
@@ -135,16 +157,23 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
                                     <small>{viewer.roleLabel}</small>
                                 </span>
                             </div>
-                            <Link href={viewer.dashboardHref} className={styles.dashboardButton}>
+                            <Link
+                                href={viewer.dashboardHref}
+                                className={styles.dashboardButton}
+                            >
                                 대시보드 <span aria-hidden="true">→</span>
                             </Link>
+                            <LogoutButton className={styles.logoutButton} />
                         </>
                     ) : (
                         <>
                             <Link href="/login" className={styles.loginButton}>
                                 로그인
                             </Link>
-                            <Link href="/signup" className={styles.signupButton}>
+                            <Link
+                                href="/signup"
+                                className={styles.signupButton}
+                            >
                                 회원가입
                             </Link>
                         </>
@@ -168,11 +197,21 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
                         <time>{notices[noticeIndex].date}</time>
                     </div>
                     <div className={styles.noticeControls}>
-                        <button type="button" onClick={() => moveNotice(-1)} aria-label="이전 공지">
+                        <button
+                            type="button"
+                            onClick={() => moveNotice(-1)}
+                            aria-label="이전 공지"
+                        >
                             ↑
                         </button>
-                        <span>{String(noticeIndex + 1).padStart(2, "0")} / 03</span>
-                        <button type="button" onClick={() => moveNotice(1)} aria-label="다음 공지">
+                        <span>
+                            {String(noticeIndex + 1).padStart(2, "0")} / 03
+                        </span>
+                        <button
+                            type="button"
+                            onClick={() => moveNotice(1)}
+                            aria-label="다음 공지"
+                        >
                             ↓
                         </button>
                     </div>
@@ -191,10 +230,12 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
                     <p className={styles.eyebrow}>LEARN · RECORD · GROW</p>
                     <h1>
                         <span className={styles.heroLine}>
-                            배움의 오늘을 <span className={styles.mobileLine}>기록하고,</span>
+                            배움의 오늘을{" "}
+                            <span className={styles.mobileLine}>기록하고,</span>
                         </span>
                         <span className={styles.heroLine}>
-                            내일의 성장을 <span className={styles.mobileLine}>만듭니다</span>
+                            내일의 성장을{" "}
+                            <span className={styles.mobileLine}>만듭니다</span>
                         </span>
                     </h1>
                     <p className={styles.heroDescription}>
@@ -202,7 +243,10 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
                         세심하게 기록하고, 가정과 함께 다음 걸음을 설계합니다.
                     </p>
                     <div className={styles.heroActions}>
-                        <Link href="/guest/inquiry" className={styles.primaryButton}>
+                        <Link
+                            href="/guest/inquiry"
+                            className={styles.primaryButton}
+                        >
                             상담 신청하기 <span aria-hidden="true">→</span>
                         </Link>
                         <Link href="/login" className={styles.textButton}>
@@ -210,14 +254,19 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
                         </Link>
                     </div>
                     <div className={styles.heroSummary}>
-                        <span>수업</span><i aria-hidden="true" />
-                        <span>기록</span><i aria-hidden="true" />
-                        <span>소통</span><i aria-hidden="true" />
+                        <span>수업</span>
+                        <i aria-hidden="true" />
+                        <span>기록</span>
+                        <i aria-hidden="true" />
+                        <span>소통</span>
+                        <i aria-hidden="true" />
                         <span>성장</span>
                     </div>
                 </div>
 
-                <div className={`${styles.visual} ${styles[activeBanner.tone]}`}>
+                <div
+                    className={`${styles.visual} ${styles[activeBanner.tone]}`}
+                >
                     {banners.map((banner, index) => (
                         <Image
                             key={banner.src}
@@ -226,7 +275,11 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
                             width={1080}
                             height={1440}
                             priority={index === 0}
-                            className={index === bannerIndex ? styles.imageActive : styles.image}
+                            className={
+                                index === bannerIndex
+                                    ? styles.imageActive
+                                    : styles.image
+                            }
                             aria-hidden={index !== bannerIndex}
                         />
                     ))}
@@ -235,12 +288,19 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
                         <h2>{activeBanner.title}</h2>
                         <p>{activeBanner.description}</p>
                     </div>
-                    <div className={styles.bannerControls} aria-label="메인 배너 선택">
+                    <div
+                        className={styles.bannerControls}
+                        aria-label="메인 배너 선택"
+                    >
                         {banners.map((banner, index) => (
                             <button
                                 key={banner.src}
                                 type="button"
-                                className={index === bannerIndex ? styles.dotActive : styles.dot}
+                                className={
+                                    index === bannerIndex
+                                        ? styles.dotActive
+                                        : styles.dot
+                                }
                                 onClick={() => setBannerIndex(index)}
                                 aria-label={`${index + 1}번 배너 보기`}
                                 aria-current={index === bannerIndex}
@@ -250,7 +310,9 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
                             type="button"
                             className={styles.pauseButton}
                             onClick={() => setIsPaused((current) => !current)}
-                            aria-label={isPaused ? "자동 전환 시작" : "자동 전환 멈춤"}
+                            aria-label={
+                                isPaused ? "자동 전환 시작" : "자동 전환 멈춤"
+                            }
                         >
                             {isPaused ? "▶" : "Ⅱ"}
                         </button>
@@ -283,12 +345,19 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
             <section className={styles.section} id="programs">
                 <div className={styles.sectionHeading}>
                     <p>PROGRAM</p>
-                    <h2>이해하고, 적용하고,<br />스스로 설명하는 수업</h2>
+                    <h2>
+                        이해하고, 적용하고,
+                        <br />
+                        스스로 설명하는 수업
+                    </h2>
                     <span>학생마다 다른 출발점과 속도를 존중합니다.</span>
                 </div>
                 <div className={styles.programGrid}>
                     {programs.map((program) => (
-                        <article key={program.number} className={styles.programCard}>
+                        <article
+                            key={program.number}
+                            className={styles.programCard}
+                        >
                             <span>{program.number}</span>
                             <div>
                                 <small>{program.subtitle}</small>
@@ -305,7 +374,8 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
                     <p>LEARNING JOURNEY</p>
                     <h2>성장은 보이지 않는 순간에도 이어집니다</h2>
                     <span>
-                        감이 아닌 기록으로 학생을 이해하고, 필요한 순간에 함께합니다.
+                        감이 아닌 기록으로 학생을 이해하고, 필요한 순간에
+                        함께합니다.
                     </span>
                 </div>
                 <ol className={styles.stepList}>
@@ -321,7 +391,11 @@ export default function HomeScreen({ viewer }: { viewer: HomeViewer | null }) {
 
             <section className={styles.finalCta}>
                 <p>START TOGETHER</p>
-                <h2>우리 아이에게 맞는 배움,<br />상담에서 시작해 보세요</h2>
+                <h2>
+                    우리 아이에게 맞는 배움,
+                    <br />
+                    상담에서 시작해 보세요
+                </h2>
                 <Link href="/guest/inquiry" className={styles.lightButton}>
                     상담 문의 남기기 <span aria-hidden="true">→</span>
                 </Link>
