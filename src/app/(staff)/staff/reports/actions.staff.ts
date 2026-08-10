@@ -3,11 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import {
-    AiUnavailableError,
-    generateText,
-    isGeminiConfigured,
-} from "@/lib/ai";
+import { AiUnavailableError, generateText, isGeminiConfigured } from "@/lib/ai";
 import { userHasPermission } from "@/lib/permission-guard";
 import { getStaffScope, studentScopeWhere } from "@/lib/staff-scope";
 
@@ -218,7 +214,7 @@ export async function saveDraftReport(input: {
 }): Promise<ActionResult> {
     const session = await requireStaffOrTeacher();
     if (!session) {
-        return { ok: false, message: "교직원 로그인이 필요합니다." };
+        return { ok: false, message: "직원 로그인이 필요합니다." };
     }
 
     const permError = await requireWriteAiReport(session);
@@ -281,7 +277,7 @@ export async function regenerateDraftWithAi(input: {
 }): Promise<ActionResult> {
     const session = await requireStaffOrTeacher();
     if (!session) {
-        return { ok: false, message: "교직원 로그인이 필요합니다." };
+        return { ok: false, message: "직원 로그인이 필요합니다." };
     }
 
     const permError = await requireWriteAiReport(session);
@@ -363,7 +359,7 @@ export async function requestReportApproval(input: {
 }): Promise<ActionResult> {
     const session = await requireStaffOrTeacher();
     if (!session) {
-        return { ok: false, message: "교직원 로그인이 필요합니다." };
+        return { ok: false, message: "직원 로그인이 필요합니다." };
     }
 
     const permError = await requireWriteAiReport(session);

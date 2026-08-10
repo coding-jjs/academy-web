@@ -141,19 +141,20 @@ export default function ClassesManagementScreen({
     function saveClass() {
         setFeedback(null);
         startTransition(async () => {
-            const result = editing && active
-                ? await updateClass({
-                      classId: active.id,
-                      name,
-                      subject,
-                      teacherUserId: teacherUserId || null,
-                      active: activeFlag,
-                  })
-                : await createClass({
-                      name,
-                      subject,
-                      teacherUserId: teacherUserId || null,
-                  });
+            const result =
+                editing && active
+                    ? await updateClass({
+                          classId: active.id,
+                          name,
+                          subject,
+                          teacherUserId: teacherUserId || null,
+                          active: activeFlag,
+                      })
+                    : await createClass({
+                          name,
+                          subject,
+                          teacherUserId: teacherUserId || null,
+                      });
 
             setFeedback(result.message);
             if (result.ok) {
@@ -287,7 +288,9 @@ export default function ClassesManagementScreen({
                                 {teachers.map((t) => (
                                     <option key={t.id} value={t.id}>
                                         {t.name} (
-                                        {t.role === "TEACHER" ? "교사" : "직원"}
+                                        {t.role === "TEACHER"
+                                            ? "선생님"
+                                            : "직원"}
                                         )
                                     </option>
                                 ))}

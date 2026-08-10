@@ -15,7 +15,7 @@ export default async function AdminShell({
     children: ReactNode;
 }) {
     const session = await auth();
-    const roleLabel = role === "director" ? "원장" : "교직원";
+    const roleLabel = role === "director" ? "원장" : "직원";
     const userName = session?.user?.name ?? roleLabel;
 
     return (
@@ -33,7 +33,7 @@ export default async function AdminShell({
                         <>
                             <span className={styles.userName}>
                                 {userName}{" "}
-                                {role === "director" ? "원장" : "교직원"}
+                                {role === "director" ? "원장" : "직원"}
                             </span>
                             <LogoutButton className={styles.logoutButton} />
                         </>

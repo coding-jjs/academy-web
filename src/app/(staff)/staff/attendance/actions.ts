@@ -89,7 +89,7 @@ async function assertCanEditSession(
             return {
                 ok: false,
                 message:
-                    "타 교사반 출결 입력 권한이 없습니다. 원장에게 권한 부여를 요청하세요.",
+                    "타 선생님반 출결 입력 권한이 없습니다. 원장에게 권한 부여를 요청하세요.",
             };
         }
     }
@@ -109,7 +109,7 @@ export async function saveSessionAttendance(
 ): Promise<SaveAttendanceState> {
     const session = await requireStaffOrTeacher();
     if (!session) {
-        return { status: "error", message: "교직원 로그인이 필요합니다." };
+        return { status: "error", message: "직원 로그인이 필요합니다." };
     }
 
     const sessionId = String(formData.get("sessionId") ?? "").trim();
@@ -186,7 +186,7 @@ export async function saveSessionAttendance(
                 const existing = existingByStudent.get(row.studentId);
                 const checkInAt =
                     row.status === "PRESENT" || row.status === "LATE"
-                        ? existing?.checkInAt ?? now
+                        ? (existing?.checkInAt ?? now)
                         : null;
 
                 return prisma.attendanceRecord.upsert({
@@ -206,8 +206,7 @@ export async function saveSessionAttendance(
                     update: {
                         status: row.status,
                         checkInAt,
-                        checkOutAt:
-                            row.status === "EARLY_LEAVE" ? now : null,
+                        checkOutAt: row.status === "EARLY_LEAVE" ? now : null,
                         updatedBy: session.user.id,
                     },
                 });

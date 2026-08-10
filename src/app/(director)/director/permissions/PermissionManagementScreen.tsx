@@ -24,7 +24,7 @@ const permissionLabels: Record<PermissionKey, string> = {
     writeAiReport: "AI 리포트 작성",
     aiDirectSend: "AI 리포트 즉시 발송",
     ownClassAttendanceGrade: "담당반 출결/성적 입력",
-    otherTeacherAttendanceGrade: "타 교사반 출결/성적 입력",
+    otherTeacherAttendanceGrade: "타 선생님반 출결/성적 입력",
     sendMessage: "쪽지 발송",
     billing: "결제/청구 관리",
     linkParentStudent: "학부모-학생 연결",
@@ -109,7 +109,7 @@ export default function PermissionManagementScreen({
                 <div>
                     <span>PERMISSIONS</span>
                     <h1>권한 설정</h1>
-                    <p>교사와 직원에게 필요한 권한만 선택해 부여합니다.</p>
+                    <p>선생님와 직원에게 필요한 권한만 선택해 부여합니다.</p>
                 </div>
                 <div className={styles.headerActions}>
                     <button
@@ -134,9 +134,9 @@ export default function PermissionManagementScreen({
 
             {members.length === 0 ? (
                 <div className={styles.empty}>
-                    <h2>교사·직원이 없습니다</h2>
+                    <h2>선생님·직원이 없습니다</h2>
                     <p>
-                        가입 사용자에서 교사 또는 직원 역할을 부여하면 여기에
+                        가입 사용자에서 선생님 또는 직원 역할을 부여하면 여기에
                         표시됩니다.
                     </p>
                 </div>
@@ -164,7 +164,7 @@ export default function PermissionManagementScreen({
                                         </span>
                                         <small>
                                             {member.role === "TEACHER"
-                                                ? "교사"
+                                                ? "선생님"
                                                 : "직원"}
                                         </small>
                                     </button>
@@ -191,7 +191,7 @@ export default function PermissionManagementScreen({
                                                 <span>
                                                     {permissionLabels[key]}
                                                     {teacherBillingLocked
-                                                        ? " (교사 불가)"
+                                                        ? " (선생님 불가)"
                                                         : ""}
                                                 </span>
                                                 <input

@@ -45,7 +45,7 @@ export async function saveMemberPermissions(input: {
     if (user.role !== "TEACHER" && user.role !== "STAFF") {
         return {
             ok: false,
-            message: "교사·직원에게만 권한을 부여할 수 있습니다.",
+            message: "선생님·직원에게만 권한을 부여할 수 있습니다.",
         };
     }
 
@@ -58,7 +58,7 @@ export async function saveMemberPermissions(input: {
         data[key] = Boolean(input.permissions?.[key]);
     }
 
-    // 교사에게 수납 권한은 스펙상 불가
+    // 선생님에게 수납 권한은 스펙상 불가
     if (user.role === "TEACHER") {
         data.billing = false;
     }

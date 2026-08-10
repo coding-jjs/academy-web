@@ -97,8 +97,7 @@ async function assertCanWriteStudent(
             : "담당 범위의 학생만 입력할 수 있습니다.";
     }
 
-    const teacherUserId =
-        student.enrollments[0]?.class.teacherUserId ?? null;
+    const teacherUserId = student.enrollments[0]?.class.teacherUserId ?? null;
     const isOwnClass = teacherUserId === actor.userId;
 
     if (isOwnClass || !teacherUserId) {
@@ -115,7 +114,7 @@ async function assertCanWriteStudent(
             "otherTeacherAttendanceGrade",
         );
         if (!allowed) {
-            return "타 교사반 성적 입력 권한이 없습니다. 원장에게 권한 부여를 요청하세요.";
+            return "타 선생님반 성적 입력 권한이 없습니다. 원장에게 권한 부여를 요청하세요.";
         }
     }
 

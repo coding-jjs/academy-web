@@ -65,7 +65,7 @@ export async function createClass(input: {
             select: { id: true },
         });
         if (!teacher) {
-            return { ok: false, message: "담당 교사를 찾을 수 없습니다." };
+            return { ok: false, message: "담당 선생님를 찾을 수 없습니다." };
         }
     }
 
@@ -125,7 +125,7 @@ export async function updateClass(input: {
             select: { id: true },
         });
         if (!teacher) {
-            return { ok: false, message: "담당 교사를 찾을 수 없습니다." };
+            return { ok: false, message: "담당 선생님를 찾을 수 없습니다." };
         }
     }
 

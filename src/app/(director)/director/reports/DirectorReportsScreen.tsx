@@ -82,7 +82,7 @@ export default function DirectorReportsScreen({
             {
                 label: "승인 대기",
                 value: `${counts.PENDING_APPROVAL}건`,
-                detail: "교사 작성 완료",
+                detail: "선생님 작성 완료",
                 tone: "warning" as const,
             },
             {
@@ -156,7 +156,10 @@ export default function DirectorReportsScreen({
                 <div>
                     <span>AI REPORT</span>
                     <h1>리포트 승인</h1>
-                    <p>역할이 학생인 사용자를 기준으로 리포트 상태를 확인합니다.</p>
+                    <p>
+                        역할이 학생인 사용자를 기준으로 리포트 상태를
+                        확인합니다.
+                    </p>
                 </div>
             </header>
 
@@ -173,7 +176,10 @@ export default function DirectorReportsScreen({
             {students.length === 0 ? (
                 <div className={styles.emptyPanel}>
                     <h2>표시할 학생이 없습니다</h2>
-                    <p>가입 사용자에서 역할을 학생으로 부여하면 이곳에 나타납니다.</p>
+                    <p>
+                        가입 사용자에서 역할을 학생으로 부여하면 이곳에
+                        나타납니다.
+                    </p>
                 </div>
             ) : (
                 <div className={styles.layout}>
@@ -212,8 +218,12 @@ export default function DirectorReportsScreen({
                                                 }}
                                             >
                                                 <td>
-                                                    <strong>{student.name}</strong>
-                                                    <small>{student.email}</small>
+                                                    <strong>
+                                                        {student.name}
+                                                    </strong>
+                                                    <small>
+                                                        {student.email}
+                                                    </small>
                                                 </td>
                                                 <td>
                                                     {formatSchool(
@@ -221,9 +231,13 @@ export default function DirectorReportsScreen({
                                                         student.grade,
                                                     )}
                                                 </td>
-                                                <td>{student.className ?? "—"}</td>
                                                 <td>
-                                                    <StatusChip tone={meta.tone}>
+                                                    {student.className ?? "—"}
+                                                </td>
+                                                <td>
+                                                    <StatusChip
+                                                        tone={meta.tone}
+                                                    >
                                                         {meta.label}
                                                     </StatusChip>
                                                 </td>
@@ -239,7 +253,9 @@ export default function DirectorReportsScreen({
                         <div className={styles.panelHead}>
                             <h2>상세</h2>
                             {activeStatus && (
-                                <StatusChip tone={statusMeta[activeStatus].tone}>
+                                <StatusChip
+                                    tone={statusMeta[activeStatus].tone}
+                                >
                                     {statusMeta[activeStatus].label}
                                 </StatusChip>
                             )}
@@ -264,7 +280,7 @@ export default function DirectorReportsScreen({
                                         </strong>
                                     </div>
                                     <div>
-                                        <span>반 · 교사</span>
+                                        <span>반 · 선생님</span>
                                         <strong>
                                             {active.className ?? "미배정"}
                                             {" · "}
@@ -278,7 +294,10 @@ export default function DirectorReportsScreen({
                                 <div className={styles.contentBox}>
                                     <h3>최근 리포트</h3>
                                     {active.report ? (
-                                        <p>{active.report.content || "(내용 없음)"}</p>
+                                        <p>
+                                            {active.report.content ||
+                                                "(내용 없음)"}
+                                        </p>
                                     ) : (
                                         <p className={styles.empty}>
                                             아직 작성된 AI 리포트가 없습니다.
@@ -301,7 +320,7 @@ export default function DirectorReportsScreen({
                                                         )
                                                     }
                                                     rows={3}
-                                                    placeholder="교사에게 전달할 반려 사유를 입력하세요."
+                                                    placeholder="선생님에게 전달할 반려 사유를 입력하세요."
                                                 />
                                             </label>
                                             <div className={styles.actions}>
@@ -336,7 +355,9 @@ export default function DirectorReportsScreen({
                                 {active.report &&
                                     activeStatus !== "PENDING_APPROVAL" &&
                                     feedback && (
-                                        <p className={styles.hint}>{feedback}</p>
+                                        <p className={styles.hint}>
+                                            {feedback}
+                                        </p>
                                     )}
                             </>
                         )}
