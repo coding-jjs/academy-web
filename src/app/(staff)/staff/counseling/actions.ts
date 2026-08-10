@@ -28,7 +28,7 @@ export async function createCounselingMemo(
 ): Promise<CounselingActionState> {
     const session = await requireStaff();
     if (!session) {
-        return { status: "error", message: "교직원 로그인이 필요합니다." };
+        return { status: "error", message: "직원 로그인이 필요합니다." };
     }
 
     const canEdit = await userHasPermission(
@@ -57,9 +57,7 @@ export async function createCounselingMemo(
         };
     }
 
-    const counseledAt = counseledAtRaw
-        ? new Date(counseledAtRaw)
-        : new Date();
+    const counseledAt = counseledAtRaw ? new Date(counseledAtRaw) : new Date();
     if (Number.isNaN(counseledAt.getTime())) {
         return { status: "error", message: "상담 일시가 올바르지 않습니다." };
     }

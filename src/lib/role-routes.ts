@@ -2,7 +2,7 @@ import type { AppRole } from "@/types/roles";
 
 export const roleLabels: Record<AppRole, string> = {
     DIRECTOR: "원장",
-    TEACHER: "교사",
+    TEACHER: "선생님",
     STAFF: "직원",
     PARENT: "학부모",
     STUDENT: "학생",

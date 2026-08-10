@@ -82,8 +82,7 @@ export default async function DirectorParentsPage() {
                 </div>
                 <div className={styles.activeBadge}>
                     <span className={styles.statusDot} aria-hidden="true" />
-                    활성 연결
-                    <strong>{activeLinks.length}</strong>
+                    연결 중<strong>{activeLinks.length}</strong>
                 </div>
             </header>
 

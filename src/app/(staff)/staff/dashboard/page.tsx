@@ -99,7 +99,7 @@ export default async function StaffDashboardPage() {
     return (
         <StaffDashboardScreen
             role={session.user.role as "TEACHER" | "STAFF"}
-            staffName={session.user.name ?? "교직원"}
+            staffName={session.user.name ?? "직원"}
             metrics={{
                 todayClassCount: sessions.length,
                 firstClassTime,

@@ -18,7 +18,7 @@ type Option = { id: string; name: string };
 
 const audienceLabels: Record<string, string> = {
     ALL: "전체 사용자",
-    STAFF: "직원(교사·사무)",
+    STAFF: "직원(선생님·사무)",
     PARENT: "학부모(+연결 학생)",
     STUDENT: "학생",
 };
@@ -106,7 +106,11 @@ export default function MessagesScreen({
                     ? await directorSendMessage({
                           title,
                           content,
-                          audience: audience as "ALL" | "STAFF" | "PARENT" | "STUDENT",
+                          audience: audience as
+                              | "ALL"
+                              | "STAFF"
+                              | "PARENT"
+                              | "STUDENT",
                           ...target,
                       })
                     : await submitMessageForApproval({
@@ -180,7 +184,9 @@ export default function MessagesScreen({
             <div className={styles.tabs}>
                 <button
                     type="button"
-                    className={tab === "compose" ? styles.tabActive : styles.tab}
+                    className={
+                        tab === "compose" ? styles.tabActive : styles.tab
+                    }
                     onClick={() => setTab("compose")}
                 >
                     작성
@@ -193,7 +199,8 @@ export default function MessagesScreen({
                         }
                         onClick={() => setTab("pending")}
                     >
-                        승인 대기 {pending.length > 0 ? `(${pending.length})` : ""}
+                        승인 대기{" "}
+                        {pending.length > 0 ? `(${pending.length})` : ""}
                     </button>
                 )}
                 <button
@@ -232,12 +239,17 @@ export default function MessagesScreen({
                             value={targetType}
                             onChange={(e) =>
                                 setTargetType(
-                                    e.target.value as "none" | "student" | "class",
+                                    e.target.value as
+                                        | "none"
+                                        | "student"
+                                        | "class",
                                 )
                             }
                         >
                             {mode === "director" && (
-                                <option value="none">전체(대상 유형 기준)</option>
+                                <option value="none">
+                                    전체(대상 유형 기준)
+                                </option>
                             )}
                             <option value="student">학생 단위</option>
                             <option value="class">반 단위</option>
@@ -267,7 +279,9 @@ export default function MessagesScreen({
                             <span>반</span>
                             <select
                                 value={targetClassId}
-                                onChange={(e) => setTargetClassId(e.target.value)}
+                                onChange={(e) =>
+                                    setTargetClassId(e.target.value)
+                                }
                             >
                                 {classes.map((c) => (
                                     <option key={c.id} value={c.id}>
@@ -315,7 +329,9 @@ export default function MessagesScreen({
                 <div className={styles.layout}>
                     <aside className={styles.listPanel}>
                         {list.length === 0 ? (
-                            <p className={styles.empty}>목록이 비어 있습니다.</p>
+                            <p className={styles.empty}>
+                                목록이 비어 있습니다.
+                            </p>
                         ) : (
                             <ul className={styles.messageList}>
                                 {list.map((item) => (
@@ -374,7 +390,9 @@ export default function MessagesScreen({
                                     ? ` · 수신 ${active.recipientCount}명`
                                     : ""}
                             </p>
-                            <div className={styles.content}>{active.content}</div>
+                            <div className={styles.content}>
+                                {active.content}
+                            </div>
 
                             {active.status === "REJECTED" &&
                                 active.rejectionReason && (

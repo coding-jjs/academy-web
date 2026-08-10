@@ -25,7 +25,7 @@ export async function createLearningRecord(
         !session?.user?.id ||
         (session.user.role !== "TEACHER" && session.user.role !== "STAFF")
     ) {
-        return { status: "error", message: "교직원 로그인이 필요합니다." };
+        return { status: "error", message: "직원 로그인이 필요합니다." };
     }
 
     const studentId = String(formData.get("studentId") ?? "").trim();

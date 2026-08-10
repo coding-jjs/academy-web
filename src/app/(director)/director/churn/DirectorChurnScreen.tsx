@@ -100,7 +100,7 @@ export default function DirectorChurnScreen({
             {
                 label: "상담 중",
                 value: `${counts.COUNSELING}명`,
-                detail: "담당 교사 조치 중",
+                detail: "담당 선생님 조치 중",
             },
             {
                 label: "개선",
@@ -161,9 +161,7 @@ export default function DirectorChurnScreen({
                 <div>
                     <span>STUDENT CARE</span>
                     <h1>이탈 위험</h1>
-                    <p>
-                        출결, 성적, 연속 결석과 미납 신호를 함께 확인합니다.
-                    </p>
+                    <p>출결, 성적, 연속 결석과 미납 신호를 함께 확인합니다.</p>
                 </div>
                 <div className={styles.headerActions}>
                     <button
