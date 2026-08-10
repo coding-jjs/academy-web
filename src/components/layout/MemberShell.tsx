@@ -15,6 +15,40 @@ export default function MemberShell({
     userName: string | null | undefined;
     children: ReactNode;
 }) {
+    if (role === "parent" || role === "student") {
+        const roleLabel = memberLabel(role);
+
+        return (
+            <div className={styles.adminPage}>
+                <header className={styles.adminHeader}>
+                    <Link href="/" className={styles.brand}>
+                        <span>A</span>
+                        <div>
+                            <strong>A학원</strong>
+                            <small>{roleLabel} 페이지</small>
+                        </div>
+                    </Link>
+                    <div className={styles.headerTools}>
+                        <span className={styles.userName}>
+                            {userName ?? roleLabel} {roleLabel}
+                        </span>
+                        <LogoutButton className={styles.logoutButton} />
+                    </div>
+                </header>
+                <div className={styles.adminBody}>
+                    <aside className={styles.sidebar}>
+                        <nav aria-label={`${roleLabel} 메뉴`}>
+                            {roleNavigation[role].map((item) => (
+                                <NavLink item={item} key={item.href} />
+                            ))}
+                        </nav>
+                    </aside>
+                    <main className={styles.adminContent}>{children}</main>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.memberPage}>
             <header className={styles.memberHeader}>
