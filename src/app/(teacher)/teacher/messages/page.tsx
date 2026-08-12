@@ -11,7 +11,7 @@ import MessagesScreen from "@/features/messages/MessagesScreen";
 export const dynamic = "force-dynamic";
 
 export default async function StaffMessagesPage() {
-    const session = await requireRole("STAFF", "TEACHER");
+    const session = await requireRole("TEACHER");
     const canCompose = await userHasPermission(session.user.id, "sendMessage");
 
     if (!canCompose) {

@@ -95,7 +95,8 @@ export async function createLearningRecord(
                 recordDate,
             },
         });
-        revalidatePath("/staff/students");
+        revalidatePath("/teacher/students");
+    revalidatePath("/employee/students");
         return { status: "success", message: "학습 기록이 등록되었습니다." };
     } catch {
         return { status: "error", message: "기록 등록에 실패했습니다." };

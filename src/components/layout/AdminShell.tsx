@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { roleNavigation } from "@/lib/navigation";
-import { adminRoleLabels, roleLabels } from "@/lib/role-routes";
+import { adminRoleLabels } from "@/lib/role-routes";
 import type { RolePrefix } from "@/types/roles";
 import { auth } from "@/lib/auth";
 import NavLink from "./NavLink";
@@ -12,14 +12,11 @@ export default async function AdminShell({
     role,
     children,
 }: {
-    role: Extract<RolePrefix, "director" | "staff">;
+    role: Extract<RolePrefix, "director" | "teacher" | "employee">;
     children: ReactNode;
 }) {
     const session = await auth();
-    const roleLabel =
-        role === "staff" && session?.user?.role === "TEACHER"
-            ? roleLabels.TEACHER
-            : adminRoleLabels[role];
+    const roleLabel = adminRoleLabels[role];
     const userName = session?.user?.name ?? roleLabel;
 
     return (

@@ -53,7 +53,7 @@ function isFutureKstDate(value: string) {
 
 function revalidateGrades() {
     revalidatePath("/director/grades");
-    revalidatePath("/staff/grades");
+    revalidatePath("/teacher/grades");
     revalidatePath("/parent/grades");
     revalidatePath("/student/grades");
 }

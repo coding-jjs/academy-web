@@ -6,23 +6,22 @@ import StaffDashboardScreen from "./StaffDashboardScreen";
 
 export const dynamic = "force-dynamic";
 
-export default async function StaffDashboardPage() {
-    const session = await requireRole("STAFF", "TEACHER");
-    const role = session.user.role as "TEACHER" | "STAFF";
+export default async function TeacherDashboardPage() {
+    const session = await requireRole("TEACHER");
     const staffScope = await getStaffScope(session.user.id);
     const { startOfToday, endOfToday } = getKstDayRange();
     const dashboardData = await getStaffDashboardData({
         staffScope,
         staffUserId: session.user.id,
-        isOfficeStaff: role === "STAFF",
+        isOfficeStaff: false,
         startOfDay: startOfToday,
         endOfDay: endOfToday,
     });
 
     return (
         <StaffDashboardScreen
-            role={role}
-            staffName={session.user.name ?? "직원"}
+            role="TEACHER"
+            staffName={session.user.name ?? "선생님"}
             {...dashboardData}
         />
     );

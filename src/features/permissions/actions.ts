@@ -82,11 +82,13 @@ export async function saveMemberPermissions(input: {
     });
 
     revalidatePath("/director/permissions");
-    revalidatePath("/staff/billing");
-    revalidatePath("/staff/grades");
-    revalidatePath("/staff/students");
-    revalidatePath("/staff/reports");
-    revalidatePath("/staff/counseling");
+    revalidatePath("/employee/billing");
+    revalidatePath("/teacher/grades");
+    revalidatePath("/teacher/students");
+    revalidatePath("/employee/students");
+    revalidatePath("/teacher/reports");
+    revalidatePath("/teacher/counseling");
+    revalidatePath("/employee/counseling");
 
     return { ok: true, message: "권한을 저장했습니다." };
 }

@@ -5,14 +5,13 @@ import StaffCounselingScreen from "./StaffCounselingScreen";
 
 export const dynamic = "force-dynamic";
 
-export default async function StaffCounselingPage() {
-    const session = await requireRole("STAFF", "TEACHER");
+export default async function TeacherCounselingPage() {
+    const session = await requireRole("TEACHER");
     const staffScope = await getStaffScope(session.user.id);
-    const role = session.user.role as "TEACHER" | "STAFF";
     const counselingData = await getStaffCounselingData({
         staffScope,
-        includeInquiries: role === "STAFF",
+        includeInquiries: false,
     });
 
-    return <StaffCounselingScreen role={role} {...counselingData} />;
+    return <StaffCounselingScreen role="TEACHER" {...counselingData} />;
 }

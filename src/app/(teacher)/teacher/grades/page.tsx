@@ -8,7 +8,7 @@ import GradesManagementScreen from "@/features/grades/GradesManagementScreen";
 export const dynamic = "force-dynamic";
 
 export default async function StaffGradesPage() {
-    const session = await requireRole("STAFF", "TEACHER");
+    const session = await requireRole("TEACHER");
     const { day: todayKst } = getKstDayRange();
 
     const [canOwn, canOther] = await Promise.all([

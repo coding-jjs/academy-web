@@ -7,8 +7,8 @@ import BillingManagementScreen from "@/features/billing/BillingManagementScreen"
 
 export const dynamic = "force-dynamic";
 
-export default async function StaffBillingPage() {
-    const session = await requireRole("STAFF", "TEACHER");
+export default async function EmployeeBillingPage() {
+    const session = await requireRole("STAFF");
 
     const canManage = await userHasPermission(session.user.id, "billing");
     if (!canManage) {

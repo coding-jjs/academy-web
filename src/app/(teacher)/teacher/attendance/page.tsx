@@ -7,7 +7,7 @@ import StaffAttendanceScreen from "./StaffAttendanceScreen";
 export const dynamic = "force-dynamic";
 
 export default async function StaffAttendancePage() {
-    const session = await requireRole("STAFF", "TEACHER");
+    const session = await requireRole("TEACHER");
     const staffScope = await getStaffScope(session.user.id);
     const { startOfToday, endOfToday } = getKstDayRange();
     const sessions = await getStaffAttendanceSessions({
@@ -16,10 +16,5 @@ export default async function StaffAttendancePage() {
         endOfDay: endOfToday,
     });
 
-    return (
-        <StaffAttendanceScreen
-            sessions={sessions}
-            role={session.user.role as "TEACHER" | "STAFF"}
-        />
-    );
+    return <StaffAttendanceScreen sessions={sessions} role="TEACHER" />;
 }

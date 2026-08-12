@@ -29,10 +29,11 @@ function revalidateStudentPaths() {
     revalidatePath("/director/billing");
     revalidatePath("/director/grades");
     revalidatePath("/director/classes");
-    revalidatePath("/staff/students");
-    revalidatePath("/staff/billing");
-    revalidatePath("/staff/grades");
-    revalidatePath("/staff/attendance");
+    revalidatePath("/teacher/students");
+    revalidatePath("/employee/students");
+    revalidatePath("/employee/billing");
+    revalidatePath("/teacher/grades");
+    revalidatePath("/teacher/attendance");
 }
 
 export async function addStudentEnrollment(input: {
