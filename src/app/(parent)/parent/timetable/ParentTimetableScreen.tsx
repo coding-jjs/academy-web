@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
 import type {
@@ -130,56 +130,59 @@ export default function ParentTimetableScreen({
                                 )}
                             </div>
 
-                            <div className={styles.weekGrid}>
-                                {weekDays.map((day) => (
-                                    <article
-                                        key={day.key}
-                                        className={
-                                            day.isToday
-                                                ? styles.dayToday
-                                                : styles.dayCard
-                                        }
-                                    >
-                                        <div className={styles.dayHead}>
-                                            <strong>
-                                                {WEEK_DAY_LABELS[day.key]}
-                                            </strong>
-                                            <span>{day.label}</span>
-                                            {day.isToday && (
-                                                <StatusChip tone="success">
-                                                    오늘
-                                                </StatusChip>
+                            <div className={styles.weeScroll}>
+                                <div className={styles.weekGrid}>
+                                    {weekDays.map((day) => (
+                                        <article
+                                            key={day.key}
+                                            className={
+                                                day.isToday
+                                                    ? styles.dayToday
+                                                    : styles.dayCard
+                                            }
+                                        >
+                                            <div className={styles.dayHead}>
+                                                <strong>
+                                                    {WEEK_DAY_LABELS[day.key]}
+                                                </strong>
+                                                <span>{day.label}</span>
+                                                {day.isToday && (
+                                                    <StatusChip tone="success">
+                                                        오늘
+                                                    </StatusChip>
+                                                )}
+                                            </div>
+                                            {byDay[day.key].length === 0 ? (
+                                                <p className={styles.muted}>
+                                                    없음
+                                                </p>
+                                            ) : (
+                                                <ul className={styles.slotList}>
+                                                    {byDay[day.key].map((s) => (
+                                                        <li key={s.id}>
+                                                            <strong>
+                                                                {s.timeLabel}
+                                                            </strong>
+                                                            <span>
+                                                                {s.className}
+                                                            </span>
+                                                            <small>
+                                                                {s.subject}
+                                                                {s.classroom
+                                                                    ? ` · ${s.classroom}`
+                                                                    : ""}
+                                                                {s.teacherName
+                                                                    ? ` · ${s.teacherName}`
+                                                                    : ""}
+                                                            </small>
+                                                        </li>
+                                                    ))}
+                                                </ul>
                                             )}
-                                        </div>
-                                        {byDay[day.key].length === 0 ? (
-                                            <p className={styles.muted}>없음</p>
-                                        ) : (
-                                            <ul className={styles.slotList}>
-                                                {byDay[day.key].map((s) => (
-                                                    <li key={s.id}>
-                                                        <strong>
-                                                            {s.timeLabel}
-                                                        </strong>
-                                                        <span>
-                                                            {s.className}
-                                                        </span>
-                                                        <small>
-                                                            {s.subject}
-                                                            {s.classroom
-                                                                ? ` · ${s.classroom}`
-                                                                : ""}
-                                                            {s.teacherName
-                                                                ? ` · ${s.teacherName}`
-                                                                : ""}
-                                                        </small>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </article>
-                                ))}
+                                        </article>
+                                    ))}
+                                </div>
                             </div>
-
                             <article className={styles.panel}>
                                 <div className={styles.panelHead}>
                                     <h2>수강 반</h2>
