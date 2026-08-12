@@ -65,7 +65,7 @@ export default function StudentDashboardScreen({
                 ) : (
                     <StatusChip tone="neutral">오늘 출석</StatusChip>
                 )}
-                <h2>안녕, {data.studentName}!</h2>
+                <h2>어서오세요, {data.studentName}님</h2>
                 <p>
                     {data.nextSession
                         ? `다음 수업은 ${data.nextSession.timeLabel.split("~")[0]} ${data.nextSession.className}${
