@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { roleNavigation } from "@/lib/navigation";
-import { adminRoleLabels } from "@/lib/role-routes";
+import { adminRoleLabels, roleLabels } from "@/lib/role-routes";
 import type { RolePrefix } from "@/types/roles";
 import { auth } from "@/lib/auth";
 import NavLink from "./NavLink";
@@ -16,7 +16,10 @@ export default async function AdminShell({
     children: ReactNode;
 }) {
     const session = await auth();
-    const roleLabel = adminRoleLabels[role];
+    const roleLabel =
+        role === "staff" && session?.user?.role === "TEACHER"
+            ? roleLabels.TEACHER
+            : adminRoleLabels[role];
     const userName = session?.user?.name ?? roleLabel;
 
     return (
@@ -33,8 +36,7 @@ export default async function AdminShell({
                     {session?.user ? (
                         <>
                             <span className={styles.userName}>
-                                {userName}{" "}
-                                {roleLabel}
+                                {userName} {roleLabel}
                             </span>
                             <LogoutButton className={styles.logoutButton} />
                         </>

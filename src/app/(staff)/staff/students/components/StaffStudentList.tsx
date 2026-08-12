@@ -40,11 +40,6 @@ export default function StaffStudentList({
                                         <span>반 없음</span>
                                     )}
                                 </div>
-                                {student.grade && (
-                                    <span className={styles.studentGrade}>
-                                        {student.grade}
-                                    </span>
-                                )}
                                 <div className={styles.itemMeta}>
                                     <StatusChip
                                         tone={
@@ -53,7 +48,9 @@ export default function StaffStudentList({
                                                 : "neutral"
                                         }
                                     >
-                                        {student.googleLinked ? "연동" : "미연동"}
+                                        {student.googleLinked
+                                            ? "연동"
+                                            : "미연동"}
                                     </StatusChip>
                                     <StatusChip>
                                         학부모 {student.parents.length}명

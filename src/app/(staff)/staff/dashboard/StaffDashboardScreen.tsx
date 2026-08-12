@@ -30,7 +30,7 @@ export default function StaffDashboardScreen({
         <section className={styles.page}>
             <header className={styles.heading}>
                 <div>
-                    <span>STAFF</span>
+                    <span>{role === "TEACHER" ? "TEACHER" : "STAFF"}</span>
                     <h1>내 수업</h1>
                     <p>
                         {staffName}님, 오늘 담당 수업과 학생 현황을 확인하세요.
