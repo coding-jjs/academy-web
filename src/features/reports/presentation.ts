@@ -36,7 +36,20 @@ export function getDefaultReportPeriod() {
 }
 
 export function getStudentReportStatus(
-    student: { report: { status: ReportStatus } | null },
+    student: {
+        report: { status: ReportStatus } | null;
+        submittedReport?: { status: ReportStatus } | null;
+    },
 ): ReportStatus {
-    return student.report?.status ?? "UNWRITTEN";
+    // Prefer approval-queue visibility when a locked submission exists.
+    if (student.submittedReport?.status === "PENDING_APPROVAL") {
+        return "PENDING_APPROVAL";
+    }
+    if (student.report) {
+        return student.report.status;
+    }
+    if (student.submittedReport) {
+        return student.submittedReport.status;
+    }
+    return "UNWRITTEN";
 }

@@ -91,30 +91,61 @@ async function upsertDraft(params: {
     keywords: string[];
     periodStart: Date;
     periodEnd: Date;
+    forceNew?: boolean;
+    reportId?: string;
 }) {
-    const existing = await prisma.aiReport.findFirst({
-        where: {
-            studentId: params.studentId,
-            status: { in: ["UNWRITTEN", "DRAFTING", "REJECTED"] },
-        },
-        orderBy: { createdAt: "desc" },
-        select: { id: true, status: true },
-    });
-
-    if (existing && EDITABLE.has(existing.status)) {
-        return prisma.aiReport.update({
-            where: { id: existing.id },
-            data: {
-                authorUserId: params.session.user.id,
-                content: params.content,
-                keywords: params.keywords,
-                periodStart: params.periodStart,
-                periodEnd: params.periodEnd,
-                status: "DRAFTING",
-                rejectionReason: null,
+    if (params.reportId && !params.forceNew) {
+        const existing = await prisma.aiReport.findFirst({
+            where: {
+                id: params.reportId,
+                studentId: params.studentId,
+                status: { in: ["UNWRITTEN", "DRAFTING", "REJECTED"] },
             },
-            select: { id: true },
+            select: { id: true, status: true },
         });
+
+        if (existing && EDITABLE.has(existing.status)) {
+            return prisma.aiReport.update({
+                where: { id: existing.id },
+                data: {
+                    authorUserId: params.session.user.id,
+                    content: params.content,
+                    keywords: params.keywords,
+                    periodStart: params.periodStart,
+                    periodEnd: params.periodEnd,
+                    status: "DRAFTING",
+                    rejectionReason: null,
+                },
+                select: { id: true },
+            });
+        }
+    }
+
+    if (!params.forceNew) {
+        const existing = await prisma.aiReport.findFirst({
+            where: {
+                studentId: params.studentId,
+                status: { in: ["UNWRITTEN", "DRAFTING", "REJECTED"] },
+            },
+            orderBy: { updatedAt: "desc" },
+            select: { id: true, status: true },
+        });
+
+        if (existing && EDITABLE.has(existing.status)) {
+            return prisma.aiReport.update({
+                where: { id: existing.id },
+                data: {
+                    authorUserId: params.session.user.id,
+                    content: params.content,
+                    keywords: params.keywords,
+                    periodStart: params.periodStart,
+                    periodEnd: params.periodEnd,
+                    status: "DRAFTING",
+                    rejectionReason: null,
+                },
+                select: { id: true },
+            });
+        }
     }
 
     return prisma.aiReport.create({
@@ -137,6 +168,8 @@ export async function saveDraftReport(input: {
     keywords: string[];
     periodStart: string;
     periodEnd: string;
+    forceNew?: boolean;
+    reportId?: string;
 }): Promise<ActionResult> {
     const session = await requireStaffOrTeacher();
     if (!session) {
@@ -153,6 +186,7 @@ export async function saveDraftReport(input: {
     const keywords = Array.isArray(input.keywords)
         ? input.keywords.map(String).filter(Boolean)
         : [];
+    const reportId = String(input.reportId ?? "").trim() || undefined;
 
     if (!studentId) {
         return { ok: false, message: "학생 정보가 없습니다." };
@@ -182,6 +216,8 @@ export async function saveDraftReport(input: {
         keywords,
         periodStart,
         periodEnd,
+        forceNew: Boolean(input.forceNew),
+        reportId,
     });
 
     revalidatePath("/teacher/reports");
@@ -190,7 +226,9 @@ export async function saveDraftReport(input: {
     return {
         ok: true,
         reportId: report.id,
-        message: "초안을 저장했습니다.",
+        message: input.forceNew
+            ? "새 기간 초안을 저장했습니다."
+            : "초안을 저장했습니다.",
     };
 }
 
@@ -200,6 +238,8 @@ export async function regenerateDraftWithAi(input: {
     tone: string;
     periodStart: string;
     periodEnd: string;
+    forceNew?: boolean;
+    reportId?: string;
 }): Promise<ActionResult> {
     const session = await requireStaffOrTeacher();
     if (!session) {
@@ -225,6 +265,9 @@ export async function regenerateDraftWithAi(input: {
     const periodEnd = parseDateOnly(input.periodEnd, "종료일");
     if (!periodStart || !periodEnd) {
         return { ok: false, message: "기간 형식이 올바르지 않습니다." };
+    }
+    if (periodEnd < periodStart) {
+        return { ok: false, message: "종료일이 시작일보다 빠를 수 없습니다." };
     }
 
     const accessError = await assertCanAccessStudent(session, studentId);
@@ -264,10 +307,14 @@ export async function regenerateDraftWithAi(input: {
         keywords,
         periodStart,
         periodEnd,
+        forceNew: Boolean(input.forceNew),
+        reportId: String(input.reportId ?? "").trim() || undefined,
     });
 
     revalidatePath("/teacher/reports");
     revalidatePath("/director/reports");
+
+    const verb = input.forceNew ? "신규 초안을 만들었습니다" : "AI 초안을 생성했습니다";
 
     if (draft.usedAi) {
         return {
@@ -275,7 +322,7 @@ export async function regenerateDraftWithAi(input: {
             reportId: report.id,
             content: draft.content,
             evidenceSummary,
-            message: `AI 초안을 생성했습니다. (근거: ${evidenceSummary})`,
+            message: `${verb}. (근거: ${evidenceSummary})`,
         };
     }
 
