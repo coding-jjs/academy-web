@@ -98,7 +98,7 @@ export default function StaffReportsScreen({
                         onSelect={setSelectedStudentId}
                     />
                     <ReportEditor
-                        key={selectedStudent.id}
+                        key={`${selectedStudent.id}:${selectedStudent.report?.id ?? "none"}:${selectedStudent.submittedReport?.id ?? "none"}:${selectedStudent.submittedReport?.updatedAt ?? ""}`}
                         student={selectedStudent}
                     />
                 </div>
