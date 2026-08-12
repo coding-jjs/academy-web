@@ -1,30 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
-import type {
-    ParentGradesChild,
-} from "@/features/grades/types";
+import type { ParentGradesChild } from "@/features/grades/types";
 import {
     formatGradeDate,
     formatGradeDelta,
 } from "@/features/grades/formatters";
 import { WRONG_NOTE_STATUS_METADATA } from "@/features/grades/presentation";
 import styles from "./ParentGradesScreen.module.css";
+import { writeParentChildCookie } from "@/features/families/parent-child-cooke";
 
 const wrongStatusMeta = WRONG_NOTE_STATUS_METADATA;
 const formatDate = formatGradeDate;
 
 export default function ParentGradesScreen({
     childList,
+    activeChildId,
 }: {
     childList: ParentGradesChild[];
+    activeChildId: string;
 }) {
-    const [activeChildId, setActiveChildId] = useState(childList[0]?.id ?? "");
     const child =
         childList.find((item) => item.id === activeChildId) ??
         childList[0] ??
         null;
+    const router = useRouter();
+    function selectChild(childId: string) {
+        writeParentChildCookie(childId);
+        router.replace(`/parent/grades?childId=${childId}`);
+    }
 
     return (
         <section className={styles.page}>
@@ -54,7 +59,7 @@ export default function ParentGradesScreen({
                                             ? styles.childActive
                                             : styles.childBtn
                                     }
-                                    onClick={() => setActiveChildId(item.id)}
+                                    onClick={() => selectChild(item.id)}
                                 >
                                     {item.name}
                                 </button>
@@ -70,7 +75,9 @@ export default function ParentGradesScreen({
                                         <article key={item.subject}>
                                             <span>최근 {item.subject}</span>
                                             <strong>{item.score}점</strong>
-                                            <p>{formatGradeDelta(item.delta)}</p>
+                                            <p>
+                                                {formatGradeDelta(item.delta)}
+                                            </p>
                                         </article>
                                     ))
                                 ) : (
@@ -115,7 +122,9 @@ export default function ParentGradesScreen({
                                                             {` · ${formatDate(g.assessedAt)}`}
                                                         </span>
                                                     </div>
-                                                    <div className={styles.score}>
+                                                    <div
+                                                        className={styles.score}
+                                                    >
                                                         <strong>
                                                             {g.score}
                                                             <small>
@@ -173,11 +182,17 @@ export default function ParentGradesScreen({
                                                         </span>
                                                         {note.explanation && (
                                                             <small>
-                                                                {note.explanation}
+                                                                {
+                                                                    note.explanation
+                                                                }
                                                             </small>
                                                         )}
                                                     </div>
-                                                    <div className={styles.badges}>
+                                                    <div
+                                                        className={
+                                                            styles.badges
+                                                        }
+                                                    >
                                                         <StatusChip
                                                             tone={
                                                                 wrongStatusMeta[
@@ -191,10 +206,13 @@ export default function ParentGradesScreen({
                                                                 ].label
                                                             }
                                                         </StatusChip>
-                                                        {note.imageCount > 0 && (
+                                                        {note.imageCount >
+                                                            0 && (
                                                             <StatusChip>
                                                                 사진{" "}
-                                                                {note.imageCount}
+                                                                {
+                                                                    note.imageCount
+                                                                }
                                                             </StatusChip>
                                                         )}
                                                     </div>

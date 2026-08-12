@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
 import { ATTENDANCE_STATUS_METADATA } from "@/features/attendance/presentation";
 import { formatKstMonthDay } from "@/lib/date-kst";
@@ -10,6 +10,7 @@ import type {
     ParentDashboardChild,
 } from "@/features/dashboard/types";
 import styles from "./ParentDashboardScreen.module.css";
+import { writeParentChildCookie } from "@/features/families/parent-child-cooke";
 
 const statusMeta = ATTENDANCE_STATUS_METADATA;
 
@@ -26,16 +27,22 @@ export default function ParentDashboardScreen({
     childList,
     unreadCount,
     news,
+    activeChildId,
 }: {
     childList: ParentDashboardChild[];
     unreadCount: number;
     news: DashboardNewsItem[];
+    activeChildId: string;
 }) {
-    const [activeChildId, setActiveChildId] = useState(childList[0]?.id ?? "");
     const child =
         childList.find((item) => item.id === activeChildId) ??
         childList[0] ??
         null;
+    const router = useRouter();
+    function selectChild(childId: string) {
+        writeParentChildCookie(childId);
+        router.replace(`/parent/dashboard?childId=${childId}`);
+    }
 
     return (
         <section className={styles.page}>
@@ -70,7 +77,7 @@ export default function ParentDashboardScreen({
                                             ? styles.childActive
                                             : styles.childBtn
                                     }
-                                    onClick={() => setActiveChildId(item.id)}
+                                    onClick={() => selectChild(item.id)}
                                 >
                                     {item.name}
                                 </button>
@@ -83,20 +90,24 @@ export default function ParentDashboardScreen({
                             <div className={styles.hero}>
                                 {child.arrivalSummary ? (
                                     <>
-                                        <StatusChip tone="neutral">오늘</StatusChip>
+                                        <StatusChip tone="neutral">
+                                            오늘
+                                        </StatusChip>
                                         <h2>{child.arrivalSummary.title}</h2>
                                         <p>{child.arrivalSummary.detail}</p>
                                         {child.arrivalSummary.status ? (
                                             <StatusChip
                                                 tone={
                                                     statusMeta[
-                                                        child.arrivalSummary.status
+                                                        child.arrivalSummary
+                                                            .status
                                                     ].tone
                                                 }
                                             >
                                                 {
                                                     statusMeta[
-                                                        child.arrivalSummary.status
+                                                        child.arrivalSummary
+                                                            .status
                                                     ].label
                                                 }
                                             </StatusChip>
@@ -106,7 +117,9 @@ export default function ParentDashboardScreen({
                                     </>
                                 ) : (
                                     <>
-                                        <StatusChip tone="neutral">오늘</StatusChip>
+                                        <StatusChip tone="neutral">
+                                            오늘
+                                        </StatusChip>
                                         <h2>오늘 수업 없음</h2>
                                         <p>
                                             {child.className
@@ -119,7 +132,19 @@ export default function ParentDashboardScreen({
 
                             <div className={styles.quick}>
                                 {quickLinks.map((link) => (
-                                    <Link key={link.href} href={link.href}>
+                                    <Link
+                                        key={link.href}
+                                        href={
+                                            [
+                                                "/parent/attendance",
+                                                "/parent/reports",
+                                                "/parent/timetable",
+                                                "/parent/grades",
+                                            ].includes(link.href)
+                                                ? `${link.href}?childId=${child.id}`
+                                                : link.href
+                                        }
+                                    >
                                         {link.label}
                                     </Link>
                                 ))}
@@ -129,7 +154,11 @@ export default function ParentDashboardScreen({
                                 <article className={styles.panel}>
                                     <div className={styles.panelHead}>
                                         <h2>오늘 시간표</h2>
-                                        <Link href="/parent/attendance">전체</Link>
+                                        <Link
+                                            href={`/parent/attendance?childId=${child.id}`}
+                                        >
+                                            전체
+                                        </Link>
                                     </div>
                                     {child.todaySessions.length === 0 ? (
                                         <p className={styles.muted}>
@@ -140,7 +169,9 @@ export default function ParentDashboardScreen({
                                             {child.todaySessions.map((s) => (
                                                 <li key={s.id}>
                                                     <div>
-                                                        <strong>{s.className}</strong>
+                                                        <strong>
+                                                            {s.className}
+                                                        </strong>
                                                         <span>
                                                             {s.timeLabel}
                                                             {s.classroom
@@ -152,18 +183,22 @@ export default function ParentDashboardScreen({
                                                         <StatusChip
                                                             tone={
                                                                 statusMeta[
-                                                                    s.attendanceStatus
+                                                                    s
+                                                                        .attendanceStatus
                                                                 ].tone
                                                             }
                                                         >
                                                             {
                                                                 statusMeta[
-                                                                    s.attendanceStatus
+                                                                    s
+                                                                        .attendanceStatus
                                                                 ].label
                                                             }
                                                         </StatusChip>
                                                     ) : (
-                                                        <StatusChip>예정</StatusChip>
+                                                        <StatusChip>
+                                                            예정
+                                                        </StatusChip>
                                                     )}
                                                 </li>
                                             ))}
@@ -174,7 +209,11 @@ export default function ParentDashboardScreen({
                                 <article className={styles.panel}>
                                     <div className={styles.panelHead}>
                                         <h2>학습 보고서</h2>
-                                        <Link href="/parent/reports">전체</Link>
+                                        <Link
+                                            href={`/parent/reports?childId=${child.id}`}
+                                        >
+                                            전체
+                                        </Link>
                                     </div>
                                     {child.reports.length === 0 ? (
                                         <p className={styles.muted}>
@@ -186,9 +225,12 @@ export default function ParentDashboardScreen({
                                                 <li key={r.id}>
                                                     <div>
                                                         <strong>
-                                                            {r.content.slice(0, 40) ||
-                                                                "학습 보고서"}
-                                                            {r.content.length > 40
+                                                            {r.content.slice(
+                                                                0,
+                                                                40,
+                                                            ) || "학습 보고서"}
+                                                            {r.content.length >
+                                                            40
                                                                 ? "…"
                                                                 : ""}
                                                         </strong>
@@ -231,10 +273,14 @@ export default function ParentDashboardScreen({
                                         {news.map((item) => (
                                             <li key={item.id}>
                                                 <div>
-                                                    <strong>{item.title}</strong>
+                                                    <strong>
+                                                        {item.title}
+                                                    </strong>
                                                 </div>
                                                 <span className={styles.date}>
-                                                    {formatKstMonthDay(item.createdAt)}
+                                                    {formatKstMonthDay(
+                                                        item.createdAt,
+                                                    )}
                                                 </span>
                                             </li>
                                         ))}
