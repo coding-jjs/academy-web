@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
 import type {
     ParentTimetableChild,
@@ -10,16 +11,17 @@ import type {
 } from "@/features/timetable/types";
 import { WEEK_DAY_LABELS } from "@/features/timetable/presentation";
 import styles from "./ParentTimetableScreen.module.css";
+import { writeParentChildCookie } from "@/features/families/parent-child-cooke";
 
 export default function ParentTimetableScreen({
     childList,
     weekDays,
+    activeChildId,
 }: {
     childList: ParentTimetableChild[];
     weekDays: WeekDay[];
+    activeChildId: string;
 }) {
-    const [activeChildId, setActiveChildId] = useState(childList[0]?.id ?? "");
-
     const child =
         childList.find((item) => item.id === activeChildId) ??
         childList[0] ??
@@ -46,6 +48,12 @@ export default function ParentTimetableScreen({
     }, [child, weekDays]);
 
     const todaySessions = child?.sessions.filter((s) => s.isToday) ?? [];
+    const router = useRouter();
+
+    function selectChild(childId: string) {
+        writeParentChildCookie(childId);
+        router.replace(`/parent/timetable?childId=${childId}`);
+    }
 
     return (
         <section className={styles.page}>
@@ -55,7 +63,10 @@ export default function ParentTimetableScreen({
                     <h1>자녀 시간표</h1>
                     <p>선택한 자녀의 수업 시간과 강의실을 확인합니다.</p>
                 </div>
-                <Link href="/parent/attendance" className={styles.secondaryBtn}>
+                <Link
+                    href={`/parent/attendance?childId=${child.id}`}
+                    className={styles.secondaryBtn}
+                >
                     출결·결석 신청
                 </Link>
             </header>
@@ -78,7 +89,7 @@ export default function ParentTimetableScreen({
                                             ? styles.childActive
                                             : styles.childBtn
                                     }
-                                    onClick={() => setActiveChildId(item.id)}
+                                    onClick={() => selectChild(item.id)}
                                 >
                                     {item.name}
                                 </button>
@@ -214,7 +225,11 @@ export default function ParentTimetableScreen({
                                             >
                                                 <div>
                                                     <strong>
-                                                        {WEEK_DAY_LABELS[slot.day]}{" "}
+                                                        {
+                                                            WEEK_DAY_LABELS[
+                                                                slot.day
+                                                            ]
+                                                        }{" "}
                                                         {slot.start}~{slot.end}
                                                     </strong>
                                                     <span>

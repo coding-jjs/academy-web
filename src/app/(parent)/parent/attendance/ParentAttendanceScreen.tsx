@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
 import { ATTENDANCE_STATUS_METADATA } from "@/features/attendance/presentation";
 import type { ParentAttendanceChild } from "@/features/attendance/parent-types";
@@ -8,6 +9,7 @@ import {
     requestAbsence,
     type AbsenceState,
 } from "@/features/attendance/parent-actions";
+import { writeParentChildCookie } from "@/features/families/parent-child-cooke";
 import styles from "./ParentAttendanceScreen.module.css";
 
 const statusMeta = ATTENDANCE_STATUS_METADATA;
@@ -16,28 +18,33 @@ const initialAbsence: AbsenceState = { status: "idle", message: "" };
 
 export default function ParentAttendanceScreen({
     childList,
+    activeChildId,
 }: {
     childList: ParentAttendanceChild[];
+    activeChildId: string;
 }) {
-    const [activeChildId, setActiveChildId] = useState(
-        childList[0]?.id ?? "",
-    );
     const [state, formAction, pending] = useActionState(
         requestAbsence,
         initialAbsence,
     );
+    const router = useRouter();
 
     const child =
-        childList.find((item) => item.id === activeChildId) ?? childList[0] ?? null;
+        childList.find((item) => item.id === activeChildId) ??
+        childList[0] ??
+        null;
 
     const requestableSessions = useMemo(() => {
         if (!child) return [];
         return child.sessions.filter(
-            (s) =>
-                new Date(s.startsAt) > new Date() &&
-                !s.absenceRequest,
+            (s) => new Date(s.startsAt) > new Date() && !s.absenceRequest,
         );
     }, [child]);
+
+    function selectChild(childId: string) {
+        writeParentChildCookie(childId);
+        router.replace(`/parent/attendance?childId=${childId}`);
+    }
 
     return (
         <section className={styles.page}>
@@ -67,7 +74,7 @@ export default function ParentAttendanceScreen({
                                             ? styles.childActive
                                             : styles.childBtn
                                     }
-                                    onClick={() => setActiveChildId(item.id)}
+                                    onClick={() => selectChild(item.id)}
                                 >
                                     {item.name}
                                 </button>
@@ -81,7 +88,9 @@ export default function ParentAttendanceScreen({
                                 <StatusChip tone="neutral">오늘</StatusChip>
                                 {child.todayHighlight ? (
                                     <>
-                                        <h2>{child.todayHighlight.className}</h2>
+                                        <h2>
+                                            {child.todayHighlight.className}
+                                        </h2>
                                         <p>
                                             {child.todayHighlight.timeLabel}
                                             {child.todayHighlight.classroom
@@ -92,13 +101,15 @@ export default function ParentAttendanceScreen({
                                             <StatusChip
                                                 tone={
                                                     statusMeta[
-                                                        child.todayHighlight.status
+                                                        child.todayHighlight
+                                                            .status
                                                     ].tone
                                                 }
                                             >
                                                 {
                                                     statusMeta[
-                                                        child.todayHighlight.status
+                                                        child.todayHighlight
+                                                            .status
                                                     ].label
                                                 }
                                             </StatusChip>
@@ -160,18 +171,24 @@ export default function ParentAttendanceScreen({
                                                                 : ""}
                                                         </span>
                                                     </div>
-                                                    <div className={styles.badges}>
+                                                    <div
+                                                        className={
+                                                            styles.badges
+                                                        }
+                                                    >
                                                         {s.attendanceStatus ? (
                                                             <StatusChip
                                                                 tone={
                                                                     statusMeta[
-                                                                        s.attendanceStatus
+                                                                        s
+                                                                            .attendanceStatus
                                                                     ].tone
                                                                 }
                                                             >
                                                                 {
                                                                     statusMeta[
-                                                                        s.attendanceStatus
+                                                                        s
+                                                                            .attendanceStatus
                                                                     ].label
                                                                 }
                                                             </StatusChip>
@@ -214,7 +231,10 @@ export default function ParentAttendanceScreen({
                                         </p>
                                     )}
 
-                                    <form action={formAction} className={styles.form}>
+                                    <form
+                                        action={formAction}
+                                        className={styles.form}
+                                    >
                                         <input
                                             type="hidden"
                                             name="studentId"
@@ -230,11 +250,17 @@ export default function ParentAttendanceScreen({
                                                 <option value="" disabled>
                                                     선택
                                                 </option>
-                                                {requestableSessions.map((s) => (
-                                                    <option key={s.id} value={s.id}>
-                                                        {s.className} · {s.timeLabel}
-                                                    </option>
-                                                ))}
+                                                {requestableSessions.map(
+                                                    (s) => (
+                                                        <option
+                                                            key={s.id}
+                                                            value={s.id}
+                                                        >
+                                                            {s.className} ·{" "}
+                                                            {s.timeLabel}
+                                                        </option>
+                                                    ),
+                                                )}
                                             </select>
                                         </label>
                                         <label className={styles.field}>
@@ -255,9 +281,7 @@ export default function ParentAttendanceScreen({
                                                 requestableSessions.length === 0
                                             }
                                         >
-                                            {pending
-                                                ? "신청 중…"
-                                                : "결석 요청"}
+                                            {pending ? "신청 중…" : "결석 요청"}
                                         </button>
                                     </form>
                                 </article>

@@ -1,29 +1,32 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
 import type { ParentReportChild } from "@/features/reports/parent-types";
 import styles from "./ParentReportsScreen.module.css";
+import { writeParentChildCookie } from "@/features/families/parent-child-cooke";
 
 export default function ParentReportsScreen({
     childList,
+    activeChildId,
 }: {
     childList: ParentReportChild[];
+    activeChildId: string;
 }) {
-    const [activeChildId, setActiveChildId] = useState<string | null>(
-        childList[0]?.id ?? null,
-    );
-    const [activeReportId, setActiveReportId] = useState<string | null>(
-        childList[0]?.reports[0]?.id ?? null,
-    );
-
     const activeChild =
-        childList.find((child) => child.id === activeChildId) ?? null;
-
+        childList.find((child) => child.id === activeChildId) ??
+        childList[0] ??
+        null;
+    const [activeReportId, setActiveReportId] = useState<string | null>(
+        activeChild?.reports[0]?.id ?? null,
+    );
     const activeReport = useMemo(() => {
         if (!activeChild) return null;
         return (
-            activeChild.reports.find((report) => report.id === activeReportId) ??
+            activeChild.reports.find(
+                (report) => report.id === activeReportId,
+            ) ??
             activeChild.reports[0] ??
             null
         );
@@ -35,11 +38,11 @@ export default function ParentReportsScreen({
             (report) => report.id !== activeReport.id,
         );
     }, [activeChild, activeReport]);
+    const router = useRouter();
 
     function selectChild(childId: string) {
-        const next = childList.find((child) => child.id === childId);
-        setActiveChildId(childId);
-        setActiveReportId(next?.reports[0]?.id ?? null);
+        writeParentChildCookie(childId);
+        router.replace(`/parent/reports?childId=${childId}`);
     }
 
     return (
@@ -132,9 +135,11 @@ export default function ParentReportsScreen({
                                 <article className={styles.panel}>
                                     <h3>평가 키워드</h3>
                                     <ul className={styles.keywordList}>
-                                        {activeReport.keywords.map((keyword) => (
-                                            <li key={keyword}>{keyword}</li>
-                                        ))}
+                                        {activeReport.keywords.map(
+                                            (keyword) => (
+                                                <li key={keyword}>{keyword}</li>
+                                            ),
+                                        )}
                                     </ul>
                                 </article>
                             )}

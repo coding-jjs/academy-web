@@ -1,16 +1,37 @@
-import { requireRole } from "@/lib/auth-guard";
-import { getParentPaymentsData } from "@/features/billing/parent-data";
-import ParentPaymentsScreen from "./ParentPaymentsScreen";
+import Link from "next/link";
+import styles from "./ParentPaymentsScreen.module.css";
 
-export const dynamic = "force-dynamic";
-
-export default async function ParentPaymentsPage() {
-    const session = await requireRole("PARENT");
-    const data = await getParentPaymentsData(session.user.id);
+export default function ParentPaymentsPage() {
     return (
-        <ParentPaymentsScreen
-            {...data}
-            tossReady={Boolean(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY)}
-        />
+        <section className={styles.page}>
+            <header className={styles.heading}>
+                <div>
+                    <span>PAYMENTS</span>
+                    <h1>결제</h1>
+                    <p>수강료와 교재비를 온라인으로 결제할 수 있습니다.</p>
+                </div>
+            </header>
+
+            <div className={styles.preparing}>
+                <div className={styles.preparingIcon} aria-hidden="true">
+                    ◷
+                </div>
+
+                <span className={styles.preparingBadge}>COMING SOON</span>
+
+                <h2>현재 준비 중인 서비스입니다</h2>
+
+                <p>
+                    더욱 편리하고 안전한 결제 서비스를 제공하기 위해 준비하고
+                    있습니다.
+                    <br />
+                    결제 관련 문의는 학원으로 연락해 주세요.
+                </p>
+
+                <Link href="/parent/dashboard" className={styles.dashboardLink}>
+                    자녀 홈으로 돌아가기
+                </Link>
+            </div>
+        </section>
     );
 }
