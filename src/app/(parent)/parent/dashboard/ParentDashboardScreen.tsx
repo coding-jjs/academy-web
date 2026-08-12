@@ -3,63 +3,15 @@
 import Link from "next/link";
 import { useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
+import { ATTENDANCE_STATUS_METADATA } from "@/features/attendance/presentation";
+import { formatKstMonthDay } from "@/lib/date-kst";
+import type {
+    DashboardNewsItem,
+    ParentDashboardChild,
+} from "@/features/dashboard/types";
 import styles from "./ParentDashboardScreen.module.css";
 
-export type AttendanceStatus =
-    | "PRESENT"
-    | "LATE"
-    | "ABSENT"
-    | "EXCUSED"
-    | "EARLY_LEAVE";
-
-export type ParentDashboardChild = {
-    id: string;
-    name: string;
-    schoolName: string | null;
-    grade: string | null;
-    className: string | null;
-    teacherName: string | null;
-    arrivalSummary: {
-        title: string;
-        detail: string;
-        status: AttendanceStatus | null;
-        checkInAt: string | null;
-    } | null;
-    todaySessions: {
-        id: string;
-        className: string;
-        subject: string;
-        timeLabel: string;
-        classroom: string | null;
-        attendanceStatus: AttendanceStatus | null;
-    }[];
-    reports: {
-        id: string;
-        content: string;
-        teacherName: string;
-        sentAt: string | null;
-        parentReadAt: string | null;
-        periodStart: string;
-        periodEnd: string;
-    }[];
-};
-
-type NewsItem = {
-    id: string;
-    title: string;
-    createdAt: string;
-};
-
-const statusMeta: Record<
-    AttendanceStatus,
-    { label: string; tone: "neutral" | "success" | "warning" | "danger" }
-> = {
-    PRESENT: { label: "출석", tone: "success" },
-    LATE: { label: "지각", tone: "warning" },
-    ABSENT: { label: "결석", tone: "danger" },
-    EXCUSED: { label: "공결", tone: "neutral" },
-    EARLY_LEAVE: { label: "조퇴", tone: "warning" },
-};
+const statusMeta = ATTENDANCE_STATUS_METADATA;
 
 const quickLinks = [
     { href: "/parent/attendance", label: "출결" },
@@ -70,14 +22,6 @@ const quickLinks = [
     { href: "/parent/inbox", label: "쪽지함" },
 ];
 
-function formatDate(iso: string) {
-    return new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Seoul",
-        month: "2-digit",
-        day: "2-digit",
-    }).format(new Date(iso));
-}
-
 export default function ParentDashboardScreen({
     childList,
     unreadCount,
@@ -85,7 +29,7 @@ export default function ParentDashboardScreen({
 }: {
     childList: ParentDashboardChild[];
     unreadCount: number;
-    news: NewsItem[];
+    news: DashboardNewsItem[];
 }) {
     const [activeChildId, setActiveChildId] = useState(childList[0]?.id ?? "");
     const child =
@@ -251,7 +195,7 @@ export default function ParentDashboardScreen({
                                                         <span>
                                                             {r.teacherName}
                                                             {r.sentAt
-                                                                ? ` · ${formatDate(r.sentAt)}`
+                                                                ? ` · ${formatKstMonthDay(r.sentAt)}`
                                                                 : ""}
                                                         </span>
                                                     </div>
@@ -290,7 +234,7 @@ export default function ParentDashboardScreen({
                                                     <strong>{item.title}</strong>
                                                 </div>
                                                 <span className={styles.date}>
-                                                    {formatDate(item.createdAt)}
+                                                    {formatKstMonthDay(item.createdAt)}
                                                 </span>
                                             </li>
                                         ))}

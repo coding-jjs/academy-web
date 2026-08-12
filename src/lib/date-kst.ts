@@ -34,11 +34,53 @@ export function getKstWeekRange(now = new Date()) {
     return { startOfToday, startOfWeek, endOfWeek };
 }
 
-export function formatKstTime(date: Date) {
+type DateInput = Date | string;
+
+function toDate(date: DateInput) {
+    return typeof date === "string" ? new Date(date) : date;
+}
+
+export function formatKstTime(date: DateInput) {
     return new Intl.DateTimeFormat("ko-KR", {
         timeZone: "Asia/Seoul",
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
-    }).format(date);
+    }).format(toDate(date));
+}
+
+export function formatKstMonthDay(date: DateInput) {
+    return new Intl.DateTimeFormat("ko-KR", {
+        timeZone: "Asia/Seoul",
+        month: "2-digit",
+        day: "2-digit",
+    }).format(toDate(date));
+}
+
+export function formatKstYearMonthDay(date: DateInput) {
+    return new Intl.DateTimeFormat("ko-KR", {
+        timeZone: "Asia/Seoul",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    }).format(toDate(date));
+}
+
+export function formatKstDateTime(date: DateInput) {
+    return new Intl.DateTimeFormat("ko-KR", {
+        timeZone: "Asia/Seoul",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+    }).format(toDate(date));
+}
+
+export function formatKstSessionTime(session: {
+    startsAt: Date;
+    endsAt: Date;
+}) {
+    return `${formatKstTime(session.startsAt)}~${formatKstTime(session.endsAt)}`;
 }

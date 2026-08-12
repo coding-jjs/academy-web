@@ -1,3 +1,4 @@
+import { CHURN_SIGNAL_LABELS } from "@/features/churn/presentation";
 import { prisma } from "@/lib/db";
 import { getKstDayRange } from "@/lib/date-kst";
 import type { Prisma } from "@/generate/prisma/client";
@@ -175,17 +176,11 @@ async function evaluateStudent(
 }
 
 function buildSummary(signals: DetectedSignal[]) {
-    const labels: Record<DetectedSignal["type"], string> = {
-        ATTENDANCE_DROP: "출석 하락",
-        SCORE_DROP: "성적 하락",
-        CONSECUTIVE_ABSENCE: "연속 결석",
-        UNPAID_DAYS: "미납",
-    };
     return signals
         .map((s) =>
             s.value != null
-                ? `${labels[s.type]} (${s.value})`
-                : labels[s.type],
+                ? `${CHURN_SIGNAL_LABELS[s.type]} (${s.value})`
+                : CHURN_SIGNAL_LABELS[s.type],
         )
         .join(" · ");
 }

@@ -1,52 +1,18 @@
 import { requireRole } from "@/lib/auth-guard";
-import { prisma } from "@/lib/db";
 import { userHasPermission } from "@/lib/permission-guard";
 import {
     classScopeWhere,
     getStaffScope,
     studentScopeWhere,
 } from "@/lib/staff-scope";
+import { getStaffMessagesData } from "@/features/messages/data";
 import MessagesScreen from "@/features/messages/MessagesScreen";
-import type { MessageListItem } from "@/features/messages/actions";
 
 export const dynamic = "force-dynamic";
 
-function mapRow(row: {
-    id: string;
-    title: string;
-    content: string;
-    status: MessageListItem["status"];
-    audience: MessageListItem["audience"];
-    rejectionReason: string | null;
-    createdAt: Date;
-    submittedAt: Date | null;
-    sentAt: Date | null;
-    author: { name: string | null } | null;
-    sender: { name: string | null } | null;
-    _count: { recipients: number };
-}): MessageListItem {
-    return {
-        id: row.id,
-        title: row.title,
-        content: row.content,
-        status: row.status,
-        audience: row.audience,
-        authorName: row.author?.name ?? row.sender?.name ?? "학원",
-        rejectionReason: row.rejectionReason,
-        createdAt: row.createdAt.toISOString(),
-        submittedAt: row.submittedAt?.toISOString() ?? null,
-        sentAt: row.sentAt?.toISOString() ?? null,
-        recipientCount: row._count.recipients,
-    };
-}
-
 export default async function StaffMessagesPage() {
     const session = await requireRole("STAFF", "TEACHER");
-
-    const canCompose = await userHasPermission(
-        session.user.id,
-        "sendMessage",
-    );
+    const canCompose = await userHasPermission(session.user.id, "sendMessage");
 
     if (!canCompose) {
         return (
@@ -62,57 +28,18 @@ export default async function StaffMessagesPage() {
         );
     }
 
-    const scope = await getStaffScope(session.user.id);
+    const staffScope = await getStaffScope(session.user.id);
+    const messagesData = await getStaffMessagesData({
+        staffUserId: session.user.id,
+        studentWhere: {
+            status: "ENROLLED",
+            ...studentScopeWhere(staffScope),
+        },
+        classWhere: {
+            active: true,
+            ...classScopeWhere(staffScope),
+        },
+    });
 
-    const [students, classes, mineRaw] = await Promise.all([
-        prisma.student.findMany({
-            where: {
-                status: "ENROLLED",
-                ...studentScopeWhere(scope),
-            },
-            orderBy: { name: "asc" },
-            select: { id: true, name: true },
-        }),
-        prisma.class.findMany({
-            where: {
-                active: true,
-                ...classScopeWhere(scope),
-            },
-            orderBy: { name: "asc" },
-            select: { id: true, name: true },
-        }),
-        prisma.message.findMany({
-            where: {
-                authorUserId: session.user.id,
-                status: { in: ["PENDING_APPROVAL", "SENT", "REJECTED"] },
-            },
-            orderBy: { createdAt: "desc" },
-            take: 50,
-            select: {
-                id: true,
-                title: true,
-                content: true,
-                status: true,
-                audience: true,
-                rejectionReason: true,
-                createdAt: true,
-                submittedAt: true,
-                sentAt: true,
-                author: { select: { name: true } },
-                sender: { select: { name: true } },
-                _count: { select: { recipients: true } },
-            },
-        }),
-    ]);
-
-    return (
-        <MessagesScreen
-            mode="staff"
-            canCompose
-            students={students}
-            classes={classes}
-            pending={[]}
-            mine={mineRaw.map(mapRow)}
-        />
-    );
+    return <MessagesScreen mode="staff" canCompose {...messagesData} />;
 }

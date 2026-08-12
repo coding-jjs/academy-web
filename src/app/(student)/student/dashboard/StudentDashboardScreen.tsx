@@ -1,62 +1,11 @@
 import Link from "next/link";
 import StatusChip from "@/components/ui/StatusChip";
+import { ATTENDANCE_STATUS_METADATA } from "@/features/attendance/presentation";
+import { formatKstMonthDay } from "@/lib/date-kst";
+import type { StudentDashboardData } from "@/features/dashboard/types";
 import styles from "./StudentDashboardScreen.module.css";
 
-export type AttendanceStatus =
-    | "PRESENT"
-    | "LATE"
-    | "ABSENT"
-    | "EXCUSED"
-    | "EARLY_LEAVE";
-
-export type StudentDashboardData = {
-    studentName: string;
-    schoolName: string | null;
-    grade: string | null;
-    linked: boolean;
-    todaySessions: {
-        id: string;
-        className: string;
-        subject: string;
-        timeLabel: string;
-        classroom: string | null;
-        startsAt: string;
-        attendanceStatus: AttendanceStatus | null;
-    }[];
-    nextSession: {
-        className: string;
-        timeLabel: string;
-        classroom: string | null;
-    } | null;
-    todayAttendanceLabel: AttendanceStatus | null;
-    latestGrade: {
-        subject: string;
-        title: string;
-        score: number;
-        maxScore: number;
-        assessedAt: string;
-    } | null;
-    openWrongCount: number;
-    unreadCount: number;
-    news: { id: string; title: string; createdAt: string }[];
-    homework: {
-        id: string;
-        title: string;
-        content: string;
-        recordDate: string;
-    }[];
-};
-
-const statusMeta: Record<
-    AttendanceStatus,
-    { label: string; tone: "neutral" | "success" | "warning" | "danger" }
-> = {
-    PRESENT: { label: "출석", tone: "success" },
-    LATE: { label: "지각", tone: "warning" },
-    ABSENT: { label: "결석", tone: "danger" },
-    EXCUSED: { label: "공결", tone: "neutral" },
-    EARLY_LEAVE: { label: "조퇴", tone: "warning" },
-};
+const statusMeta = ATTENDANCE_STATUS_METADATA;
 
 const quickLinks = [
     { href: "/student/timetable", label: "시간표" },
@@ -64,14 +13,6 @@ const quickLinks = [
     { href: "/student/grades", label: "오답" },
     { href: "/student/inbox", label: "공지" },
 ];
-
-function formatDate(iso: string) {
-    return new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Seoul",
-        month: "2-digit",
-        day: "2-digit",
-    }).format(new Date(iso));
-}
 
 export default function StudentDashboardScreen({
     data,
@@ -228,7 +169,7 @@ export default function StudentDashboardScreen({
                                     <div>
                                         <strong>{item.title}</strong>
                                         <span>
-                                            {formatDate(item.recordDate)}
+                                            {formatKstMonthDay(item.recordDate)}
                                         </span>
                                     </div>
                                 </li>
@@ -253,7 +194,7 @@ export default function StudentDashboardScreen({
                                     <strong>{item.title}</strong>
                                 </div>
                                 <span className={styles.date}>
-                                    {formatDate(item.createdAt)}
+                                    {formatKstMonthDay(item.createdAt)}
                                 </span>
                             </li>
                         ))}

@@ -12,7 +12,6 @@ import {
 } from "@/features/messages/recipients";
 import type {
     MessageAudience,
-    MessageStatus,
 } from "@/generate/prisma/client";
 
 export type MessageActionResult =
@@ -353,17 +352,3 @@ export async function rejectMessage(input: {
     revalidateMessagePaths();
     return { ok: true, message: "반려 처리했습니다." };
 }
-
-export type MessageListItem = {
-    id: string;
-    title: string;
-    content: string;
-    status: MessageStatus;
-    audience: MessageAudience | null;
-    authorName: string;
-    rejectionReason: string | null;
-    createdAt: string;
-    submittedAt: string | null;
-    sentAt: string | null;
-    recipientCount: number;
-};

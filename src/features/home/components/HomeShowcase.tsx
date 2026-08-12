@@ -1,0 +1,58 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { HOME_BANNERS, HOME_NOTICES } from "@/features/home/content";
+import styles from "../HomeScreen.module.css";
+
+export default function HomeShowcase() {
+    const [noticeIndex, setNoticeIndex] = useState(0);
+    const [bannerIndex, setBannerIndex] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
+
+    useAutoAdvance({ isPaused, interval: 4000, itemCount: HOME_NOTICES.length, setIndex: setNoticeIndex });
+    useAutoAdvance({ isPaused, interval: 6000, itemCount: HOME_BANNERS.length, setIndex: setBannerIndex });
+
+    const activeBanner = HOME_BANNERS[bannerIndex];
+    const pauseEvents = {
+        onMouseEnter: () => setIsPaused(true),
+        onMouseLeave: () => setIsPaused(false),
+        onFocusCapture: () => setIsPaused(true),
+        onBlurCapture: () => setIsPaused(false),
+    };
+
+    function moveNotice(direction: 1 | -1) {
+        setNoticeIndex((current) => (current + direction + HOME_NOTICES.length) % HOME_NOTICES.length);
+    }
+
+    return (
+        <>
+            <section className={styles.noticeBar} aria-label="주요 공지사항" {...pauseEvents}>
+                <div className={styles.noticeInner}><strong className={styles.noticeLabel}>NOTICE</strong><div className={styles.noticeContent} aria-live="polite"><span>{HOME_NOTICES[noticeIndex].audience}</span><p>{HOME_NOTICES[noticeIndex].title}</p><time>{HOME_NOTICES[noticeIndex].date}</time></div><div className={styles.noticeControls}><button type="button" onClick={() => moveNotice(-1)} aria-label="이전 공지">↑</button><span>{String(noticeIndex + 1).padStart(2, "0")} / {String(HOME_NOTICES.length).padStart(2, "0")}</span><button type="button" onClick={() => moveNotice(1)} aria-label="다음 공지">↓</button></div></div>
+            </section>
+            <section className={styles.hero} id="about" {...pauseEvents}>
+                <div className={styles.heroCopy}>
+                    <p className={styles.eyebrow}>LEARN · RECORD · GROW</p>
+                    <h1><span className={styles.heroLine}>배움의 오늘을 <span className={styles.mobileLine}>기록하고,</span></span><span className={styles.heroLine}>내일의 성장을 <span className={styles.mobileLine}>만듭니다</span></span></h1>
+                    <p className={styles.heroDescription}>A학원은 수업만 제공하지 않습니다. 학생의 과정과 변화를 세심하게 기록하고, 가정과 함께 다음 걸음을 설계합니다.</p>
+                    <div className={styles.heroActions}><Link href="/guest/inquiry" className={styles.primaryButton}>상담 신청하기 <span aria-hidden="true">→</span></Link><Link href="/login" className={styles.textButton}>학부모 · 학생 로그인</Link></div>
+                    <div className={styles.heroSummary}><span>수업</span><i aria-hidden="true" /><span>기록</span><i aria-hidden="true" /><span>소통</span><i aria-hidden="true" /><span>성장</span></div>
+                </div>
+                <div className={`${styles.visual} ${styles[activeBanner.tone]}`}>
+                    {HOME_BANNERS.map((banner, index) => <Image key={banner.src} src={banner.src} alt={banner.description} width={1080} height={1440} priority={index === 0} className={index === bannerIndex ? styles.imageActive : styles.image} aria-hidden={index !== bannerIndex} />)}
+                    <div className={styles.visualCopy}><span>{activeBanner.eyebrow}</span><h2>{activeBanner.title}</h2><p>{activeBanner.description}</p></div>
+                    <div className={styles.bannerControls} aria-label="메인 배너 선택">{HOME_BANNERS.map((banner, index) => <button key={banner.src} type="button" className={index === bannerIndex ? styles.dotActive : styles.dot} onClick={() => setBannerIndex(index)} aria-label={`${index + 1}번 배너 보기`} aria-current={index === bannerIndex} />)}<button type="button" className={styles.pauseButton} onClick={() => setIsPaused((current) => !current)} aria-label={isPaused ? "자동 전환 시작" : "자동 전환 멈춤"}>{isPaused ? "▶" : "Ⅱ"}</button></div>
+                </div>
+            </section>
+        </>
+    );
+}
+
+function useAutoAdvance({ isPaused, interval, itemCount, setIndex }: { isPaused: boolean; interval: number; itemCount: number; setIndex: React.Dispatch<React.SetStateAction<number>> }) {
+    useEffect(() => {
+        if (isPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const timer = window.setInterval(() => setIndex((current) => (current + 1) % itemCount), interval);
+        return () => window.clearInterval(timer);
+    }, [interval, isPaused, itemCount, setIndex]);
+}

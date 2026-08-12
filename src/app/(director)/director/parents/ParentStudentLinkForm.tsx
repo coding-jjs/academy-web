@@ -1,7 +1,11 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
-import { linkParentStudent, type ParentLinkState } from "./actions";
+import {
+    linkParentStudent,
+    type ParentLinkState,
+} from "@/features/families/actions";
+import { formatStudentOptionLabel } from "@/features/students/presentation";
 import styles from "./page.module.css";
 
 const initialState: ParentLinkState = {
@@ -36,16 +40,6 @@ function getUnavailableMessage(parentCount: number, studentCount: number) {
     }
 
     return null;
-}
-
-function formatStudentOption(student: StudentOption) {
-    return [
-        student.name,
-        student.schoolName,
-        student.grade ? `${student.grade}학년` : null,
-    ]
-        .filter(Boolean)
-        .join(" · ");
 }
 
 export default function ParentStudentLinkForm({
@@ -130,7 +124,7 @@ export default function ParentStudentLinkForm({
                         </option>
                         {students.map((student) => (
                             <option key={student.id} value={student.id}>
-                                {formatStudentOption(student)}
+                                {formatStudentOptionLabel(student)}
                             </option>
                         ))}
                     </select>

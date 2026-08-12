@@ -3,69 +3,13 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
+import type {
+    ParentTimetableChild,
+    WeekDay,
+    WeekDayKey,
+} from "@/features/timetable/types";
+import { WEEK_DAY_LABELS } from "@/features/timetable/presentation";
 import styles from "./ParentTimetableScreen.module.css";
-
-export type WeekDayKey =
-    | "mon"
-    | "tue"
-    | "wed"
-    | "thu"
-    | "fri"
-    | "sat"
-    | "sun";
-
-export type ParentTimetableChild = {
-    id: string;
-    name: string;
-    schoolName: string | null;
-    grade: string | null;
-    classes: {
-        id: string;
-        name: string;
-        subject: string;
-        teacherName: string | null;
-    }[];
-    sessions: {
-        id: string;
-        className: string;
-        subject: string;
-        teacherName: string | null;
-        classroom: string | null;
-        dayKey: WeekDayKey;
-        timeLabel: string;
-        startsAt: string;
-        endsAt: string;
-        isToday: boolean;
-        status: string;
-    }[];
-    recurring: {
-        classId: string;
-        className: string;
-        subject: string;
-        teacherName: string | null;
-        day: WeekDayKey;
-        start: string;
-        end: string;
-        classroom: string | null;
-    }[];
-};
-
-export type WeekDay = {
-    key: WeekDayKey;
-    label: string;
-    isToday: boolean;
-    dateIso: string;
-};
-
-const DAY_LABEL: Record<WeekDayKey, string> = {
-    mon: "월",
-    tue: "화",
-    wed: "수",
-    thu: "목",
-    fri: "금",
-    sat: "토",
-    sun: "일",
-};
 
 export default function ParentTimetableScreen({
     childList,
@@ -187,7 +131,7 @@ export default function ParentTimetableScreen({
                                     >
                                         <div className={styles.dayHead}>
                                             <strong>
-                                                {DAY_LABEL[day.key]}
+                                                {WEEK_DAY_LABELS[day.key]}
                                             </strong>
                                             <span>{day.label}</span>
                                             {day.isToday && (
@@ -270,7 +214,7 @@ export default function ParentTimetableScreen({
                                             >
                                                 <div>
                                                     <strong>
-                                                        {DAY_LABEL[slot.day]}{" "}
+                                                        {WEEK_DAY_LABELS[slot.day]}{" "}
                                                         {slot.start}~{slot.end}
                                                     </strong>
                                                     <span>

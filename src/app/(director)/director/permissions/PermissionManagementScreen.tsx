@@ -3,19 +3,10 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { PermissionKey } from "@/types/roles";
+import type { PermissionMember } from "@/features/permissions/types";
 import { presetForRole } from "@/lib/permissions";
-import { saveMemberPermissions } from "./actions";
+import { saveMemberPermissions } from "@/features/permissions/actions";
 import styles from "./PermissionManagementScreen.module.css";
-
-type MemberRole = "TEACHER" | "STAFF";
-
-export type PermissionMember = {
-    id: string;
-    name: string;
-    email: string;
-    role: MemberRole;
-    permissions: Record<PermissionKey, boolean>;
-};
 
 const permissionLabels: Record<PermissionKey, string> = {
     viewAllStudents: "전체 학생 조회",

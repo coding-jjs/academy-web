@@ -2,67 +2,26 @@
 
 import { useActionState, useEffect, useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
+import type { ParentInvoice } from "@/features/billing/parent-types";
+import {
+    formatInvoiceAmount,
+    formatInvoiceDate,
+    PARENT_INVOICE_STATUS_METADATA,
+} from "@/features/billing/presentation";
 import { requestTossPayment } from "@/lib/toss-client";
-import { prepareTossCheckout, type CheckoutState } from "./actions";
+import {
+    prepareTossCheckout,
+    type CheckoutState,
+} from "@/features/billing/parent-actions";
 import styles from "./ParentPaymentsScreen.module.css";
 
-export type InvoiceStatus =
-    | "DRAFT"
-    | "ISSUED"
-    | "PAID"
-    | "OVERDUE"
-    | "CANCELLED";
-
-export type ParentInvoice = {
-    id: string;
-    title: string;
-    items: { name: string; amount: number }[];
-    totalAmount: number;
-    status: InvoiceStatus;
-    dueDate: string;
-    issuedAt: string | null;
-    paidAt: string | null;
-    studentId: string;
-    studentName: string;
-    latestPayment: {
-        id: string;
-        orderId: string;
-        status: string;
-        method: string | null;
-        approvedAt: string | null;
-        failureMessage: string | null;
-    } | null;
-};
-
-const statusMeta: Record<
-    InvoiceStatus,
-    { label: string; tone: "neutral" | "success" | "warning" | "danger" }
-> = {
-    DRAFT: { label: "작성중", tone: "neutral" },
-    ISSUED: { label: "결제 대기", tone: "warning" },
-    OVERDUE: { label: "미납", tone: "danger" },
-    PAID: { label: "완료", tone: "success" },
-    CANCELLED: { label: "취소", tone: "neutral" },
-};
+const statusMeta = PARENT_INVOICE_STATUS_METADATA;
 
 const initialCheckout: CheckoutState = {
     status: "idle",
     message: "",
     checkout: null,
 };
-
-function formatAmount(amount: number) {
-    return new Intl.NumberFormat("ko-KR").format(amount) + "원";
-}
-
-function formatDate(iso: string) {
-    return new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Seoul",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-    }).format(new Date(iso));
-}
 
 export default function ParentPaymentsScreen({
     payable,
@@ -126,11 +85,11 @@ export default function ParentPaymentsScreen({
                     </StatusChip>
                     <h2>{selected.title}</h2>
                     <p className={styles.amount}>
-                        {formatAmount(selected.totalAmount)}
+                        {formatInvoiceAmount(selected.totalAmount)}
                     </p>
                     <p>
                         {selected.studentName} · 납기{" "}
-                        {formatDate(selected.dueDate)}
+                        {formatInvoiceDate(selected.dueDate)}
                     </p>
 
                     <form action={formAction} className={styles.payForm}>
@@ -192,12 +151,12 @@ export default function ParentPaymentsScreen({
                                         <strong>{inv.title}</strong>
                                         <span>
                                             {inv.studentName} · 납기{" "}
-                                            {formatDate(inv.dueDate)}
+                                            {formatInvoiceDate(inv.dueDate)}
                                         </span>
                                     </div>
                                     <div className={styles.rowRight}>
                                         <strong>
-                                            {formatAmount(inv.totalAmount)}
+                                            {formatInvoiceAmount(inv.totalAmount)}
                                         </strong>
                                         <StatusChip
                                             tone={statusMeta[inv.status].tone}
@@ -228,13 +187,13 @@ export default function ParentPaymentsScreen({
                                     <span>
                                         {inv.studentName}
                                         {inv.paidAt
-                                            ? ` · ${formatDate(inv.paidAt)}`
+                                            ? ` · ${formatInvoiceDate(inv.paidAt)}`
                                             : ""}
                                     </span>
                                 </div>
                                 <div className={styles.rowRight}>
                                     <strong>
-                                        {formatAmount(inv.totalAmount)}
+                                        {formatInvoiceAmount(inv.totalAmount)}
                                     </strong>
                                     <StatusChip
                                         tone={statusMeta[inv.status].tone}

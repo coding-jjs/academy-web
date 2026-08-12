@@ -2,73 +2,18 @@
 
 import { useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
+import type {
+    ParentGradesChild,
+} from "@/features/grades/types";
+import {
+    formatGradeDate,
+    formatGradeDelta,
+} from "@/features/grades/formatters";
+import { WRONG_NOTE_STATUS_METADATA } from "@/features/grades/presentation";
 import styles from "./ParentGradesScreen.module.css";
 
-export type WrongNoteStatus = "OPEN" | "REVIEWED" | "MASTERED";
-
-export type ParentGradesChild = {
-    id: string;
-    name: string;
-    schoolName: string | null;
-    grade: string | null;
-    className: string | null;
-    teacherName: string | null;
-    highlights: {
-        subject: string;
-        score: number;
-        delta: number | null;
-    }[];
-    openWrongCount: number;
-    grades: {
-        id: string;
-        title: string;
-        subject: string;
-        className: string | null;
-        score: number;
-        maxScore: number;
-        percent: number | null;
-        assessedAt: string;
-    }[];
-    wrongNotes: {
-        id: string;
-        questionNo: string | null;
-        questionText: string | null;
-        studentAnswer: string | null;
-        correctAnswer: string | null;
-        explanation: string | null;
-        status: WrongNoteStatus;
-        createdAt: string;
-        className: string | null;
-        subject: string | null;
-        gradeTitle: string | null;
-        imageCount: number;
-    }[];
-};
-
-const wrongStatusMeta: Record<
-    WrongNoteStatus,
-    { label: string; tone: "neutral" | "success" | "warning" | "danger" }
-> = {
-    OPEN: { label: "복습 필요", tone: "warning" },
-    REVIEWED: { label: "복습함", tone: "neutral" },
-    MASTERED: { label: "완료", tone: "success" },
-};
-
-function formatDate(iso: string) {
-    return new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Seoul",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-    }).format(new Date(iso));
-}
-
-function formatDelta(delta: number | null) {
-    if (delta == null) return "비교 없음";
-    if (delta > 0) return `이전 대비 +${delta}`;
-    if (delta < 0) return `이전 대비 ${delta}`;
-    return "이전과 동일";
-}
+const wrongStatusMeta = WRONG_NOTE_STATUS_METADATA;
+const formatDate = formatGradeDate;
 
 export default function ParentGradesScreen({
     childList,
@@ -125,7 +70,7 @@ export default function ParentGradesScreen({
                                         <article key={item.subject}>
                                             <span>최근 {item.subject}</span>
                                             <strong>{item.score}점</strong>
-                                            <p>{formatDelta(item.delta)}</p>
+                                            <p>{formatGradeDelta(item.delta)}</p>
                                         </article>
                                     ))
                                 ) : (

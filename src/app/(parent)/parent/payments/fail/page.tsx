@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth-guard";
-import { prisma } from "@/lib/db";
+import { recordParentPaymentFailure } from "@/features/billing/payment-confirmation";
 import styles from "../ParentPaymentsScreen.module.css";
 
 export const dynamic = "force-dynamic";
@@ -25,20 +25,12 @@ export default async function ParentPaymentFailPage({
         params.message?.trim() ||
         "결제가 취소되었거나 완료되지 않았습니다.";
 
-    if (orderId) {
-        await prisma.payment.updateMany({
-            where: {
-                orderId,
-                payerUserId: session.user.id,
-                status: "PENDING",
-            },
-            data: {
-                status: "FAILED",
-                failureCode: failCode || null,
-                failureMessage: failMessage,
-            },
-        });
-    }
+    await recordParentPaymentFailure({
+        parentUserId: session.user.id,
+        orderId,
+        failureCode: failCode,
+        failureMessage: failMessage,
+    });
 
     return (
         <section className={styles.page}>

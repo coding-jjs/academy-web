@@ -8,43 +8,20 @@ import {
     markMessageRead,
     type InboxActionState,
 } from "@/features/messages/inbox-actions";
+import type { ParentInboxMessage } from "@/features/messages/inbox-types";
+import {
+    formatInboxDateTime,
+    getMessageSenderRoleLabel,
+} from "@/features/messages/inbox-presentation";
 import styles from "./ParentInboxScreen.module.css";
-
-export type ParentInboxMessage = {
-    recipientId: string;
-    messageId: string;
-    title: string;
-    content: string;
-    deepLink: string | null;
-    createdAt: string;
-    readAt: string | null;
-    senderName: string;
-    senderRole: string | null;
-    hasReport: boolean;
-};
 
 const initialState: InboxActionState = {
     status: "idle",
     message: "",
 };
 
-function formatDateTime(iso: string) {
-    return new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Seoul",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-    }).format(new Date(iso));
-}
-
-function roleLabel(role: string | null) {
-    if (role === "DIRECTOR") return "원장";
-    if (role === "TEACHER") return "선생님";
-    if (role === "STAFF") return "사무";
-    return "학원";
-}
+const formatDateTime = formatInboxDateTime;
+const roleLabel = getMessageSenderRoleLabel;
 
 export default function ParentInboxScreen({
     messages,

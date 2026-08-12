@@ -42,7 +42,6 @@ npm run dev
 - Google 인증 후 추가 정보를 입력하는 회원가입 흐름
 - Apple 디자인 토큰 기반의 반응형 UI
 - Prisma 마이그레이션으로 관리하는 PostgreSQL 스키마
-- `/preview`에서 기존 전체 역할 와이어프레임 제공
 
 ## 주요 구조
 
@@ -56,10 +55,15 @@ src/app/(parent)/           학부모 라우트
 src/app/(student)/          학생 라우트
 src/app/(guest)/            게스트 라우트
 src/components/layout/      AdminShell·MemberShell
-src/features/               여러 역할이 공유하는 도메인 화면·액션
+src/features/               도메인별 데이터·액션·표시 규칙·공유 화면
 src/lib/                    인증·DB·권한·공통 서버 로직
 src/types/                  공통 역할·권한 타입
 ```
+
+`app`은 라우팅, 역할별 화면 조합, 해당 라우트에만 종속된 인증 흐름을
+담습니다. 데이터 조회와 변경, 상태 라벨·날짜·금액 같은 도메인 표시 규칙은
+`features/{domain}`에 둡니다. Server Action은 직접 호출 가능한 진입점이므로
+각 액션 안에서 인증과 권한을 다시 확인합니다.
 
 Next.js 16에서는 `middleware.ts`가 폐기되어 동일한 역할을 하는
 `src/proxy.ts`를 사용합니다.

@@ -6,7 +6,10 @@ import {
     useEffect,
     useRef,
 } from "react";
-import { unlinkParentStudent, type ParentLinkState } from "./actions";
+import {
+    unlinkParentStudent,
+    type ParentLinkState,
+} from "@/features/families/actions";
 import styles from "./page.module.css";
 
 const initialState: ParentLinkState = {

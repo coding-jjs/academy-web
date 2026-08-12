@@ -1,43 +1,17 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { AuthError } from "next-auth";
-import { signIn } from "@/lib/auth";
 import {
-    DEV_LOGIN_PROVIDER_ID,
     DEV_LOGIN_ROLES,
     isDevLoginEnabled,
-    parseDevTestEmail,
 } from "@/lib/dev-login";
-import { prisma } from "@/lib/db";
+import {
+    signInAsTestUser,
+    signInWithGoogle,
+} from "@/features/auth/actions";
+import { getDevelopmentTestUsers } from "@/features/auth/data";
 import { roleLabels } from "@/lib/role-routes";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
-
-async function signInAsTestUser(formData: FormData) {
-    "use server";
-
-    if (!isDevLoginEnabled()) {
-        redirect("/login");
-    }
-
-    const email = parseDevTestEmail(formData.get("email"));
-    if (!email) {
-        redirect("/login?error=CredentialsSignin");
-    }
-
-    try {
-        await signIn(DEV_LOGIN_PROVIDER_ID, {
-            email,
-            redirectTo: "/post-login",
-        });
-    } catch (error) {
-        if (error instanceof AuthError) {
-            redirect("/login?error=CredentialsSignin");
-        }
-        throw error;
-    }
-}
 
 export default async function LoginPage({
     searchParams,
@@ -46,17 +20,7 @@ export default async function LoginPage({
 }) {
     const params = await searchParams;
     const devLoginEnabled = isDevLoginEnabled();
-    const testUsers = devLoginEnabled
-        ? await prisma.user.findMany({
-              where: {
-                  status: "ACTIVE",
-                  email: { endsWith: "@test.local" },
-                  role: { in: [...DEV_LOGIN_ROLES] },
-              },
-              orderBy: [{ role: "asc" }, { name: "asc" }],
-              select: { email: true, name: true, role: true },
-          })
-        : [];
+    const testUsers = await getDevelopmentTestUsers();
 
     return (
         <main className={styles.page}>
@@ -85,14 +49,7 @@ export default async function LoginPage({
                         </p>
                     )}
 
-                    <form
-                        action={async () => {
-                            "use server";
-                            await signIn("google", {
-                                redirectTo: "/post-login",
-                            });
-                        }}
-                    >
+                    <form action={signInWithGoogle}>
                         <button className={styles.googleButton} type="submit">
                             <GoogleMark />
                             <span>Google로 계속하기</span>
