@@ -89,7 +89,8 @@ export async function createCounselingMemo(
                 counseledAt,
             },
         });
-        revalidatePath("/staff/counseling");
+        revalidatePath("/teacher/counseling");
+        revalidatePath("/employee/counseling");
         return { status: "success", message: "상담 기록이 등록되었습니다." };
     } catch {
         return { status: "error", message: "상담 등록에 실패했습니다." };
@@ -127,7 +128,8 @@ export async function updateInquiryStatus(
                 assignedUserId: session.user.id,
             },
         });
-        revalidatePath("/staff/counseling");
+        revalidatePath("/teacher/counseling");
+        revalidatePath("/employee/counseling");
         return { status: "success", message: "문의 상태가 변경되었습니다." };
     } catch {
         return { status: "error", message: "문의 상태 변경에 실패했습니다." };

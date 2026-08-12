@@ -164,7 +164,7 @@ export async function approveAndSendReport(input: {
     }
 
     revalidatePath("/director/reports");
-    revalidatePath("/staff/reports");
+    revalidatePath("/teacher/reports");
     revalidatePath("/parent/reports");
     revalidatePath("/parent/inbox");
     revalidatePath("/parent/student-inbox");
@@ -228,7 +228,7 @@ export async function rejectReport(input: {
     }
 
     revalidatePath("/director/reports");
-    revalidatePath("/staff/reports");
+    revalidatePath("/teacher/reports");
 
     return { ok: true, message: "반려 처리 완료" };
 }

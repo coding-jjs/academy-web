@@ -8,7 +8,8 @@ export type AppRole =
 
 export type RolePrefix =
     | "director"
-    | "staff"
+    | "teacher"
+    | "employee"
     | "parent"
     | "student"
     | "guest";

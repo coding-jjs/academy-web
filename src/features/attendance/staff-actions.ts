@@ -213,7 +213,7 @@ export async function saveSessionAttendance(
             }),
         );
 
-        revalidatePath("/staff/attendance");
+        revalidatePath("/teacher/attendance");
         return {
             status: "success",
             message: `${changedRows.length}명의 출결이 저장되었습니다.`,

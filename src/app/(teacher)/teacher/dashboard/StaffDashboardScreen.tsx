@@ -20,10 +20,10 @@ export default function StaffDashboardScreen({
     sessions: StaffDashboardSession[];
 }) {
     const quickLinks = [
-        { href: "/staff/attendance", label: "출석 체크" },
-        { href: "/staff/reports", label: "AI 리포트" },
-        { href: "/staff/students", label: "담당 학생" },
-        { href: "/staff/counseling", label: "상담 관리" },
+        { href: "/teacher/attendance", label: "출석 체크" },
+        { href: "/teacher/reports", label: "AI 리포트" },
+        { href: "/teacher/students", label: "담당 학생" },
+        { href: "/teacher/counseling", label: "상담 관리" },
     ];
 
     return (
@@ -124,7 +124,7 @@ export default function StaffDashboardScreen({
                                         </StatusChip>
                                     )}
                                     <Link
-                                        href="/staff/attendance"
+                                        href="/teacher/attendance"
                                         className={
                                             item.uncheckedCount > 0
                                                 ? styles.primaryLink
@@ -134,7 +134,7 @@ export default function StaffDashboardScreen({
                                         출석 체크
                                     </Link>
                                     <Link
-                                        href="/staff/students"
+                                        href="/teacher/students"
                                         className={styles.secondaryLink}
                                     >
                                         학생 보기

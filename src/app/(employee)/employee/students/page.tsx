@@ -6,12 +6,12 @@ import {
     studentScopeWhere,
 } from "@/lib/staff-scope";
 import { getStaffStudentsData } from "@/features/students/staff-data";
-import StaffStudentsScreen from "./StaffStudentsScreen";
+import StaffStudentsScreen from "@/app/(teacher)/teacher/students/StaffStudentsScreen";
 
 export const dynamic = "force-dynamic";
 
-export default async function StaffStudentsPage() {
-    const session = await requireRole("STAFF", "TEACHER");
+export default async function EmployeeStudentsPage() {
+    const session = await requireRole("STAFF");
     const staffScope = await getStaffScope(session.user.id);
     const { startRecent } = getKstRecentRange(14);
     const studentsData = await getStaffStudentsData({

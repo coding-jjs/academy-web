@@ -67,8 +67,8 @@ export default function StaffStudentsScreen({
             <header className={styles.heading}>
                 <div>
                     <span>MY STUDENTS</span>
-                    <h1>담당 학생</h1>
-                    <p>담당 학생의 출결과 최근 학습 기록을 확인합니다.</p>
+                    <h1>학생 관리</h1>
+                    <p>학생의 출결과 최근 학습 기록을 확인합니다.</p>
                 </div>
                 <button
                     type="button"

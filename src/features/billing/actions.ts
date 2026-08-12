@@ -94,7 +94,7 @@ async function resolveActiveParentUserId(
 
 function revalidateBilling() {
     revalidatePath("/director/billing");
-    revalidatePath("/staff/billing");
+    revalidatePath("/employee/billing");
     revalidatePath("/parent/payments");
     revalidatePath("/director/dashboard");
 }

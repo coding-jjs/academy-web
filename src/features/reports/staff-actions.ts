@@ -6,9 +6,19 @@ import { prisma } from "@/lib/db";
 import { userHasPermission } from "@/lib/permission-guard";
 import { getStaffScope, studentScopeWhere } from "@/lib/staff-scope";
 import { createReportDraft } from "@/features/reports/draft-generator";
+import {
+    formatEvidenceSummary,
+    getReportEvidence,
+} from "@/features/reports/evidence";
 
 type ActionResult =
-    | { ok: true; reportId?: string; content?: string; message?: string }
+    | {
+          ok: true;
+          reportId?: string;
+          content?: string;
+          message?: string;
+          evidenceSummary?: string;
+      }
     | { ok: false; message: string };
 
 type StaffSession = {
@@ -174,7 +184,7 @@ export async function saveDraftReport(input: {
         periodEnd,
     });
 
-    revalidatePath("/staff/reports");
+    revalidatePath("/teacher/reports");
     revalidatePath("/director/reports");
 
     return {
@@ -231,12 +241,20 @@ export async function regenerateDraftWithAi(input: {
         return { ok: false, message: "학생을 찾을 수 없습니다." };
     }
 
+    const evidence = await getReportEvidence({
+        studentId,
+        periodStart: input.periodStart,
+        periodEnd: input.periodEnd,
+    });
+    const evidenceSummary = formatEvidenceSummary(evidence);
+
     const draft = await createReportDraft({
         studentName: student.name,
         keywords,
         tone,
         periodStart: input.periodStart,
         periodEnd: input.periodEnd,
+        evidence,
     });
 
     const report = await upsertDraft({
@@ -248,7 +266,7 @@ export async function regenerateDraftWithAi(input: {
         periodEnd,
     });
 
-    revalidatePath("/staff/reports");
+    revalidatePath("/teacher/reports");
     revalidatePath("/director/reports");
 
     if (draft.usedAi) {
@@ -256,7 +274,8 @@ export async function regenerateDraftWithAi(input: {
             ok: true,
             reportId: report.id,
             content: draft.content,
-            message: "AI 초안을 생성했습니다.",
+            evidenceSummary,
+            message: `AI 초안을 생성했습니다. (근거: ${evidenceSummary})`,
         };
     }
 
@@ -264,9 +283,10 @@ export async function regenerateDraftWithAi(input: {
         ok: true,
         reportId: report.id,
         content: draft.content,
+        evidenceSummary,
         message: draft.fallbackReason
-            ? `템플릿 초안을 사용했습니다. (${draft.fallbackReason})`
-            : "템플릿 초안을 사용했습니다.",
+            ? `템플릿 초안을 사용했습니다. (${draft.fallbackReason} · 근거: ${evidenceSummary})`
+            : `템플릿 초안을 사용했습니다. (근거: ${evidenceSummary})`,
     };
 }
 
@@ -331,7 +351,7 @@ export async function requestReportApproval(input: {
         },
     });
 
-    revalidatePath("/staff/reports");
+    revalidatePath("/teacher/reports");
     revalidatePath("/director/reports");
 
     return { ok: true, message: "승인 요청을 보냈습니다." };

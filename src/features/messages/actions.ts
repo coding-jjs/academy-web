@@ -20,7 +20,8 @@ export type MessageActionResult =
 
 function revalidateMessagePaths() {
     revalidatePath("/director/messages");
-    revalidatePath("/staff/messages");
+    revalidatePath("/teacher/messages");
+    revalidatePath("/employee/messages");
     revalidatePath("/parent/inbox");
     revalidatePath("/parent/student-inbox");
     revalidatePath("/student/inbox");

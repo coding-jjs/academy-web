@@ -19,8 +19,9 @@ async function requireDirector() {
 function revalidateClasses() {
     revalidatePath("/director/classes");
     revalidatePath("/director/students");
-    revalidatePath("/staff/attendance");
-    revalidatePath("/staff/dashboard");
+    revalidatePath("/teacher/attendance");
+    revalidatePath("/teacher/dashboard");
+    revalidatePath("/employee/dashboard");
     revalidatePath("/parent/timetable");
     revalidatePath("/student/timetable");
 }
