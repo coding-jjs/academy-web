@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
 import type {
@@ -32,6 +32,8 @@ export default function ParentTimetableScreen({
             ? ` · ${child.classes.map((c) => c.name).join(", ")}`
             : "";
 
+    const [weekExpanded, setWeekExpanded] = useState(false);
+
     const byDay = useMemo(() => {
         const map = Object.fromEntries(
             weekDays.map((d) => [
@@ -46,6 +48,11 @@ export default function ParentTimetableScreen({
         }
         return map;
     }, [child, weekDays]);
+
+    const hasDenseDays = useMemo(
+        () => weekDays.some((day) => byDay[day.key].length >= 2),
+        [byDay, weekDays],
+    );
 
     const todaySessions = child?.sessions.filter((s) => s.isToday) ?? [];
     const router = useRouter();
@@ -130,58 +137,120 @@ export default function ParentTimetableScreen({
                                 )}
                             </div>
 
-                            <div className={styles.weeScroll}>
-                                <div className={styles.weekGrid}>
-                                    {weekDays.map((day) => (
-                                        <article
-                                            key={day.key}
-                                            className={
-                                                day.isToday
-                                                    ? styles.dayToday
-                                                    : styles.dayCard
-                                            }
-                                        >
-                                            <div className={styles.dayHead}>
-                                                <strong>
-                                                    {WEEK_DAY_LABELS[day.key]}
-                                                </strong>
-                                                <span>{day.label}</span>
-                                                {day.isToday && (
-                                                    <StatusChip tone="success">
-                                                        오늘
-                                                    </StatusChip>
-                                                )}
-                                            </div>
-                                            {byDay[day.key].length === 0 ? (
-                                                <p className={styles.muted}>
-                                                    없음
-                                                </p>
-                                            ) : (
-                                                <ul className={styles.slotList}>
-                                                    {byDay[day.key].map((s) => (
-                                                        <li key={s.id}>
-                                                            <strong>
-                                                                {s.timeLabel}
-                                                            </strong>
-                                                            <span>
-                                                                {s.className}
-                                                            </span>
-                                                            <small>
-                                                                {s.subject}
-                                                                {s.classroom
-                                                                    ? ` · ${s.classroom}`
-                                                                    : ""}
-                                                                {s.teacherName
-                                                                    ? ` · ${s.teacherName}`
-                                                                    : ""}
-                                                            </small>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                        </article>
-                                    ))}
+                            <div className={styles.weekSection}>
+                                <div className={styles.weekScroll}>
+                                    <div className={styles.weekGrid}>
+                                        {weekDays.map((day) => {
+                                            const daySessions = byDay[day.key];
+                                            const visibleSessions = weekExpanded
+                                                ? daySessions
+                                                : daySessions.slice(0, 1);
+                                            const hiddenCount =
+                                                daySessions.length -
+                                                visibleSessions.length;
+                                            return (
+                                                <article
+                                                    key={day.key}
+                                                    className={
+                                                        day.isToday
+                                                            ? styles.dayToday
+                                                            : styles.dayCard
+                                                    }
+                                                >
+                                                    <div
+                                                        className={
+                                                            styles.dayHead
+                                                        }
+                                                    >
+                                                        <strong>
+                                                            {
+                                                                WEEK_DAY_LABELS[
+                                                                    day.key
+                                                                ]
+                                                            }
+                                                        </strong>
+                                                        <span>{day.label}</span>
+                                                        {day.isToday && (
+                                                            <StatusChip tone="success">
+                                                                오늘
+                                                            </StatusChip>
+                                                        )}
+                                                    </div>
+                                                    {daySessions.length ===
+                                                    0 ? (
+                                                        <p
+                                                            className={
+                                                                styles.muted
+                                                            }
+                                                        >
+                                                            없음
+                                                        </p>
+                                                    ) : (
+                                                        <>
+                                                            <ul
+                                                                className={
+                                                                    styles.slotList
+                                                                }
+                                                            >
+                                                                {visibleSessions.map(
+                                                                    (s) => (
+                                                                        <li
+                                                                            key={
+                                                                                s.id
+                                                                            }
+                                                                        >
+                                                                            <strong>
+                                                                                {
+                                                                                    s.timeLabel
+                                                                                }
+                                                                            </strong>
+                                                                            <span>
+                                                                                {
+                                                                                    s.className
+                                                                                }
+                                                                            </span>
+                                                                            <small>
+                                                                                {
+                                                                                    s.subject
+                                                                                }
+                                                                            </small>
+                                                                        </li>
+                                                                    ),
+                                                                )}
+                                                            </ul>
+                                                            {!weekExpanded &&
+                                                                hiddenCount >
+                                                                    0 && (
+                                                                    <p
+                                                                        className={
+                                                                            styles.moreHint
+                                                                        }
+                                                                    >
+                                                                        +
+                                                                        {
+                                                                            hiddenCount
+                                                                        }
+                                                                        개 더
+                                                                    </p>
+                                                                )}
+                                                        </>
+                                                    )}
+                                                </article>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
+                                {hasDenseDays && (
+                                    <button
+                                        type="button"
+                                        className={styles.weekToggleBtn}
+                                        onClick={() =>
+                                            setWeekExpanded(!weekExpanded)
+                                        }
+                                    >
+                                        {weekExpanded ? "접기" : `더보기`}
+                                    </button>
+                                )}
                             </div>
                             <article className={styles.panel}>
                                 <div className={styles.panelHead}>
