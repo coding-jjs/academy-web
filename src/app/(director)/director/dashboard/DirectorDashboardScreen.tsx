@@ -1,17 +1,8 @@
 import Link from "next/link";
 import StatusChip from "@/components/ui/StatusChip";
+import type { DirectorDashboardMetrics } from "@/features/dashboard/types";
+import { REPORT_STATUS_METADATA } from "@/features/reports/presentation";
 import styles from "./DirectorDashboardScreen.module.css";
-
-export type DirectorDashboardMetrics = {
-    pendingReports: number;
-    openChurn: number;
-    overdueInvoices: number;
-    newInquiries: number;
-    enrolledStudents: number;
-    guestUsers: number;
-    todayAttendanceRate: number | null;
-    todaySessionCount: number;
-};
 
 type MetricCard = {
     label: string;
@@ -36,7 +27,7 @@ export default function DirectorDashboardScreen({
 }) {
     const cards: MetricCard[] = [
         {
-            label: "승인 대기",
+            label: REPORT_STATUS_METADATA.PENDING_APPROVAL.label,
             value: String(metrics.pendingReports),
             detail: "AI 리포트",
             tone: metrics.pendingReports > 0 ? "warning" : "success",

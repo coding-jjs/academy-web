@@ -9,6 +9,11 @@ export const roleLabels: Record<AppRole, string> = {
     GUEST: "게스트",
 };
 
+export const adminRoleLabels = {
+    director: roleLabels.DIRECTOR,
+    staff: roleLabels.STAFF,
+} as const;
+
 const roleHomePaths: Record<AppRole, string> = {
     DIRECTOR: "/director/dashboard",
     TEACHER: "/staff/dashboard",

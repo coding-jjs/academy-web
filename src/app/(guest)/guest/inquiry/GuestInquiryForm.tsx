@@ -1,7 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
-import { createInquiry, type InquiryField, type InquiryState } from "./actions";
+import {
+    createInquiry,
+    type InquiryField,
+    type InquiryState,
+} from "@/features/inquiries/actions";
 import styles from "./GuestInquiryScreen.module.css";
 
 const initialState: InquiryState = {

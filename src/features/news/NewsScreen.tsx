@@ -2,65 +2,17 @@
 
 import { useMemo, useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
-import styles from "./NewsScreen.module.css";
-
-export type NewsKind = "NOTICE" | "BANNER";
-export type NewsCategory =
-    | "PARENT_ADMISSION"
-    | "PARENT_NOTICE"
-    | "STUDENT_YOUTH"
-    | "GENERAL";
-export type NewsAudience = "PARENT" | "STUDENT" | "ALL";
-
-export type NewsItem = {
-    id: string;
-    kind: NewsKind;
-    category: NewsCategory;
-    audience: NewsAudience;
-    title: string;
-    content: string | null;
-    imageUrl: string | null;
-    linkUrl: string | null;
-    startsAt: string | null;
-    endsAt: string | null;
-    createdAt: string;
-};
-
-const categoryMeta: Record<
+import type {
     NewsCategory,
-    { label: string; tone: "neutral" | "success" | "warning" | "danger" }
-> = {
-    PARENT_ADMISSION: { label: "입학·모집", tone: "warning" },
-    PARENT_NOTICE: { label: "학부모 공지", tone: "success" },
-    STUDENT_YOUTH: { label: "체험·진로", tone: "neutral" },
-    GENERAL: { label: "일반", tone: "neutral" },
-};
-
-const parentFilters: Array<{ id: "ALL" | NewsCategory; label: string }> = [
-    { id: "ALL", label: "전체" },
-    { id: "PARENT_NOTICE", label: "학부모 공지" },
-    { id: "PARENT_ADMISSION", label: "입학·모집" },
-    { id: "STUDENT_YOUTH", label: "체험·진로" },
-    { id: "GENERAL", label: "일반" },
-];
-
-const studentFilters: Array<{
-    id: "ALL" | "STUDENT_YOUTH" | "GENERAL";
-    label: string;
-}> = [
-    { id: "ALL", label: "전체" },
-    { id: "STUDENT_YOUTH", label: "체험·진로" },
-    { id: "GENERAL", label: "일반" },
-];
-
-function formatDate(iso: string) {
-    return new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Seoul",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-    }).format(new Date(iso));
-}
+    NewsItem,
+} from "@/features/news/types";
+import {
+    NEWS_CATEGORY_METADATA,
+    PARENT_NEWS_FILTERS,
+    STUDENT_NEWS_FILTERS,
+} from "@/features/news/presentation";
+import { formatKstYearMonthDay } from "@/lib/date-kst";
+import styles from "./NewsScreen.module.css";
 
 function isSafeExternalUrl(url: string) {
     try {
@@ -80,7 +32,8 @@ export default function NewsScreen({
 }) {
     const [filter, setFilter] = useState<"ALL" | NewsCategory>("ALL");
     const [activeId, setActiveId] = useState(items[0]?.id ?? "");
-    const filters = audience === "student" ? studentFilters : parentFilters;
+    const filters =
+        audience === "student" ? STUDENT_NEWS_FILTERS : PARENT_NEWS_FILTERS;
 
     const filtered = useMemo(() => {
         if (filter === "ALL") return items;
@@ -156,12 +109,12 @@ export default function NewsScreen({
                                         <div className={styles.itemTop}>
                                             <StatusChip
                                                 tone={
-                                                    categoryMeta[item.category]
+                                                    NEWS_CATEGORY_METADATA[item.category]
                                                         .tone
                                                 }
                                             >
                                                 {
-                                                    categoryMeta[item.category]
+                                                    NEWS_CATEGORY_METADATA[item.category]
                                                         .label
                                                 }
                                             </StatusChip>
@@ -171,7 +124,7 @@ export default function NewsScreen({
                                         </div>
                                         <strong>{item.title}</strong>
                                         <span>
-                                            {formatDate(item.createdAt)}
+                                            {formatKstYearMonthDay(item.createdAt)}
                                         </span>
                                     </button>
                                 </li>
@@ -183,12 +136,12 @@ export default function NewsScreen({
                         <article className={styles.detail}>
                             <div className={styles.detailHead}>
                                 <StatusChip
-                                    tone={categoryMeta[active.category].tone}
+                                    tone={NEWS_CATEGORY_METADATA[active.category].tone}
                                 >
-                                    {categoryMeta[active.category].label}
+                                    {NEWS_CATEGORY_METADATA[active.category].label}
                                 </StatusChip>
                                 <h2>{active.title}</h2>
-                                <p>{formatDate(active.createdAt)}</p>
+                                <p>{formatKstYearMonthDay(active.createdAt)}</p>
                             </div>
 
                             {active.imageUrl &&

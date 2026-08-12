@@ -2,99 +2,17 @@
 
 import { useMemo } from "react";
 import StatusChip from "@/components/ui/StatusChip";
+import {
+    ATTENDANCE_STATUS_METADATA,
+    formatAttendanceCheckInTime,
+} from "@/features/attendance/presentation";
+import { WEEK_DAY_LABELS } from "@/features/timetable/presentation";
+import type {
+    StudentTimetableData,
+    WeekDay,
+    WeekDayKey,
+} from "@/features/timetable/types";
 import styles from "./StudentTimetableScreen.module.css";
-
-export type WeekDayKey =
-    | "mon"
-    | "tue"
-    | "wed"
-    | "thu"
-    | "fri"
-    | "sat"
-    | "sun";
-
-export type AttendanceStatus =
-    | "PRESENT"
-    | "LATE"
-    | "ABSENT"
-    | "EXCUSED"
-    | "EARLY_LEAVE";
-
-export type WeekDay = {
-    key: WeekDayKey;
-    label: string;
-    isToday: boolean;
-    dateIso: string;
-};
-
-export type StudentTimetableData = {
-    linked: boolean;
-    studentName: string;
-    schoolName: string | null;
-    grade: string | null;
-    classes: {
-        id: string;
-        name: string;
-        subject: string;
-        teacherName: string | null;
-    }[];
-    sessions: {
-        id: string;
-        className: string;
-        subject: string;
-        teacherName: string | null;
-        classroom: string | null;
-        dayKey: WeekDayKey;
-        timeLabel: string;
-        startsAt: string;
-        endsAt: string;
-        isToday: boolean;
-        status: string;
-        attendanceStatus: AttendanceStatus | null;
-        checkInAt: string | null;
-    }[];
-    recurring: {
-        classId: string;
-        className: string;
-        subject: string;
-        teacherName: string | null;
-        day: WeekDayKey;
-        start: string;
-        end: string;
-        classroom: string | null;
-    }[];
-};
-
-const DAY_LABEL: Record<WeekDayKey, string> = {
-    mon: "월",
-    tue: "화",
-    wed: "수",
-    thu: "목",
-    fri: "금",
-    sat: "토",
-    sun: "일",
-};
-
-const statusMeta: Record<
-    AttendanceStatus,
-    { label: string; tone: "neutral" | "success" | "warning" | "danger" }
-> = {
-    PRESENT: { label: "출석", tone: "success" },
-    LATE: { label: "지각", tone: "warning" },
-    ABSENT: { label: "결석", tone: "danger" },
-    EXCUSED: { label: "공결", tone: "neutral" },
-    EARLY_LEAVE: { label: "조퇴", tone: "warning" },
-};
-
-function formatCheckIn(iso: string | null) {
-    if (!iso) return null;
-    return new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Seoul",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-    }).format(new Date(iso));
-}
 
 export default function StudentTimetableScreen({
     weekDays,
@@ -171,12 +89,18 @@ export default function StudentTimetableScreen({
                                 {s.attendanceStatus ? (
                                     <StatusChip
                                         tone={
-                                            statusMeta[s.attendanceStatus].tone
+                                            ATTENDANCE_STATUS_METADATA[
+                                                s.attendanceStatus
+                                            ].tone
                                         }
                                     >
-                                        {statusMeta[s.attendanceStatus].label}
-                                        {formatCheckIn(s.checkInAt)
-                                            ? ` ${formatCheckIn(s.checkInAt)}`
+                                        {
+                                            ATTENDANCE_STATUS_METADATA[
+                                                s.attendanceStatus
+                                            ].label
+                                        }
+                                        {formatAttendanceCheckInTime(s.checkInAt)
+                                            ? ` ${formatAttendanceCheckInTime(s.checkInAt)}`
                                             : ""}
                                     </StatusChip>
                                 ) : (
@@ -199,7 +123,7 @@ export default function StudentTimetableScreen({
                         }
                     >
                         <div className={styles.dayHead}>
-                            <strong>{DAY_LABEL[day.key]}</strong>
+                            <strong>{WEEK_DAY_LABELS[day.key]}</strong>
                             <span>{day.label}</span>
                             {day.isToday && (
                                 <StatusChip tone="success">오늘</StatusChip>
@@ -225,13 +149,13 @@ export default function StudentTimetableScreen({
                                         {s.attendanceStatus && (
                                             <StatusChip
                                                 tone={
-                                                    statusMeta[
+                                                    ATTENDANCE_STATUS_METADATA[
                                                         s.attendanceStatus
                                                     ].tone
                                                 }
                                             >
                                                 {
-                                                    statusMeta[
+                                                    ATTENDANCE_STATUS_METADATA[
                                                         s.attendanceStatus
                                                     ].label
                                                 }
@@ -284,7 +208,7 @@ export default function StudentTimetableScreen({
                             >
                                 <div>
                                     <strong>
-                                        {DAY_LABEL[slot.day]} {slot.start}~
+                                        {WEEK_DAY_LABELS[slot.day]} {slot.start}~
                                         {slot.end}
                                     </strong>
                                     <span>

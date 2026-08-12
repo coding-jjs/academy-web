@@ -2,28 +2,11 @@
 
 import Link from "next/link";
 import StatusChip from "@/components/ui/StatusChip";
+import type {
+    StaffDashboardMetrics,
+    StaffDashboardSession,
+} from "@/features/dashboard/types";
 import styles from "./StaffDashboardScreen.module.css";
-
-export type StaffDashboardSession = {
-    id: string;
-    classId: string;
-    className: string;
-    subject: string;
-    classroom: string | null;
-    timeLabel: string;
-    startsAt: string;
-    studentCount: number;
-    uncheckedCount: number;
-};
-
-export type StaffDashboardMetrics = {
-    todayClassCount: number;
-    firstClassTime: string | null;
-    uncheckedSessions: number;
-    pendingReports: number;
-    myStudentCount: number;
-    openInquiries: number;
-};
 
 export default function StaffDashboardScreen({
     role,

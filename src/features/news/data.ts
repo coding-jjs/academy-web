@@ -1,7 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/lib/db";
-import type { NewsItem } from "@/features/news/NewsScreen";
+import type { NewsItem } from "@/features/news/types";
 
 export async function getPublishedNews(audience: "PARENT" | "STUDENT") {
     const now = new Date();

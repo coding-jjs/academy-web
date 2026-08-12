@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
-import { assignUserRole } from "./actions";
+import { assignUserRole } from "@/features/users/actions";
+import {
+    formatStudentOptionLabel,
+    STUDENT_STATUS_METADATA,
+} from "@/features/students/presentation";
+import { roleLabels } from "@/lib/role-routes";
 import styles from "./page.module.css";
 
 export default function RoleAssignmentForm({
@@ -42,14 +47,14 @@ export default function RoleAssignmentForm({
                     <option value="" disabled>
                         역할을 선택하세요
                     </option>
-                    <option value="TEACHER">선생님</option>
-                    <option value="STAFF">직원</option>
-                    <option value="PARENT">학부모</option>
+                    <option value="TEACHER">{roleLabels.TEACHER}</option>
+                    <option value="STAFF">{roleLabels.STAFF}</option>
+                    <option value="PARENT">{roleLabels.PARENT}</option>
                     <option
                         value="STUDENT"
                         disabled={students.length === 0 || hasStudentProfile}
                     >
-                        학생
+                        {roleLabels.STUDENT}
                     </option>
                 </select>
                 <AssignButton />
@@ -89,14 +94,8 @@ function formatStudentOption(student: {
     grade: string | null;
     status: "ENROLLED" | "PAUSED" | "WITHDRAWN";
 }) {
-    const profile = [
-        student.schoolName,
-        student.grade && `${student.grade}학년`,
-    ]
-        .filter(Boolean)
-        .join(" · ");
-    const status = student.status === "PAUSED" ? "휴원" : "재원";
-    return `${student.name}${profile ? ` · ${profile}` : ""} (${status})`;
+    const status = STUDENT_STATUS_METADATA[student.status].label;
+    return `${formatStudentOptionLabel(student)} (${status})`;
 }
 
 function AssignButton() {

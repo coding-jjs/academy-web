@@ -1,307 +1,67 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
-import {
-    regenerateDraftWithAi,
-    requestReportApproval,
-    saveDraftReport,
-} from "./actions.staff";
+import type { StaffReportStudent } from "@/features/reports/types";
+import ReportEditor from "./components/ReportEditor";
+import ReportStudentList from "./components/ReportStudentList";
+import { getStudentReportStatus } from "@/features/reports/presentation";
 import styles from "./StaffReportsScreen.module.css";
-
-export type ReportStatus =
-    | "UNWRITTEN"
-    | "DRAFTING"
-    | "PENDING_APPROVAL"
-    | "REJECTED"
-    | "SENT"
-    | "FAILED";
-
-export type StaffReportStudent = {
-    id: string;
-    studentProfileId: string | null;
-    name: string;
-    email: string;
-    schoolName: string | null;
-    grade: string | null;
-    className: string | null;
-    teacherName: string | null;
-    report: {
-        id: string;
-        status: ReportStatus;
-        content: string;
-        keywords: string[];
-        rejectionReason: string | null;
-        teacherName: string;
-        periodStart: string;
-        periodEnd: string;
-    } | null;
-};
-
-const statusMeta: Record<
-    ReportStatus,
-    { label: string; tone: "neutral" | "success" | "warning" | "danger" }
-> = {
-    UNWRITTEN: { label: "미작성", tone: "neutral" },
-    DRAFTING: { label: "작성 중", tone: "neutral" },
-    PENDING_APPROVAL: { label: "승인 대기", tone: "warning" },
-    REJECTED: { label: "반려", tone: "danger" },
-    SENT: { label: "발송됨", tone: "success" },
-    FAILED: { label: "실패", tone: "danger" },
-};
-
-const keywordOptions = [
-    "수업 태도 · 과제 · 이해도",
-    "참여도 · 질문 · 복습",
-    "성실도 · 집중력 · 성장",
-];
-
-const toneOptions = ["격려·칭찬", "전문적", "단호"];
-
-function getStatus(student: StaffReportStudent): ReportStatus {
-    return student.report?.status ?? "UNWRITTEN";
-}
-
-function toDateInputValue(date: Date) {
-    return date.toISOString().slice(0, 10);
-}
-
-function getDefaultPeriod() {
-    const now = new Date();
-    const start = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
-    );
-    const end = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0),
-    );
-    return {
-        periodStart: toDateInputValue(start),
-        periodEnd: toDateInputValue(end),
-    };
-}
 
 export default function StaffReportsScreen({
     students,
 }: {
     students: StaffReportStudent[];
 }) {
-    const router = useRouter();
-    const [isPending, startTransition] = useTransition();
-
-    const [activeId, setActiveId] = useState<string | null>(
-        students[0]?.id ?? null,
+    const [selectedStudentId, setSelectedStudentId] = useState(
+        students[0]?.id ?? "",
     );
-    const [keyword, setKeyword] = useState(keywordOptions[0]);
-    const [tone, setTone] = useState(toneOptions[0]);
-    const [content, setContent] = useState(
-        students[0]?.report?.content ?? "",
-    );
-    const [feedback, setFeedback] = useState<string | null>(null);
-
-    const active =
-        students.find((s) => s.id === activeId) ?? students[0] ?? null;
-    const activeStatus = active ? getStatus(active) : null;
-
-    const canEdit =
-        activeStatus === "UNWRITTEN" ||
-        activeStatus === "DRAFTING" ||
-        activeStatus === "REJECTED";
-
-    function selectStudent(student: StaffReportStudent) {
-        setActiveId(student.id);
-        setContent(student.report?.content ?? "");
-        setKeyword(student.report?.keywords[0] ?? keywordOptions[0]);
-        setTone(toneOptions[0]);
-        setFeedback(null);
-    }
-
-    const stats = useMemo(() => {
+    const selectedStudent =
+        students.find((student) => student.id === selectedStudentId) ??
+        students[0] ??
+        null;
+    const metrics = useMemo(() => {
         const counts = {
-            UNWRITTEN: 0,
-            DRAFTING: 0,
-            PENDING_APPROVAL: 0,
-            REJECTED: 0,
+            unwritten: 0,
+            drafting: 0,
+            pendingApproval: 0,
+            rejected: 0,
         };
 
         for (const student of students) {
-            const status = getStatus(student);
-
+            const status = getStudentReportStatus(student);
             if (status === "UNWRITTEN" || status === "FAILED") {
-                counts.UNWRITTEN += 1;
+                counts.unwritten += 1;
             } else if (status === "DRAFTING") {
-                counts.DRAFTING += 1;
+                counts.drafting += 1;
             } else if (status === "PENDING_APPROVAL") {
-                counts.PENDING_APPROVAL += 1;
+                counts.pendingApproval += 1;
             } else if (status === "REJECTED") {
-                counts.REJECTED += 1;
+                counts.rejected += 1;
             }
         }
 
         return [
             {
                 label: "미작성",
-                value: `${counts.UNWRITTEN}명`,
+                value: `${counts.unwritten}명`,
                 detail: "작성 필요",
                 tone: "neutral" as const,
             },
             {
                 label: "작성 중",
-                value: `${counts.DRAFTING}명`,
+                value: `${counts.drafting}명`,
                 detail: "초안 편집",
                 tone: "neutral" as const,
             },
             {
                 label: "승인·반려",
-                value: `${counts.PENDING_APPROVAL} / ${counts.REJECTED}`,
+                value: `${counts.pendingApproval} / ${counts.rejected}`,
                 detail: `학생 ${students.length}명`,
                 tone: "warning" as const,
             },
         ];
     }, [students]);
-
-    function getActivePeriod() {
-        if (active?.report) {
-            return {
-                periodStart: active.report.periodStart.slice(0, 10),
-                periodEnd: active.report.periodEnd.slice(0, 10),
-            };
-        }
-        return getDefaultPeriod();
-    }
-
-    function handleSaveDraft() {
-        if (!active) {
-            setFeedback("학생을 선택해 주세요.");
-            return;
-        }
-
-        const studentId = active.studentProfileId;
-        if (!studentId) {
-            setFeedback("학생 프로필이 없어 저장할 수 없습니다.");
-            return;
-        }
-
-        if (!content.trim()) {
-            setFeedback("본문을 입력해 주세요.");
-            return;
-        }
-
-        const { periodStart, periodEnd } = getActivePeriod();
-        setFeedback(null);
-
-        startTransition(async () => {
-            const result = await saveDraftReport({
-                studentId,
-                content,
-                keywords: [keyword],
-                periodStart,
-                periodEnd,
-            });
-
-            if (!result.ok) {
-                setFeedback(result.message);
-                return;
-            }
-
-            setFeedback(result.message ?? "초안을 저장했습니다.");
-            router.refresh();
-        });
-    }
-
-    function handleRegenerate() {
-        if (!active) {
-            setFeedback("학생을 선택해 주세요.");
-            return;
-        }
-
-        const studentId = active.studentProfileId;
-        if (!studentId) {
-            setFeedback("학생 프로필이 없어 생성할 수 없습니다.");
-            return;
-        }
-
-        const { periodStart, periodEnd } = getActivePeriod();
-        setFeedback(null);
-
-        startTransition(async () => {
-            const result = await regenerateDraftWithAi({
-                studentId,
-                keywords: [keyword],
-                tone,
-                periodStart,
-                periodEnd,
-            });
-
-            if (!result.ok) {
-                setFeedback(result.message);
-                return;
-            }
-
-            if (result.content) {
-                setContent(result.content);
-            }
-            setFeedback(result.message ?? "AI 초안을 생성했습니다.");
-            router.refresh();
-        });
-    }
-
-    function handleRequestApproval() {
-        if (!active || !canEdit) return;
-
-        if (!content.trim()) {
-            setFeedback("본문이 비어 있어 승인 요청할 수 없습니다.");
-            return;
-        }
-
-        setFeedback(null);
-
-        startTransition(async () => {
-            let reportId = active.report?.id;
-
-            if (!reportId) {
-                const studentId = active.studentProfileId;
-                if (!studentId) {
-                    setFeedback("학생 프로필이 없어 승인 요청할 수 없습니다.");
-                    return;
-                }
-
-                const { periodStart, periodEnd } = getActivePeriod();
-
-                const saveResult = await saveDraftReport({
-                    studentId,
-                    content,
-                    keywords: [keyword],
-                    periodStart,
-                    periodEnd,
-                });
-
-                if (!saveResult.ok) {
-                    setFeedback(saveResult.message);
-                    return;
-                }
-
-                reportId = saveResult.reportId;
-            }
-
-            if (!reportId) {
-                setFeedback(
-                    "저장된 리포트 ID를 확인하지 못했습니다. 다시 시도해 주세요.",
-                );
-                return;
-            }
-
-            const result = await requestReportApproval({ reportId });
-
-            if (!result.ok) {
-                setFeedback(result.message);
-                return;
-            }
-
-            setFeedback(result.message ?? "승인 요청을 보냈습니다.");
-            router.refresh();
-        });
-    }
 
     return (
         <section className={styles.page}>
@@ -314,227 +74,35 @@ export default function StaffReportsScreen({
             </header>
 
             <div className={styles.metrics}>
-                {stats.map((item) => (
-                    <article key={item.label}>
-                        <StatusChip tone={item.tone}>{item.label}</StatusChip>
-                        <strong>{item.value}</strong>
-                        <p>{item.detail}</p>
+                {metrics.map((metric) => (
+                    <article key={metric.label}>
+                        <StatusChip tone={metric.tone}>
+                            {metric.label}
+                        </StatusChip>
+                        <strong>{metric.value}</strong>
+                        <p>{metric.detail}</p>
                     </article>
                 ))}
             </div>
 
-            {students.length === 0 ? (
+            {!selectedStudent ? (
                 <div className={styles.emptyPanel}>
                     <h2>표시할 학생이 없습니다</h2>
-                    <p>
-                        가입 사용자에서 역할을 학생으로 부여하면 이곳에
-                        나타납니다.
-                    </p>
+                    <p>학생 역할이 부여되면 이곳에 나타납니다.</p>
                 </div>
             ) : (
                 <div className={styles.layout}>
-                    <article className={styles.listPanel}>
-                        <div className={styles.panelHead}>
-                            <h2>학생 목록</h2>
-                            <StatusChip>{students.length}명</StatusChip>
-                        </div>
-
-                        <ul className={styles.studentList}>
-                            {students.map((student) => {
-                                const status = getStatus(student);
-                                const meta = statusMeta[status];
-
-                                return (
-                                    <li key={student.id}>
-                                        <button
-                                            type="button"
-                                            className={
-                                                student.id === activeId
-                                                    ? styles.activeStudent
-                                                    : undefined
-                                            }
-                                            onClick={() => selectStudent(student)}
-                                        >
-                                            <span>
-                                                <strong>{student.name}</strong>
-                                                <small>
-                                                    {student.className ??
-                                                        formatSchool(
-                                                            student.schoolName,
-                                                            student.grade,
-                                                        )}
-                                                </small>
-                                            </span>
-                                            <StatusChip tone={meta.tone}>
-                                                {meta.label}
-                                            </StatusChip>
-                                        </button>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    </article>
-
-                    <article className={styles.editorPanel}>
-                        <div className={styles.panelHead}>
-                            <h2>
-                                {active
-                                    ? `${active.name} 보고서`
-                                    : "보고서 작성"}
-                            </h2>
-                            {activeStatus && (
-                                <StatusChip
-                                    tone={statusMeta[activeStatus].tone}
-                                >
-                                    {statusMeta[activeStatus].label}
-                                </StatusChip>
-                            )}
-                        </div>
-
-                        {!active ? (
-                            <p className={styles.empty}>학생을 선택하세요.</p>
-                        ) : (
-                            <>
-                                <div className={styles.meta}>
-                                    <div>
-                                        <span>학교·학년</span>
-                                        <strong>
-                                            {formatSchool(
-                                                active.schoolName,
-                                                active.grade,
-                                            )}
-                                        </strong>
-                                    </div>
-                                    <div>
-                                        <span>반</span>
-                                        <strong>
-                                            {active.className ?? "미배정"}
-                                        </strong>
-                                    </div>
-                                </div>
-
-                                {active.report?.rejectionReason && (
-                                    <div className={styles.rejectBox}>
-                                        <strong>반려 사유</strong>
-                                        <p>{active.report.rejectionReason}</p>
-                                    </div>
-                                )}
-
-                                <label className={styles.field}>
-                                    평가 키워드
-                                    <select
-                                        value={keyword}
-                                        onChange={(e) =>
-                                            setKeyword(e.target.value)
-                                        }
-                                        disabled={!canEdit || isPending}
-                                    >
-                                        {keywordOptions.map((option) => (
-                                            <option
-                                                key={option}
-                                                value={option}
-                                            >
-                                                {option}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label>
-
-                                <label className={styles.field}>
-                                    톤
-                                    <select
-                                        value={tone}
-                                        onChange={(e) =>
-                                            setTone(e.target.value)
-                                        }
-                                        disabled={!canEdit || isPending}
-                                    >
-                                        {toneOptions.map((option) => (
-                                            <option
-                                                key={option}
-                                                value={option}
-                                            >
-                                                {option}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label>
-
-                                <label className={styles.field}>
-                                    초안
-                                    <textarea
-                                        value={content}
-                                        onChange={(e) =>
-                                            setContent(e.target.value)
-                                        }
-                                        disabled={!canEdit || isPending}
-                                        rows={8}
-                                        placeholder="AI 초안이 여기에 표시됩니다."
-                                    />
-                                </label>
-
-                                <div className={styles.actions}>
-                                    <button
-                                        type="button"
-                                        className={styles.secondary}
-                                        disabled={
-                                            !canEdit ||
-                                            isPending ||
-                                            !active.studentProfileId
-                                        }
-                                        onClick={handleSaveDraft}
-                                    >
-                                        {isPending
-                                            ? "처리 중..."
-                                            : "초안 저장"}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={styles.secondary}
-                                        disabled={
-                                            !canEdit ||
-                                            isPending ||
-                                            !active.studentProfileId
-                                        }
-                                        onClick={handleRegenerate}
-                                    >
-                                        {isPending
-                                            ? "처리 중..."
-                                            : "AI 재생성"}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        disabled={!canEdit || isPending}
-                                        onClick={handleRequestApproval}
-                                    >
-                                        {isPending
-                                            ? "처리 중..."
-                                            : "승인 요청"}
-                                    </button>
-                                </div>
-
-                                {feedback && (
-                                    <p className={styles.hint}>{feedback}</p>
-                                )}
-
-                                {!active.studentProfileId && (
-                                    <p className={styles.hint}>
-                                        students 프로필이 없어 아직 DB에
-                                        리포트를 저장할 수 없습니다.
-                                    </p>
-                                )}
-                            </>
-                        )}
-                    </article>
+                    <ReportStudentList
+                        students={students}
+                        selectedStudentId={selectedStudent.id}
+                        onSelect={setSelectedStudentId}
+                    />
+                    <ReportEditor
+                        key={selectedStudent.id}
+                        student={selectedStudent}
+                    />
                 </div>
             )}
         </section>
     );
-}
-
-function formatSchool(schoolName: string | null, grade: string | null) {
-    if (!schoolName && !grade) return "미입력";
-    if (!schoolName) return `${grade}학년`;
-    if (!grade) return schoolName;
-    return `${schoolName} · ${grade}학년`;
 }

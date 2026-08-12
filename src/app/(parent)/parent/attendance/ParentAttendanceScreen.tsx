@@ -2,68 +2,15 @@
 
 import { useActionState, useMemo, useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
-import { requestAbsence, type AbsenceState } from "./actions";
+import { ATTENDANCE_STATUS_METADATA } from "@/features/attendance/presentation";
+import type { ParentAttendanceChild } from "@/features/attendance/parent-types";
+import {
+    requestAbsence,
+    type AbsenceState,
+} from "@/features/attendance/parent-actions";
 import styles from "./ParentAttendanceScreen.module.css";
 
-export type AttendanceStatus =
-    | "PRESENT"
-    | "LATE"
-    | "ABSENT"
-    | "EXCUSED"
-    | "EARLY_LEAVE";
-
-export type ParentAttendanceSession = {
-    id: string;
-    className: string;
-    subject: string;
-    teacherName: string | null;
-    classroom: string | null;
-    startsAt: string;
-    endsAt: string;
-    timeLabel: string;
-    isToday: boolean;
-    attendanceStatus: AttendanceStatus | null;
-    checkInAt: string | null;
-    checkOutAt: string | null;
-    absenceRequest: {
-        id: string;
-        reason: string;
-        requestedAt: string;
-    } | null;
-};
-
-export type ParentAttendanceChild = {
-    id: string;
-    name: string;
-    schoolName: string | null;
-    grade: string | null;
-    className: string | null;
-    teacherName: string | null;
-    monthCounts: {
-        present: number;
-        late: number;
-        absent: number;
-        earlyLeave: number;
-    };
-    todayHighlight: {
-        className: string;
-        timeLabel: string;
-        classroom: string | null;
-        status: AttendanceStatus | null;
-    } | null;
-    sessions: ParentAttendanceSession[];
-};
-
-const statusMeta: Record<
-    AttendanceStatus,
-    { label: string; tone: "neutral" | "success" | "warning" | "danger" }
-> = {
-    PRESENT: { label: "출석", tone: "success" },
-    LATE: { label: "지각", tone: "warning" },
-    ABSENT: { label: "결석", tone: "danger" },
-    EXCUSED: { label: "공결", tone: "neutral" },
-    EARLY_LEAVE: { label: "조퇴", tone: "warning" },
-};
+const statusMeta = ATTENDANCE_STATUS_METADATA;
 
 const initialAbsence: AbsenceState = { status: "idle", message: "" };
 
