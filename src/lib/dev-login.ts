@@ -3,6 +3,7 @@ import type { AppRole } from "@/types/roles";
 export const DEV_LOGIN_PROVIDER_ID = "dev-login";
 
 export const DEV_LOGIN_ROLES = [
+    "DIRECTOR",
     "TEACHER",
     "STAFF",
     "PARENT",

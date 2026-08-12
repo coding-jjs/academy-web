@@ -28,7 +28,7 @@ export default function StaffStudentDetail({
                         <h2>{student.name}</h2>
                         <p>
                             {student.schoolName ?? "학교 미입력"}
-                            {student.grade ? ` · ${student.grade}` : ""}
+                            {student.grade ? ` · ${student.grade}` : ""}학년
                         </p>
                     </div>
                     <StatusChip tone={statusMetadata.tone}>
@@ -100,7 +100,11 @@ function RecentAttendance({ student }: { student: StaffStudentRow }) {
                     {student.recentAttendance.map((attendance, index) => (
                         <li key={`${attendance.startsAt}-${index}`}>
                             <strong>
-                                {ATTENDANCE_STATUS_METADATA[attendance.status].label}
+                                {
+                                    ATTENDANCE_STATUS_METADATA[
+                                        attendance.status
+                                    ].label
+                                }
                             </strong>
                             <span>
                                 {attendance.className} ·{" "}
