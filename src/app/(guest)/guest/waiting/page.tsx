@@ -72,11 +72,19 @@ export default function GuestWaitingPage() {
             <section id="location" className={styles.block}>
                 <div className={styles.blockHead}>
                     <h2>오시는 길</h2>
-                    <p>대구광역시 ○○구 ○○로 00 · A학원</p>
+                    <p>대구광역시 수성구 알파시티1로 170 · A학원</p>
                 </div>
                 <div className={styles.map}>
-                    <span aria-hidden="true">⌖</span>
-                    <p>약도 이미지 자리</p>
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m5!3m3!1m2!1s0x356609911e108f93%3A0xd41b28115963e05a!2z64yA6rWs65SU7KeA7YS47ZiB7Iug7KeE7Z2l7JuQ!5e0!3m2!1sko!2skr!4v1786500523158!5m2!1sko!2skr"
+                        title="A학원 오시는 길"
+                        // width="600"
+                        // height="450"
+                        style={{ border: 0, width: "100%", height: "100%" }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                    />
                 </div>
                 <ul className={styles.contactList}>
                     <li>
