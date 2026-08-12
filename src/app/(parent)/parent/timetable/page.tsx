@@ -24,6 +24,7 @@ export default async function ParentTimetablePage({
     );
     return (
         <ParentTimetableScreen
+            key={activeChildId}
             childList={childList}
             weekDays={weekDays}
             activeChildId={activeChildId}
