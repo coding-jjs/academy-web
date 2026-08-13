@@ -11,7 +11,6 @@ export default function EmployeeBillingPage() {
                     <p>학생들의 수강료와 교재비를 관리할 수 있습니다.</p>
                 </div>
             </header>
-
             <div className={styles.preparing}>
                 <div className={styles.preparingIcon} aria-hidden="true">
                     ◷
