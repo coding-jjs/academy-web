@@ -26,7 +26,7 @@ export default function MessagesScreen({
     canCompose,
     deniedMessage,
     students,
-    classes,
+    classes: _classes,
     pending,
     mine,
 }: MessagesScreenProps) {
@@ -95,7 +95,6 @@ export default function MessagesScreen({
                 <MessageComposer
                     mode={mode}
                     students={students}
-                    classes={classes}
                     onFeedback={setFeedback}
                 />
             </div>
@@ -105,6 +104,7 @@ export default function MessagesScreen({
                         mode={mode}
                         messages={pending}
                         onFeedback={setFeedback}
+                        enableBulkApprove
                     />
                 </div>
             )}

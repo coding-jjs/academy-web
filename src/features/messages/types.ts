@@ -7,9 +7,22 @@ export type MessageStatus =
     | "REJECTED"
     | "CANCELLED";
 
+export type MessageParentOption = {
+    userId: string;
+    name: string;
+};
+
 export type MessageRecipientOption = {
     id: string;
     name: string;
+    parents?: MessageParentOption[];
+};
+
+export type MessageTargetFilter = {
+    studentIds?: string[];
+    parentUserIds?: string[];
+    /** 작성 시 전체 선택으로 보낸 경우 */
+    broadcast?: boolean;
 };
 
 export type MessageListItem = {
@@ -24,4 +37,6 @@ export type MessageListItem = {
     submittedAt: string | null;
     sentAt: string | null;
     recipientCount: number;
+    /** 승인/목록용 대상 요약 ("전체 발송" 또는 이름 목록) */
+    targetSummary: string;
 };

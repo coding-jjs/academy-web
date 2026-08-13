@@ -62,6 +62,31 @@
     max-width: 720px;
 }
 
+.composeSplit {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.9fr);
+    gap: 20px;
+    align-items: start;
+    max-width: 1100px;
+}
+
+.composeMain,
+.composeSide {
+    display: grid;
+    gap: 14px;
+    min-width: 0;
+}
+
+.composeSide .checkList {
+    max-height: 420px;
+}
+
+@media (max-width: 860px) {
+    .composeSplit {
+        grid-template-columns: 1fr;
+    }
+}
+
 .field {
     display: grid;
     gap: 6px;
@@ -110,6 +135,85 @@
     background: #fff;
 }
 
+.listHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.listActions {
+    display: flex;
+    gap: 8px;
+}
+
+.ghostBtn {
+    border: none;
+    background: transparent;
+    color: #0066cc;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+    padding: 0;
+}
+
+.ghostBtn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.checkList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #e5e5ea;
+    border-radius: 12px;
+    max-height: 280px;
+    overflow: auto;
+    background: #fff;
+}
+
+.checkList li + li {
+    border-top: 1px solid #f2f2f7;
+}
+
+.checkItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+}
+
+.checkItem input {
+    margin-top: 3px;
+}
+
+.checkItem span {
+    display: grid;
+    gap: 2px;
+    color: #1d1d1f;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.checkItem small {
+    color: #6e6e73;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.listEmpty {
+    margin: 0;
+    padding: 14px;
+    border: 1px dashed #d2d2d7;
+    border-radius: 12px;
+    color: #6e6e73;
+    font-size: 14px;
+}
+
 .layout {
     display: grid;
     grid-template-columns: minmax(240px, 340px) 1fr;
@@ -121,6 +225,53 @@
     border-radius: 14px;
     overflow: hidden;
     background: #fff;
+}
+
+.bulkBar {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    border-bottom: 1px solid #f2f2f7;
+    background: #fafafa;
+}
+
+.bulkBar .primaryBtn {
+    width: 100%;
+}
+
+.listRow {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: stretch;
+    border-bottom: 1px solid #f2f2f7;
+}
+
+.listRow:last-child {
+    border-bottom: none;
+}
+
+.rowCheck {
+    display: grid;
+    place-items: center;
+    padding: 0 0 0 12px;
+    background: #fff;
+}
+
+.listRow .item,
+.listRow .itemActive {
+    border-bottom: none;
+}
+
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 .messageList {

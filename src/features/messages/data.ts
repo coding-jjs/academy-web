@@ -2,6 +2,11 @@ import "server-only";
 
 import type { Prisma } from "@/generate/prisma/client";
 import { prisma } from "@/lib/db";
+import { MESSAGE_AUDIENCE_LABELS } from "@/features/messages/presentation";
+import {
+    formatTargetNames,
+    parseTargetFilter,
+} from "@/features/messages/target-filter";
 import type {
     MessageListItem,
     MessageRecipientOption,
@@ -17,8 +22,13 @@ const messageListSelect = {
     createdAt: true,
     submittedAt: true,
     sentAt: true,
+    targetFilter: true,
+    targetStudentId: true,
+    targetClassId: true,
     author: { select: { name: true } },
     sender: { select: { name: true } },
+    targetStudent: { select: { name: true } },
+    targetClass: { select: { name: true } },
     _count: { select: { recipients: true } },
 } satisfies Prisma.MessageSelect;
 
@@ -26,8 +36,108 @@ type MessageRecord = Prisma.MessageGetPayload<{
     select: typeof messageListSelect;
 }>;
 
-function toMessageListItem(message: MessageRecord): MessageListItem {
-    return {
+async function buildTargetSummaries(
+    messages: MessageRecord[],
+): Promise<Map<string, string>> {
+    const summaries = new Map<string, string>();
+    const studentIds = new Set<string>();
+    const parentIds = new Set<string>();
+
+    for (const message of messages) {
+        const filter = parseTargetFilter(message.targetFilter);
+        if (filter?.broadcast) {
+            summaries.set(message.id, "전체 발송");
+            continue;
+        }
+        for (const id of filter?.studentIds ?? []) studentIds.add(id);
+        for (const id of filter?.parentUserIds ?? []) parentIds.add(id);
+        if (
+            !filter?.studentIds?.length &&
+            message.targetStudentId &&
+            message.audience === "STUDENT"
+        ) {
+            studentIds.add(message.targetStudentId);
+        }
+    }
+
+    const [students, parents] = await Promise.all([
+        studentIds.size === 0
+            ? Promise.resolve([])
+            : prisma.student.findMany({
+                  where: { id: { in: [...studentIds] } },
+                  select: { id: true, name: true },
+              }),
+        parentIds.size === 0
+            ? Promise.resolve([])
+            : prisma.user.findMany({
+                  where: { id: { in: [...parentIds] } },
+                  select: { id: true, name: true },
+              }),
+    ]);
+
+    const studentNameById = new Map(
+        students.map((student) => [student.id, student.name]),
+    );
+    const parentNameById = new Map(
+        parents.map((parent) => [parent.id, parent.name]),
+    );
+
+    for (const message of messages) {
+        if (summaries.has(message.id)) continue;
+
+        const filter = parseTargetFilter(message.targetFilter);
+
+        if (filter?.studentIds?.length) {
+            summaries.set(
+                message.id,
+                formatTargetNames(
+                    filter.studentIds
+                        .map((id) => studentNameById.get(id))
+                        .filter((name): name is string => Boolean(name)),
+                ),
+            );
+            continue;
+        }
+
+        if (filter?.parentUserIds?.length) {
+            summaries.set(
+                message.id,
+                formatTargetNames(
+                    filter.parentUserIds
+                        .map((id) => parentNameById.get(id))
+                        .filter((name): name is string => Boolean(name)),
+                ),
+            );
+            continue;
+        }
+
+        if (message.targetClass?.name) {
+            summaries.set(message.id, `${message.targetClass.name} 반`);
+            continue;
+        }
+
+        if (message.targetStudent?.name) {
+            summaries.set(message.id, message.targetStudent.name);
+            continue;
+        }
+
+        summaries.set(
+            message.id,
+            message.audience
+                ? MESSAGE_AUDIENCE_LABELS[message.audience]
+                : "대상 미지정",
+        );
+    }
+
+    return summaries;
+}
+
+async function toMessageListItems(
+    messages: MessageRecord[],
+): Promise<MessageListItem[]> {
+    const summaries = await buildTargetSummaries(messages);
+
+    return messages.map((message) => ({
         id: message.id,
         title: message.title,
         content: message.content,
@@ -39,7 +149,8 @@ function toMessageListItem(message: MessageRecord): MessageListItem {
         submittedAt: message.submittedAt?.toISOString() ?? null,
         sentAt: message.sentAt?.toISOString() ?? null,
         recipientCount: message._count.recipients,
-    };
+        targetSummary: summaries.get(message.id) ?? "대상 미지정",
+    }));
 }
 
 export async function getDirectorMessagesData(): Promise<{
@@ -53,7 +164,22 @@ export async function getDirectorMessagesData(): Promise<{
             prisma.student.findMany({
                 where: { status: "ENROLLED" },
                 orderBy: { name: "asc" },
-                select: { id: true, name: true },
+                select: {
+                    id: true,
+                    name: true,
+                    parentLinks: {
+                        where: { endedAt: null },
+                        select: {
+                            parent: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    status: true,
+                                },
+                            },
+                        },
+                    },
+                },
             }),
             prisma.class.findMany({
                 where: { active: true },
@@ -74,11 +200,25 @@ export async function getDirectorMessagesData(): Promise<{
             }),
         ]);
 
+    const [pending, mine] = await Promise.all([
+        toMessageListItems(pendingMessages),
+        toMessageListItems(sentMessages),
+    ]);
+
     return {
-        students,
+        students: students.map((student) => ({
+            id: student.id,
+            name: student.name,
+            parents: student.parentLinks
+                .filter((link) => link.parent.status === "ACTIVE")
+                .map((link) => ({
+                    userId: link.parent.id,
+                    name: link.parent.name,
+                })),
+        })),
         classes,
-        pending: pendingMessages.map(toMessageListItem),
-        mine: sentMessages.map(toMessageListItem),
+        pending,
+        mine,
     };
 }
 
@@ -100,7 +240,22 @@ export async function getStaffMessagesData({
         prisma.student.findMany({
             where: studentWhere,
             orderBy: { name: "asc" },
-            select: { id: true, name: true },
+            select: {
+                id: true,
+                name: true,
+                parentLinks: {
+                    where: { endedAt: null },
+                    select: {
+                        parent: {
+                            select: {
+                                id: true,
+                                name: true,
+                                status: true,
+                            },
+                        },
+                    },
+                },
+            },
         }),
         prisma.class.findMany({
             where: classWhere,
@@ -119,9 +274,18 @@ export async function getStaffMessagesData({
     ]);
 
     return {
-        students,
+        students: students.map((student) => ({
+            id: student.id,
+            name: student.name,
+            parents: student.parentLinks
+                .filter((link) => link.parent.status === "ACTIVE")
+                .map((link) => ({
+                    userId: link.parent.id,
+                    name: link.parent.name,
+                })),
+        })),
         classes,
         pending: [],
-        mine: staffMessages.map(toMessageListItem),
+        mine: await toMessageListItems(staffMessages),
     };
 }

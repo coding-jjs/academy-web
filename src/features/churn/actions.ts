@@ -131,8 +131,7 @@ export async function sendChurnParentNote(input: {
     if (recipientIds.length === 0) {
         return {
             ok: false,
-            message:
-                "연결된 학부모/학생 계정이 없어 쪽지를 보낼 수 없습니다.",
+            message: "연결된 학부모가 없어 쪽지를 보낼 수 없습니다.",
         };
     }
 
@@ -148,17 +147,17 @@ export async function sendChurnParentNote(input: {
     const now = new Date();
     await prisma.message.create({
         data: {
-            senderUserId: session.user.id,
-            authorUserId: session.user.id,
             title,
             content,
             deepLink: "/parent/inbox",
             status: "SENT",
             audience: "PARENT",
             sentAt: now,
+            sender: { connect: { id: session.user.id } },
+            author: { connect: { id: session.user.id } },
             recipients: {
                 create: recipientIds.map((recipientUserId) => ({
-                    recipientUserId,
+                    recipient: { connect: { id: recipientUserId } },
                 })),
             },
         },
@@ -166,11 +165,10 @@ export async function sendChurnParentNote(input: {
 
     revalidatePath("/director/churn");
     revalidatePath("/parent/inbox");
-    revalidatePath("/parent/student-inbox");
     revalidatePath("/student/inbox");
     revalidatePath("/director/messages");
 
-    return { ok: true, message: "학부모·학생에게 쪽지를 보냈습니다." };
+    return { ok: true, message: "학부모에게 쪽지를 보냈습니다." };
 }
 
 export async function saveChurnThreshold(input: {

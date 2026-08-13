@@ -4,7 +4,6 @@ import { prisma } from "@/lib/db";
 import type {
     InboxMessage,
     ParentInboxData,
-    ParentStudentInboxData,
     StudentInboxData,
 } from "@/features/messages/inbox-types";
 
@@ -40,27 +39,7 @@ export async function getParentInboxData(
 export async function getStudentInboxData(
     studentUserId: string,
 ): Promise<StudentInboxData> {
-    const now = new Date();
-    const [recipients, newsRows] = await Promise.all([
-        getMessageRecipients(studentUserId),
-        prisma.newsItem.findMany({
-            where: {
-                published: true,
-                audience: { in: ["STUDENT", "ALL"] },
-                OR: [{ startsAt: null }, { startsAt: { lte: now } }],
-                AND: [{ OR: [{ endsAt: null }, { endsAt: { gte: now } }] }],
-            },
-            orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-            take: 30,
-            select: {
-                id: true,
-                title: true,
-                content: true,
-                category: true,
-                createdAt: true,
-            },
-        }),
-    ]);
+    const recipients = await getMessageRecipients(studentUserId);
 
     const messages = recipients.map((row) => {
         const message = mapInboxMessage(row);
@@ -74,117 +53,7 @@ export async function getStudentInboxData(
 
     return {
         messages,
-        news: newsRows.map((newsItem) => ({
-            ...newsItem,
-            createdAt: newsItem.createdAt.toISOString(),
-        })),
         unreadCount: countUnreadMessages(messages),
-    };
-}
-
-export async function getParentStudentInboxData(
-    parentUserId: string,
-): Promise<ParentStudentInboxData> {
-    const now = new Date();
-    const [links, newsRows] = await Promise.all([
-        prisma.parentStudentLink.findMany({
-            where: { parentUserId, endedAt: null },
-            orderBy: { linkedAt: "asc" },
-            select: {
-                student: {
-                    select: {
-                        id: true,
-                        name: true,
-                        schoolName: true,
-                        grade: true,
-                        userId: true,
-                        enrollments: {
-                            where: { status: "ACTIVE", endedAt: null },
-                            take: 1,
-                            select: { class: { select: { name: true } } },
-                        },
-                    },
-                },
-            },
-        }),
-        prisma.newsItem.findMany({
-            where: {
-                published: true,
-                audience: { in: ["STUDENT", "ALL"] },
-                OR: [{ startsAt: null }, { startsAt: { lte: now } }],
-                AND: [{ OR: [{ endsAt: null }, { endsAt: { gte: now } }] }],
-            },
-            orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-            take: 20,
-            select: {
-                id: true,
-                title: true,
-                content: true,
-                category: true,
-                createdAt: true,
-            },
-        }),
-    ]);
-    const studentUserIds = links
-        .map(({ student }) => student.userId)
-        .filter((userId): userId is string => Boolean(userId));
-    const recipients =
-        studentUserIds.length === 0
-            ? []
-            : await prisma.messageRecipient.findMany({
-                  where: { recipientUserId: { in: studentUserIds } },
-                  orderBy: { createdAt: "desc" },
-                  select: {
-                      id: true,
-                      recipientUserId: true,
-                      readAt: true,
-                      message: {
-                          select: {
-                              id: true,
-                              title: true,
-                              content: true,
-                              createdAt: true,
-                              sender: { select: { name: true, role: true } },
-                          },
-                      },
-                  },
-              });
-    const recipientsByUser = Map.groupBy(
-        recipients,
-        (recipient) => recipient.recipientUserId,
-    );
-
-    return {
-        childList: links.map(({ student }) => ({
-            id: student.id,
-            name: student.name,
-            schoolName: student.schoolName,
-            grade: student.grade,
-            className: student.enrollments[0]?.class.name ?? null,
-            hasStudentAccount: Boolean(student.userId),
-            messages: student.userId
-                ? (recipientsByUser.get(student.userId) ?? [])
-                      .slice(0, 40)
-                      .map((recipient) => ({
-                          recipientId: recipient.id,
-                          messageId: recipient.message.id,
-                          title: recipient.message.title,
-                          content: recipient.message.content,
-                          deepLink: null,
-                          createdAt:
-                              recipient.message.createdAt.toISOString(),
-                          readAt: recipient.readAt?.toISOString() ?? null,
-                          senderName:
-                              recipient.message.sender?.name ?? "A학원",
-                          senderRole:
-                              recipient.message.sender?.role ?? null,
-                      }))
-                : [],
-        })),
-        news: newsRows.map((newsItem) => ({
-            ...newsItem,
-            createdAt: newsItem.createdAt.toISOString(),
-        })),
     };
 }
 

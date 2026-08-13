@@ -87,8 +87,7 @@ export async function approveAndSendReport(input: {
         if (recipientIds.length === 0) {
             return {
                 ok: false,
-                message:
-                    "연결된 학부모/학생 계정이 없어 발송할 수 없습니다.",
+                message: "연결된 학부모가 없어 발송할 수 없습니다.",
             };
         }
 
@@ -110,10 +109,6 @@ export async function approveAndSendReport(input: {
 
             await tx.message.create({
                 data: {
-                    senderUserId: authorUserId,
-                    authorUserId,
-                    approverUserId: session.user.id,
-                    reportId: report.id,
                     title,
                     content: report.content,
                     deepLink: "/parent/reports",
@@ -121,9 +116,13 @@ export async function approveAndSendReport(input: {
                     audience: "PARENT",
                     approvedAt: now,
                     sentAt: now,
+                    sender: { connect: { id: authorUserId } },
+                    author: { connect: { id: authorUserId } },
+                    approver: { connect: { id: session.user.id } },
+                    report: { connect: { id: report.id } },
                     recipients: {
                         create: recipientIds.map((recipientUserId) => ({
-                            recipientUserId,
+                            recipient: { connect: { id: recipientUserId } },
                         })),
                     },
                 },
@@ -167,7 +166,6 @@ export async function approveAndSendReport(input: {
     revalidatePath("/teacher/reports");
     revalidatePath("/parent/reports");
     revalidatePath("/parent/inbox");
-    revalidatePath("/parent/student-inbox");
     revalidatePath("/student/inbox");
     revalidatePath("/director/messages");
 
