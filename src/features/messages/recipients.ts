@@ -9,32 +9,14 @@ import {
 
 export type MessageAudience = "ALL" | "STAFF" | "PARENT" | "STUDENT";
 
-/** 학부모와 현재 연결된 학생 계정을 하나의 수신자 목록으로 확장한다. */
+/** 학부모 userId만 수신자로 반환한다. (연결된 학생 계정은 포함하지 않음) */
 export async function expandParentRecipients(
     parentUserIds: string[],
     excludeUserId: string,
 ): Promise<string[]> {
-    const uniqueParents = [...new Set(parentUserIds)].filter(
+    return [...new Set(parentUserIds)].filter(
         (id) => id && id !== excludeUserId,
     );
-    if (uniqueParents.length === 0) return [];
-
-    const links = await prisma.parentStudentLink.findMany({
-        where: { parentUserId: { in: uniqueParents }, endedAt: null },
-        select: {
-            parentUserId: true,
-            student: { select: { userId: true } },
-        },
-    });
-
-    const ids = new Set<string>(uniqueParents);
-    for (const link of links) {
-        const studentUserId = link.student.userId;
-        if (studentUserId && studentUserId !== excludeUserId) {
-            ids.add(studentUserId);
-        }
-    }
-    return [...ids];
 }
 
 async function studentIsInScope(studentId: string, scope: StaffScope | null) {
@@ -68,15 +50,63 @@ async function studentIdsForClass(classId: string) {
     return rows.map((row) => row.studentId);
 }
 
+async function assertStudentsInScope(
+    studentIds: string[],
+    scope: StaffScope | null,
+) {
+    for (const studentId of studentIds) {
+        if (!(await studentIsInScope(studentId, scope))) {
+            return {
+                ok: false as const,
+                message: "대상 학생에 접근할 수 없습니다.",
+            };
+        }
+    }
+    return { ok: true as const };
+}
+
+/** scope 내 학생과 연결된 학부모만 허용 */
+async function filterParentsLinkedToScopedStudents(
+    parentUserIds: string[],
+    scope: StaffScope | null,
+) {
+    const uniqueParentIds = [...new Set(parentUserIds)].filter(Boolean);
+    if (uniqueParentIds.length === 0) return [];
+
+    const links = await prisma.parentStudentLink.findMany({
+        where: {
+            parentUserId: { in: uniqueParentIds },
+            endedAt: null,
+            student: {
+                status: "ENROLLED",
+                ...(scope ? studentScopeWhere(scope) : {}),
+            },
+            parent: { status: "ACTIVE", role: "PARENT" },
+        },
+        select: { parentUserId: true },
+    });
+
+    return [...new Set(links.map((link) => link.parentUserId))];
+}
+
 export async function resolveRecipientUserIds(input: {
     actorUserId: string;
     audience: MessageAudience;
     targetStudentId?: string | null;
     targetClassId?: string | null;
+    targetStudentIds?: string[] | null;
+    targetParentUserIds?: string[] | null;
     scope: StaffScope | null;
 }): Promise<{ ok: true; userIds: string[] } | { ok: false; message: string }> {
-    const { actorUserId, audience, targetStudentId, targetClassId, scope } =
-        input;
+    const {
+        actorUserId,
+        audience,
+        targetStudentId,
+        targetClassId,
+        targetStudentIds,
+        targetParentUserIds,
+        scope,
+    } = input;
     const isStaffScoped = scope !== null;
 
     if (isStaffScoped && (audience === "ALL" || audience === "STAFF")) {
@@ -85,22 +115,73 @@ export async function resolveRecipientUserIds(input: {
             message: "직원은 학부모·학생 대상만 요청할 수 있습니다.",
         };
     }
-    if (isStaffScoped && !targetStudentId && !targetClassId) {
+
+    const multiStudentIds = [
+        ...new Set(
+            (targetStudentIds ?? [])
+                .map((id) => id.trim())
+                .filter(Boolean),
+        ),
+    ];
+    const multiParentIds = [
+        ...new Set(
+            (targetParentUserIds ?? [])
+                .map((id) => id.trim())
+                .filter(Boolean),
+        ),
+    ];
+    const hasMultiTargets =
+        multiStudentIds.length > 0 || multiParentIds.length > 0;
+
+    if (
+        isStaffScoped &&
+        !hasMultiTargets &&
+        !targetStudentId &&
+        !targetClassId
+    ) {
         return {
             ok: false,
-            message: "학생 또는 반을 선택해 주세요.",
+            message: "수신 대상을 선택해 주세요.",
         };
     }
-    if (targetStudentId && !(await studentIsInScope(targetStudentId, scope))) {
-        return { ok: false, message: "대상 학생에 접근할 수 없습니다." };
+
+    if (audience === "PARENT" && multiParentIds.length > 0) {
+        const allowedParents = await filterParentsLinkedToScopedStudents(
+            multiParentIds,
+            scope,
+        );
+        if (allowedParents.length === 0) {
+            return { ok: false, message: "선택 가능한 학부모가 없습니다." };
+        }
+        if (allowedParents.length !== multiParentIds.length) {
+            return {
+                ok: false,
+                message: "담당 학생과 연결되지 않은 학부모가 포함되어 있습니다.",
+            };
+        }
+        return {
+            ok: true,
+            userIds: await expandParentRecipients(allowedParents, actorUserId),
+        };
     }
+
+    if (multiStudentIds.length > 0) {
+        const scoped = await assertStudentsInScope(multiStudentIds, scope);
+        if (!scoped.ok) return scoped;
+    } else if (targetStudentId) {
+        if (!(await studentIsInScope(targetStudentId, scope))) {
+            return { ok: false, message: "대상 학생에 접근할 수 없습니다." };
+        }
+    }
+
     if (targetClassId && !(await classIsInScope(targetClassId, scope))) {
         return { ok: false, message: "대상 반에 접근할 수 없습니다." };
     }
 
     let studentIds: string[] = [];
-    if (targetStudentId) studentIds = [targetStudentId];
-    if (targetClassId) studentIds = await studentIdsForClass(targetClassId);
+    if (multiStudentIds.length > 0) studentIds = multiStudentIds;
+    else if (targetStudentId) studentIds = [targetStudentId];
+    else if (targetClassId) studentIds = await studentIdsForClass(targetClassId);
 
     if (audience === "ALL") {
         const users = await prisma.user.findMany({
@@ -114,7 +195,9 @@ export async function resolveRecipientUserIds(input: {
         });
         return {
             ok: true,
-            userIds: users.map((user) => user.id).filter((id) => id !== actorUserId),
+            userIds: users
+                .map((user) => user.id)
+                .filter((id) => id !== actorUserId),
         };
     }
 
@@ -125,7 +208,9 @@ export async function resolveRecipientUserIds(input: {
         });
         return {
             ok: true,
-            userIds: users.map((user) => user.id).filter((id) => id !== actorUserId),
+            userIds: users
+                .map((user) => user.id)
+                .filter((id) => id !== actorUserId),
         };
     }
 
@@ -139,10 +224,18 @@ export async function resolveRecipientUserIds(input: {
                   where: { role: "STUDENT", status: "ACTIVE" },
                   select: { id: true },
               });
-        const ids = users.map((user) => ("userId" in user ? user.userId : user.id));
+        const ids = users.map((user) =>
+            "userId" in user ? user.userId : user.id,
+        );
         return {
             ok: true,
-            userIds: [...new Set(ids.filter((id): id is string => Boolean(id && id !== actorUserId)))],
+            userIds: [
+                ...new Set(
+                    ids.filter((id): id is string =>
+                        Boolean(id && id !== actorUserId),
+                    ),
+                ),
+            ],
         };
     }
 

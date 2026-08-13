@@ -682,6 +682,7 @@ model Message {
   audience        MessageAudience? @map("audience")
   targetStudentId String?          @map("target_student_id") @db.Uuid
   targetClassId   String?          @map("target_class_id") @db.Uuid
+  targetFilter    Json?            @map("target_filter")
   rejectionReason String?          @map("rejection_reason")
   submittedAt     DateTime?        @map("submitted_at") @db.Timestamptz(6)
   approvedAt      DateTime?        @map("approved_at") @db.Timestamptz(6)

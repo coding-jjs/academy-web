@@ -39,18 +39,13 @@ export const roleNavigation: Record<RolePrefix, NavItem[]> = {
         { href: "/parent/timetable", label: "시간표", icon: "▣" },
         { href: "/parent/grades", label: "성적·오답", icon: "▤" },
         { href: "/parent/news", label: "체험 소식", icon: "✦" },
-        {
-            href: "/parent/student-inbox",
-            label: "학생 공지",
-            icon: "□",
-        },
     ],
     student: [
         { href: "/student/dashboard", label: "내 홈", icon: "⌂" },
         { href: "/student/timetable", label: "시간표", icon: "▣" },
         { href: "/student/grades", label: "성적·오답", icon: "▤" },
         { href: "/student/news", label: "체험 소식", icon: "✦" },
-        { href: "/student/inbox", label: "공지·쪽지", icon: "□" },
+        { href: "/student/inbox", label: "쪽지", icon: "□" },
     ],
     guest: [
         { href: "/guest/waiting", label: "학원 소개", icon: "⌂" },

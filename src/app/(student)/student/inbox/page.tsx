@@ -7,15 +7,9 @@ export const dynamic = "force-dynamic";
 export default async function StudentInboxPage() {
     const session = await requireRole("STUDENT");
 
-    const { messages, news, unreadCount } = await getStudentInboxData(
-        session.user.id,
-    );
+    const { messages, unreadCount } = await getStudentInboxData(session.user.id);
 
     return (
-        <StudentInboxScreen
-            messages={messages}
-            news={news}
-            unreadCount={unreadCount}
-        />
+        <StudentInboxScreen messages={messages} unreadCount={unreadCount} />
     );
 }

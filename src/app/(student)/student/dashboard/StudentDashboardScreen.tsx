@@ -11,7 +11,7 @@ const quickLinks = [
     { href: "/student/timetable", label: "시간표" },
     { href: "/student/grades", label: "성적" },
     { href: "/student/grades", label: "오답" },
-    { href: "/student/inbox", label: "공지" },
+    { href: "/student/inbox", label: "쪽지" },
 ];
 
 export default function StudentDashboardScreen({

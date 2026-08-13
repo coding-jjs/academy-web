@@ -1,12 +1,9 @@
-import type {
-    MessageAudience,
-    MessageStatus,
-} from "@/features/messages/types";
+import type { MessageAudience, MessageStatus } from "@/features/messages/types";
 
 export const MESSAGE_AUDIENCE_LABELS: Record<MessageAudience, string> = {
     ALL: "전체 사용자",
     STAFF: "직원(선생님·사무)",
-    PARENT: "학부모(+연결 학생)",
+    PARENT: "학부모",
     STUDENT: "학생",
 };
 
