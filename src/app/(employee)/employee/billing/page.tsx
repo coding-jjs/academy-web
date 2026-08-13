@@ -1,39 +1,40 @@
-import { requireRole } from "@/lib/auth-guard";
-import { getBillingManagementData } from "@/features/billing/data";
-import { syncOverdueInvoices } from "@/features/billing/overdue";
-import { userHasPermission } from "@/lib/permission-guard";
-import { getStaffScope, studentScopeWhere } from "@/lib/staff-scope";
-import BillingManagementScreen from "@/features/billing/BillingManagementScreen";
+import Link from "next/link";
+import styles from "./EmployeeBillingScreen.module.css";
 
-export const dynamic = "force-dynamic";
+export default function EmployeeBillingPage() {
+    return (
+        <section className={styles.page}>
+            <header className={styles.heading}>
+                <div>
+                    <span>BILLING</span>
+                    <h1>청구·수납</h1>
+                    <p>학생들의 수강료와 교재비를 관리할 수 있습니다.</p>
+                </div>
+            </header>
 
-export default async function EmployeeBillingPage() {
-    const session = await requireRole("STAFF");
+            <div className={styles.preparing}>
+                <div className={styles.preparingIcon} aria-hidden="true">
+                    ◷
+                </div>
 
-    const canManage = await userHasPermission(session.user.id, "billing");
-    if (!canManage) {
-        return (
-            <BillingManagementScreen
-                students={[]}
-                invoices={[]}
-                canManage={false}
-                deniedMessage="결제/청구 관리 권한이 없습니다. 원장에게 권한 부여를 요청하세요."
-            />
-        );
-    }
+                <span className={styles.preparingBadge}>COMING SOON</span>
 
-    await syncOverdueInvoices();
+                <h2>현재 준비 중인 서비스입니다</h2>
 
-    const scope = await getStaffScope(session.user.id);
-    const studentWhere = {
-        status: "ENROLLED" as const,
-        ...studentScopeWhere(scope),
-    };
+                <p>
+                    더욱 편리하고 안전한 청구·수납 관리 서비스를 제공하기 위해
+                    준비하고 있습니다.
+                    <br />
+                    청구·수납 관련 문의는 직원에게 문의해 주세요.
+                </p>
 
-    const billingData = await getBillingManagementData({
-        studentWhere,
-        invoiceWhere: { student: studentWhere },
-    });
-
-    return <BillingManagementScreen {...billingData} canManage />;
+                <Link
+                    href="/employee/dashboard"
+                    className={styles.dashboardLink}
+                >
+                    대시보드로 돌아가기
+                </Link>
+            </div>
+        </section>
+    );
 }
