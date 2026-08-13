@@ -1,9 +1,3 @@
-export const HOME_NOTICES = [
-    { audience: "전체", title: "8월 학사 일정 및 휴원일 안내", date: "08.01" },
-    { audience: "학부모", title: "2학기 학부모 정기 상담 신청 안내", date: "07.28" },
-    { audience: "학생", title: "여름 집중 학습 프로그램 시간표 안내", date: "07.25" },
-];
-
 export const HOME_BANNERS = [
     { src: "/banners/new-semester-1080x1440.png", eyebrow: "NEW SEMESTER", title: "새 학기의 리듬을\n차근차근 만듭니다", description: "개념부터 심화까지, 학생의 속도에 맞춘 학습 설계", tone: "mint" },
     { src: "/banners/parent-consultation-1080x1440.png", eyebrow: "PARENT CONSULTING", title: "기록을 바탕으로\n함께 나누는 성장", description: "출결과 성취 기록을 연결한 정기 학습 상담", tone: "orange" },

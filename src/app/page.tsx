@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HomeScreen from "@/features/home/HomeScreen";
+import { getHomeNotices } from "@/features/notices/data";
 import { auth } from "@/lib/auth";
 import { getRoleHomePath, roleLabels } from "@/lib/role-routes";
 
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-    const session = await auth();
+    const [session, notices] = await Promise.all([auth(), getHomeNotices()]);
     const user = session?.user;
 
     return (
@@ -24,6 +25,7 @@ export default async function HomePage() {
                       }
                     : null
             }
+            notices={notices}
         />
     );
 }
