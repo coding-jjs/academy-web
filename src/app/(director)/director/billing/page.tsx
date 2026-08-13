@@ -1,18 +1,40 @@
-import { requireRole } from "@/lib/auth-guard";
-import { getBillingManagementData } from "@/features/billing/data";
-import { syncOverdueInvoices } from "@/features/billing/overdue";
-import BillingManagementScreen from "@/features/billing/BillingManagementScreen";
+import Link from "next/link";
+import styles from "./DirectorBillingScreen.module.css";
 
-export const dynamic = "force-dynamic";
+export default function DirectorBillingPage() {
+    return (
+        <section className={styles.page}>
+            <header className={styles.heading}>
+                <div>
+                    <span>BILLING</span>
+                    <h1>청구·수납</h1>
+                    <p>학생들의 수강료와 교재비를 관리할 수 있습니다.</p>
+                </div>
+            </header>
 
-export default async function DirectorBillingPage() {
-    await requireRole("DIRECTOR");
+            <div className={styles.preparing}>
+                <div className={styles.preparingIcon} aria-hidden="true">
+                    ◷
+                </div>
 
-    await syncOverdueInvoices();
+                <span className={styles.preparingBadge}>COMING SOON</span>
 
-    const billingData = await getBillingManagementData({
-        studentWhere: { status: "ENROLLED" },
-    });
+                <h2>현재 준비 중인 서비스입니다</h2>
 
-    return <BillingManagementScreen {...billingData} canManage />;
+                <p>
+                    더욱 편리하고 안전한 청구·수납 관리 서비스를 제공하기 위해
+                    준비하고 있습니다.
+                    <br />
+                    청구·수납 관련 문의는 관리자에게 문의해 주세요.
+                </p>
+
+                <Link
+                    href="/director/dashboard"
+                    className={styles.dashboardLink}
+                >
+                    대시보드로 돌아가기
+                </Link>
+            </div>
+        </section>
+    );
 }
