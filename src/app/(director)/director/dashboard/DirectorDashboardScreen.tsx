@@ -42,9 +42,9 @@ export default function DirectorDashboardScreen({
         },
         {
             label: "미납",
-            value: String(metrics.overdueInvoices),
-            detail: "연체 청구서",
-            tone: metrics.overdueInvoices > 0 ? "danger" : "neutral",
+            value: "준비 중",
+            detail: "",
+            tone: "neutral",
         },
         {
             label: "신규 문의",
@@ -125,7 +125,8 @@ export default function DirectorDashboardScreen({
                     <span>DIRECTOR</span>
                     <h1>운영 대시보드</h1>
                     <p>
-                        승인·이탈·미납·문의와 오늘 출결 요약을 한눈에 확인합니다.
+                        승인·이탈·미납·문의와 오늘 출결 요약을 한눈에
+                        확인합니다.
                     </p>
                 </div>
                 <Link href={primaryHref} className={styles.primaryBtn}>
@@ -137,7 +138,9 @@ export default function DirectorDashboardScreen({
                 {cards.map((card) => {
                     const body = (
                         <>
-                            <StatusChip tone={card.tone}>{card.label}</StatusChip>
+                            <StatusChip tone={card.tone}>
+                                {card.label}
+                            </StatusChip>
                             <strong>{card.value}</strong>
                             <p>{card.detail}</p>
                         </>
@@ -180,7 +183,10 @@ export default function DirectorDashboardScreen({
                             <li key={item.label}>
                                 <strong>{item.label}</strong>
                                 <span>{item.detail}</span>
-                                <Link href={item.href} className={styles.queueLink}>
+                                <Link
+                                    href={item.href}
+                                    className={styles.queueLink}
+                                >
                                     <StatusChip tone={item.tone}>
                                         {item.count}
                                     </StatusChip>

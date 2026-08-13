@@ -1,7 +1,10 @@
 import Link from "next/link";
 import StatusChip from "@/components/ui/StatusChip";
 import type { DirectorStudent } from "@/features/students/types";
-import { STUDENT_STATUS_METADATA } from "@/features/students/presentation";
+import {
+    STUDENT_STATUS_METADATA,
+    formatStudentSchool,
+} from "@/features/students/presentation";
 import styles from "../DirectorStudentsScreen.module.css";
 
 export default function DirectorStudentTable({
@@ -67,9 +70,11 @@ export default function DirectorStudentTable({
                                 <td>
                                     <strong>{student.name}</strong>
                                     <small>
-                                        {[student.schoolName, student.grade]
-                                            .filter(Boolean)
-                                            .join(" · ") || "학교·학년 미입력"}
+                                        {formatStudentSchool(
+                                            student.schoolName,
+                                            student.grade,
+                                            "학교·학년 미입력",
+                                        )}
                                     </small>
                                 </td>
                                 <td>
@@ -104,7 +109,9 @@ export default function DirectorStudentTable({
                                                 : "neutral"
                                         }
                                     >
-                                        {student.googleLinked ? "연동" : "미연동"}
+                                        {student.googleLinked
+                                            ? "연동"
+                                            : "미연동"}
                                     </StatusChip>
                                 </td>
                                 <td>

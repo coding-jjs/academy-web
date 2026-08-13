@@ -1,26 +1,26 @@
 .chip {
-  display: inline-flex;
-  align-items: center;
-  min-height: 25px;
-  padding: 0 9px;
-  border-radius: 999px;
-  color: #515154;
-  background: #f2f2f7;
-  font-size: 11px;
-  font-weight: 650;
+    display: inline-flex;
+    align-items: center;
+    min-height: 25px;
+    padding: 0 9px;
+    border-radius: 999px;
+    color: #515154;
+    background: #f2f2f7;
+    font-size: 11px;
+    font-weight: 650;
 }
 
 .chip[data-tone="success"] {
-  color: #1d6f34;
-  background: #e9f8ed;
+    color: #1d6f34;
+    background: #e9f8ed;
 }
 
 .chip[data-tone="warning"] {
-  color: #8a5a00;
-  background: #fff4d8;
+    color: #8a5a00;
+    background: #fff4d8;
 }
 
 .chip[data-tone="danger"] {
-  color: #b42318;
-  background: #fef0ef;
+    color: #b42318;
+    background: #fef0ef;
 }
