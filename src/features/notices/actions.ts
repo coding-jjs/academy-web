@@ -8,20 +8,23 @@ import {
     formatNoticeListDate,
     type Notice,
 } from "@/features/notices/types";
+import {
+    deleteNoticeImage,
+    uploadNoticeImage,
+} from "@/lib/supabase/notice-storage";
 
 export type NoticeActionResult =
     | { ok: true; notice: Notice }
     | { ok: false; message: string };
 
-export type DeleteNoticeResult =
-    | { ok: true }
-    | { ok: false; message: string };
+export type DeleteNoticeResult = { ok: true } | { ok: false; message: string };
 
 type NoticeRow = {
     id: string;
     audience: string;
     title: string;
     content: string | null;
+    imageUrl: string | null;
     createdAt: Date;
 };
 
@@ -30,6 +33,7 @@ const noticeSelect = {
     audience: true,
     title: true,
     content: true,
+    imageUrl: true,
     createdAt: true,
 } as const;
 
@@ -45,6 +49,7 @@ function mapNotice(row: NoticeRow): Notice {
         title: row.title,
         date: formatNoticeListDate(row.createdAt),
         body: row.content?.trim() || "",
+        imageUrl: row.imageUrl,
     };
 }
 
@@ -85,6 +90,7 @@ function validateNoticeContent(titleRaw: string, bodyRaw: string) {
 export async function createNotice(input: {
     title: string;
     body: string;
+    image?: File | null;
 }): Promise<NoticeActionResult> {
     const session = await requireDirector();
     if (!session) {
@@ -96,6 +102,18 @@ export async function createNotice(input: {
         return validated;
     }
 
+    let imageUrl: string | null = null;
+    let imageStorageKey: string | null = null;
+
+    if (input.image) {
+        const uploaded = await uploadNoticeImage(input.image);
+        if (!uploaded.ok) {
+            return uploaded;
+        }
+        imageUrl = uploaded.imageUrl;
+        imageStorageKey = uploaded.imageStorageKey;
+    }
+
     const row = await prisma.newsItem.create({
         data: {
             kind: "NOTICE",
@@ -103,6 +121,8 @@ export async function createNotice(input: {
             audience: "ALL",
             title: validated.title,
             content: validated.body,
+            imageUrl,
+            imageStorageKey,
             published: true,
             createdBy: session.user.id,
         },
@@ -117,6 +137,8 @@ export async function updateNotice(input: {
     id: string;
     title: string;
     body: string;
+    image?: File | null;
+    removeImage?: boolean;
 }): Promise<NoticeActionResult> {
     const session = await requireDirector();
     if (!session) {
@@ -137,11 +159,34 @@ export async function updateNotice(input: {
             id: input.id,
             kind: "NOTICE",
         },
-        select: { id: true },
+        select: {
+            id: true,
+            imageUrl: true,
+            imageStorageKey: true,
+        },
     });
 
     if (!existing) {
         return { ok: false, message: "공지를 찾을 수 없습니다." };
+    }
+
+    let nextImageUrl: string | null = existing.imageUrl;
+    let nextImageStorageKey: string | null = existing.imageStorageKey;
+    let previousKeyToDelete: string | null = null;
+
+    if (input.image) {
+        const uploaded = await uploadNoticeImage(input.image);
+        if (!uploaded.ok) {
+            return uploaded;
+        }
+
+        previousKeyToDelete = existing.imageStorageKey;
+        nextImageUrl = uploaded.imageUrl;
+        nextImageStorageKey = uploaded.imageStorageKey;
+    } else if (input.removeImage) {
+        previousKeyToDelete = existing.imageStorageKey;
+        nextImageUrl = null;
+        nextImageStorageKey = null;
     }
 
     const row = await prisma.newsItem.update({
@@ -149,12 +194,24 @@ export async function updateNotice(input: {
         data: {
             title: validated.title,
             content: validated.body,
+            imageUrl: nextImageUrl,
+            imageStorageKey: nextImageStorageKey,
             audience: "ALL",
             category: "GENERAL",
             published: true,
         },
         select: noticeSelect,
     });
+
+    if (
+        previousKeyToDelete &&
+        previousKeyToDelete !== nextImageStorageKey
+    ) {
+        const removed = await deleteNoticeImage(previousKeyToDelete);
+        if (!removed.ok) {
+            console.error(removed.message);
+        }
+    }
 
     revalidateNoticePaths();
     return { ok: true, notice: mapNotice(row) };
@@ -177,7 +234,10 @@ export async function deleteNotice(input: {
             id: input.id,
             kind: "NOTICE",
         },
-        select: { id: true },
+        select: {
+            id: true,
+            imageStorageKey: true,
+        },
     });
 
     if (!existing) {
@@ -187,6 +247,11 @@ export async function deleteNotice(input: {
     await prisma.newsItem.delete({
         where: { id: input.id },
     });
+
+    const removed = await deleteNoticeImage(existing.imageStorageKey);
+    if (!removed.ok) {
+        console.error(removed.message);
+    }
 
     revalidateNoticePaths();
     return { ok: true };

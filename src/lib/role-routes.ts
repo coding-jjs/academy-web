@@ -21,7 +21,7 @@ const roleHomePaths: Record<AppRole, string> = {
     STAFF: "/employee/dashboard",
     PARENT: "/parent/dashboard",
     STUDENT: "/student/dashboard",
-    GUEST: "/guest/waiting",
+    GUEST: "/",
 };
 
 export function getRoleHomePath(role: AppRole) {

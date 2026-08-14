@@ -4,6 +4,7 @@ export type Notice = {
     title: string;
     date: string;
     body: string;
+    imageUrl: string | null;
 };
 
 export const NOTICE_PAGE_SIZE = 8;

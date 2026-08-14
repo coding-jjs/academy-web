@@ -22,6 +22,52 @@ import {
 } from "@/features/notices/types";
 import styles from "./NoticesScreen.module.css";
 
+const URL_REGEX =
+    /((?:https?:\/\/|www\.)[^\s<]+[^\s<.,;:!?)\]\}])/gi;
+
+function isSafeExternalUrl(url: string) {
+    try {
+        const parsed = new URL(url);
+        return parsed.protocol === "https:" || parsed.protocol === "http:";
+    } catch {
+        return false;
+    }
+}
+
+function toHref(raw: string) {
+    const trimmed = raw.trim();
+    if (/^www\./i.test(trimmed)) {
+        return `https://${trimmed}`;
+    }
+    return trimmed;
+}
+
+function renderTextWithLinks(text: string) {
+    const parts = text.split(URL_REGEX);
+
+    return parts.map((part, index) => {
+        const href = toHref(part);
+        const looksLikeUrl =
+            /^(https?:\/\/|www\.)/i.test(part) && isSafeExternalUrl(href);
+
+        if (looksLikeUrl) {
+            return (
+                <a
+                    key={`link-${index}`}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.inlineLink}
+                >
+                    {part}
+                </a>
+            );
+        }
+
+        return <span key={`text-${index}`}>{part}</span>;
+    });
+}
+
 export default function NoticesScreen({
     initialNotices,
     canWrite = false,
@@ -34,6 +80,8 @@ export default function NoticesScreen({
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
     const [notices, setNotices] = useState<Notice[]>(initialNotices);
+    const [prevInitialNotices, setPrevInitialNotices] =
+        useState(initialNotices);
     const [selected, setSelected] = useState<Notice | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
@@ -43,12 +91,16 @@ export default function NoticesScreen({
 
     const [draftTitle, setDraftTitle] = useState("");
     const [draftBody, setDraftBody] = useState("");
+    const [draftImage, setDraftImage] = useState<File | null>(null);
+    const [draftPreviewUrl, setDraftPreviewUrl] = useState<string | null>(null);
+    const [removeExistingImage, setRemoveExistingImage] = useState(false);
     const [composeError, setComposeError] = useState("");
     const [detailError, setDetailError] = useState("");
 
-    useEffect(() => {
+    if (initialNotices !== prevInitialNotices) {
+        setPrevInitialNotices(initialNotices);
         setNotices(initialNotices);
-    }, [initialNotices]);
+    }
 
     const filteredNotices = useMemo(
         () => filterNoticesByTitle(notices, searchQuery),
@@ -58,9 +110,10 @@ export default function NoticesScreen({
     const visibleNotices = filteredNotices.slice(0, visibleCount);
     const hasMore = visibleCount < filteredNotices.length;
 
-    useEffect(() => {
+    function handleSearchChange(value: string) {
+        setSearchQuery(value);
         setVisibleCount(NOTICE_PAGE_SIZE);
-    }, [searchQuery]);
+    }
 
     const loadMore = useCallback(() => {
         if (!hasMore || isLoadingMore) return;
@@ -96,6 +149,8 @@ export default function NoticesScreen({
         setDraftBody("");
         setComposeError("");
         setIsSubmitting(false);
+        clearDraftImage();
+        setRemoveExistingImage(false);
     }
 
     function resetDetailState() {
@@ -103,6 +158,8 @@ export default function NoticesScreen({
         setIsEditing(false);
         setDetailError("");
         setIsSubmitting(false);
+        clearDraftImage();
+        setRemoveExistingImage(false);
     }
 
     function openNotice(notice: Notice) {
@@ -120,6 +177,8 @@ export default function NoticesScreen({
         if (!selected) return;
         setDraftTitle(selected.title);
         setDraftBody(selected.body);
+        clearDraftImage();
+        setRemoveExistingImage(false);
         setDetailError("");
         setIsEditing(true);
     }
@@ -128,6 +187,8 @@ export default function NoticesScreen({
         setIsEditing(false);
         setDetailError("");
         setIsSubmitting(false);
+        clearDraftImage();
+        setRemoveExistingImage(false);
     }
 
     function openCompose() {
@@ -144,6 +205,22 @@ export default function NoticesScreen({
         if (event.target === event.currentTarget) {
             event.currentTarget.close();
         }
+    }
+
+    function clearDraftImage() {
+        setDraftImage(null);
+        setDraftPreviewUrl((current) => {
+            if (current) URL.revokeObjectURL(current);
+            return null;
+        });
+    }
+
+    function handleImageChange(file: File | null) {
+        clearDraftImage();
+        if (!file) return;
+        setDraftImage(file);
+        setDraftPreviewUrl(URL.createObjectURL(file));
+        setRemoveExistingImage(false);
     }
 
     async function handleComposeSubmit(event: FormEvent<HTMLFormElement>) {
@@ -164,7 +241,7 @@ export default function NoticesScreen({
         setIsSubmitting(true);
         setComposeError("");
 
-        const result = await createNotice({ title, body });
+        const result = await createNotice({ title, body, image: draftImage });
         if (!result.ok) {
             setComposeError(result.message);
             setIsSubmitting(false);
@@ -199,6 +276,8 @@ export default function NoticesScreen({
             id: selected.id,
             title,
             body,
+            image: draftImage,
+            removeImage: removeExistingImage && !draftImage,
         });
 
         if (!result.ok) {
@@ -215,6 +294,8 @@ export default function NoticesScreen({
         setSelected(result.notice);
         setIsEditing(false);
         setIsSubmitting(false);
+        clearDraftImage();
+        setRemoveExistingImage(false);
     }
 
     async function handleDelete() {
@@ -262,12 +343,14 @@ export default function NoticesScreen({
                     </div>
                     <div className={styles.headingActions}>
                         <label className={styles.searchField}>
-                            <span className={styles.searchLabel}>제목 검색</span>
+                            <span className={styles.searchLabel}>
+                                제목 검색
+                            </span>
                             <input
                                 type="search"
                                 value={searchQuery}
                                 onChange={(event) =>
-                                    setSearchQuery(event.target.value)
+                                    handleSearchChange(event.target.value)
                                 }
                                 placeholder="공지 제목 검색"
                                 aria-label="공지 제목 검색"
@@ -411,6 +494,66 @@ export default function NoticesScreen({
                                     />
                                 </label>
 
+                                <label className={styles.composeField}>
+                                    이미지 (선택)
+                                    <input
+                                        type="file"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        disabled={isSubmitting}
+                                        onChange={(event) =>
+                                            handleImageChange(
+                                                event.target.files?.[0] ?? null,
+                                            )
+                                        }
+                                    />
+                                </label>
+
+                                {draftPreviewUrl ? (
+                                    <div className={styles.imagePreview}>
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={draftPreviewUrl}
+                                            alt="선택한 이미지 미리보기"
+                                        />
+                                        <button
+                                            type="button"
+                                            className={styles.imagePreviewAction}
+                                            onClick={clearDraftImage}
+                                            disabled={isSubmitting}
+                                        >
+                                            선택 취소
+                                        </button>
+                                    </div>
+                                ) : null}
+
+                                {!draftPreviewUrl &&
+                                selected.imageUrl &&
+                                !removeExistingImage ? (
+                                    <div className={styles.imagePreview}>
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={selected.imageUrl}
+                                            alt="현재 공지 이미지"
+                                        />
+                                        <button
+                                            type="button"
+                                            className={styles.imagePreviewAction}
+                                            onClick={() =>
+                                                setRemoveExistingImage(true)
+                                            }
+                                            disabled={isSubmitting}
+                                        >
+                                            기존 이미지 삭제
+                                        </button>
+                                    </div>
+                                ) : null}
+
+                                {removeExistingImage && !draftPreviewUrl ? (
+                                    <p className={styles.composeHint}>
+                                        저장 시 기존 이미지가 삭제됩니다.
+                                    </p>
+                                ) : null}
+
                                 {detailError ? (
                                     <p
                                         className={styles.composeError}
@@ -441,6 +584,14 @@ export default function NoticesScreen({
                         ) : (
                             <>
                                 <div className={styles.dialogBody}>
+                                    {selected.imageUrl ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img
+                                            className={styles.detailImage}
+                                            src={selected.imageUrl}
+                                            alt=""
+                                        />
+                                    ) : null}
                                     {selected.body
                                         .split("\n")
                                         .map((line, index) =>
@@ -448,7 +599,7 @@ export default function NoticesScreen({
                                                 <p
                                                     key={`${selected.id}-${index}`}
                                                 >
-                                                    {line}
+                                                    {renderTextWithLinks(line)}
                                                 </p>
                                             ) : (
                                                 <br
@@ -550,6 +701,38 @@ export default function NoticesScreen({
                                     disabled={isSubmitting}
                                 />
                             </label>
+
+                            <label className={styles.composeField}>
+                                이미지 (선택)
+                                <input
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    disabled={isSubmitting}
+                                    onChange={(event) =>
+                                        handleImageChange(
+                                            event.target.files?.[0] ?? null,
+                                        )
+                                    }
+                                />
+                            </label>
+
+                            {draftPreviewUrl ? (
+                                <div className={styles.imagePreview}>
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        src={draftPreviewUrl}
+                                        alt="선택한 이미지 미리보기"
+                                    />
+                                    <button
+                                        type="button"
+                                        className={styles.imagePreviewAction}
+                                        onClick={clearDraftImage}
+                                        disabled={isSubmitting}
+                                    >
+                                        이미지 제거
+                                    </button>
+                                </div>
+                            ) : null}
 
                             {composeError ? (
                                 <p className={styles.composeError} role="alert">

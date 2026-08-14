@@ -13,6 +13,7 @@ function mapNotice(row: {
     title: string;
     content: string | null;
     createdAt: Date;
+    imageUrl: string | null;
 }): Notice {
     return {
         id: row.id,
@@ -20,6 +21,7 @@ function mapNotice(row: {
         title: row.title,
         date: formatNoticeListDate(row.createdAt),
         body: row.content?.trim() || "내용이 없습니다.",
+        imageUrl: row.imageUrl,
     };
 }
 
@@ -38,6 +40,7 @@ export async function getPublishedNotices(limit = 200): Promise<Notice[]> {
             title: true,
             content: true,
             createdAt: true,
+            imageUrl: true,
         },
     });
 
