@@ -1,4 +1,12 @@
 import StatusChip from "@/components/ui/StatusChip";
+import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    panelStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import { REPORT_STATUS_METADATA } from "@/features/reports/presentation";
 import type { DirectorReportStudent, ReportStatus } from "@/features/reports/types";
 import { formatStudentSchool } from "@/features/students/presentation";
@@ -15,8 +23,8 @@ export default function DirectorReportDetail({ student, status, rejectionReason,
     onApprove: () => void;
 }) {
     return (
-        <article className={styles.detailPanel}>
-            <div className={styles.panelHead}>
+        <article className={cx(surfaceStyles.root, styles.detailPanel)}>
+            <div className={panelStyles.head}>
                 <h2>상세</h2>
                 {status && <StatusChip tone={REPORT_STATUS_METADATA[status].tone}>{REPORT_STATUS_METADATA[status].label}</StatusChip>}
             </div>
@@ -33,15 +41,15 @@ export default function DirectorReportDetail({ student, status, rejectionReason,
                     </div>
                     {student.report && status === "PENDING_APPROVAL" && (
                         <div className={styles.reviewBox}>
-                            <label className={styles.field}>반려 사유<textarea value={rejectionReason} onChange={(event) => onRejectionReasonChange(event.target.value)} rows={3} placeholder="선생님에게 전달할 반려 사유를 입력하세요." /></label>
+                            <label className={fieldStyles.root}>반려 사유<textarea value={rejectionReason} onChange={(event) => onRejectionReasonChange(event.target.value)} rows={3} placeholder="선생님에게 전달할 반려 사유를 입력하세요." /></label>
                             <div className={styles.actions}>
-                                <button type="button" className={styles.secondary} onClick={onReject} disabled={isPending}>{isPending ? "처리 중..." : "반려"}</button>
-                                <button type="button" onClick={onApprove} disabled={isPending}>{isPending ? "처리 중..." : "승인·발송"}</button>
+                                <button type="button" className={buttonStyles.secondary} onClick={onReject} disabled={isPending}>{isPending ? "처리 중..." : "반려"}</button>
+                                <button type="button" className={buttonStyles.primary} onClick={onApprove} disabled={isPending}>{isPending ? "처리 중..." : "승인·발송"}</button>
                             </div>
-                            {feedback && <p className={styles.hint}>{feedback}</p>}
+                            {feedback && <p className={typographyStyles.hint}>{feedback}</p>}
                         </div>
                     )}
-                    {student.report && status !== "PENDING_APPROVAL" && feedback && <p className={styles.hint}>{feedback}</p>}
+                    {student.report && status !== "PENDING_APPROVAL" && feedback && <p className={typographyStyles.hint}>{feedback}</p>}
                 </>
             )}
         </article>

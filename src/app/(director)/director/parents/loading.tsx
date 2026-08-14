@@ -1,13 +1,21 @@
+import {
+    a11yStyles,
+    cx,
+    pageHeadingStyles,
+    screenStyles,
+    skeletonStyles,
+    surfaceStyles,
+} from "@/components/ui/shared-styles";
 import styles from "./page.module.css";
 
 export default function DirectorParentsLoading() {
     return (
         <section
-            className={styles.page}
+            className={screenStyles.animatedPage}
             aria-busy="true"
             aria-label="학부모 관리 정보를 불러오는 중"
         >
-            <div className={styles.loadingHeading}>
+            <div className={cx(pageHeadingStyles.root, styles.loadingHeading)}>
                 <div>
                     <Skeleton className={styles.loadingEyebrow} />
                     <Skeleton className={styles.loadingTitle} />
@@ -21,7 +29,7 @@ export default function DirectorParentsLoading() {
                 <LoadingSummaryCard />
             </div>
 
-            <div className={styles.loadingFormCard}>
+            <div className={cx(surfaceStyles.soft, styles.loadingFormCard)}>
                 <div className={styles.loadingFormHeader}>
                     <Skeleton className={styles.loadingFormIcon} />
                     <div>
@@ -43,7 +51,7 @@ export default function DirectorParentsLoading() {
                 </div>
             </div>
 
-            <div className={styles.loadingListPanel}>
+            <div className={cx(surfaceStyles.soft, styles.loadingListPanel)}>
                 <div className={styles.loadingListHeader}>
                     <div>
                         <Skeleton className={styles.loadingSmallText} />
@@ -65,7 +73,7 @@ export default function DirectorParentsLoading() {
                     </div>
                 ))}
             </div>
-            <span className={styles.srOnly}>
+            <span className={a11yStyles.srOnly}>
                 학부모와 학생 연결 정보를 불러오고 있습니다.
             </span>
         </section>
@@ -74,7 +82,7 @@ export default function DirectorParentsLoading() {
 
 function LoadingSummaryCard() {
     return (
-        <div className={styles.loadingSummaryCard}>
+        <div className={cx(surfaceStyles.soft, styles.loadingSummaryCard)}>
             <Skeleton className={styles.loadingSummaryIcon} />
             <div>
                 <Skeleton className={styles.loadingSmallText} />
@@ -96,5 +104,5 @@ function LoadingField() {
 }
 
 function Skeleton({ className }: { className: string }) {
-    return <div className={`${styles.skeleton} ${className}`} />;
+    return <div className={cx(skeletonStyles.root, className)} />;
 }

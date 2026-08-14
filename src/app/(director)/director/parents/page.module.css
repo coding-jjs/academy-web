@@ -1,39 +1,3 @@
-.page {
-    animation: page-enter 380ms cubic-bezier(.22, 1, .36, 1) both;
-}
-
-.heading {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 24px;
-    margin-bottom: 28px;
-}
-
-.eyebrow,
-.sectionLabel {
-    color: #0066cc;
-    font-size: 10px;
-    font-weight: 750;
-    letter-spacing: .11em;
-}
-
-.heading h1 {
-    margin: 8px 0;
-    font-family: "SF Pro Display", system-ui, sans-serif;
-    font-size: clamp(32px, 5vw, 46px);
-    line-height: 1.06;
-    letter-spacing: -.045em;
-}
-
-.heading p {
-    max-width: 620px;
-    margin: 0;
-    color: #6e6e73;
-    font-size: 14px;
-    line-height: 1.55;
-}
-
 .activeBadge {
     min-height: 42px;
     display: inline-flex;
@@ -83,10 +47,6 @@
     align-items: center;
     gap: 16px;
     padding: 20px;
-    border: 1px solid rgb(0 0 0 / 7%);
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 10px 34px rgb(0 0 0 / 4%);
 }
 
 .parentSummaryIcon,
@@ -118,7 +78,6 @@
 }
 
 .summaryContent span {
-    color: #86868b;
     font-size: 11px;
     font-weight: 700;
 }
@@ -130,7 +89,6 @@
 
 .summaryContent p {
     margin: 0;
-    color: #6e6e73;
     font-size: 12px;
     line-height: 1.5;
 }
@@ -139,10 +97,6 @@
 .loadingFormCard {
     margin-bottom: 18px;
     padding: 22px;
-    border: 1px solid rgb(0 0 0 / 7%);
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 10px 34px rgb(0 0 0 / 4%);
 }
 
 .formHeader,
@@ -178,7 +132,6 @@
 
 .formHeading p {
     margin: 0;
-    color: #6e6e73;
     font-size: 12px;
 }
 
@@ -216,49 +169,6 @@
     background: #edf5ff;
     font-size: 9px;
     font-weight: 700;
-}
-
-.field select,
-.reasonField select {
-    width: 100%;
-    min-width: 0;
-    min-height: 44px;
-    padding: 0 36px 0 13px;
-    border: 1px solid #d2d2d7;
-    border-radius: 12px;
-    outline: none;
-    color: #1d1d1f;
-    background: #fff;
-    font-size: 13px;
-    transition:
-        border-color 140ms ease,
-        box-shadow 140ms ease,
-        background 140ms ease;
-}
-
-.field select:hover:not(:disabled),
-.reasonField select:hover:not(:disabled) {
-    border-color: #a8a8ad;
-}
-
-.field select:focus,
-.reasonField select:focus {
-    border-color: #0071e3;
-    box-shadow: 0 0 0 3px rgb(0 113 227 / 13%);
-}
-
-.field select:disabled,
-.reasonField select:disabled {
-    color: #86868b;
-    background: #f5f5f7;
-    cursor: not-allowed;
-    opacity: .75;
-}
-
-.fieldHint {
-    color: #86868b;
-    font-size: 10px;
-    line-height: 1.45;
 }
 
 .formFooter,
@@ -299,13 +209,11 @@
 
 .feedbackSuccess {
     border-color: #c9ecd5;
-    color: #168343;
     background: #eaf8ef;
 }
 
 .feedbackError {
     border-color: #ffd3cf;
-    color: #b42318;
     background: #fff1f0;
 }
 
@@ -314,59 +222,12 @@
 }
 
 .defaultHint {
-    color: #86868b;
-}
-
-.primaryButton,
-.retryButton {
-    min-width: 132px;
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0 17px;
-    border: 0;
-    border-radius: 12px;
-    color: #fff;
-    background: #0071e3;
-    font-size: 13px;
-    font-weight: 680;
-    cursor: pointer;
-    transition:
-        background 140ms ease,
-        transform 140ms ease,
-        box-shadow 140ms ease;
-}
-
-.primaryButton:hover:not(:disabled),
-.retryButton:hover {
-    background: #0077ed;
-    box-shadow: 0 6px 16px rgb(0 113 227 / 20%);
-    transform: translateY(-1px);
-}
-
-.primaryButton:disabled {
-    cursor: not-allowed;
-    opacity: .56;
-}
-
-.spinner {
-    width: 14px;
-    height: 14px;
-    border: 2px solid rgb(255 255 255 / 40%);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 700ms linear infinite;
+    font-size: 12px;
 }
 
 .linkListPanel,
 .loadingListPanel {
     overflow: hidden;
-    border: 1px solid rgb(0 0 0 / 7%);
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 10px 34px rgb(0 0 0 / 4%);
 }
 
 .listHeader,
@@ -388,12 +249,10 @@
 
 .listHeader p {
     margin: 0;
-    color: #6e6e73;
     font-size: 12px;
 }
 
 .linkCount {
-    color: #86868b;
     font-size: 10px;
     font-weight: 750;
     letter-spacing: .09em;
@@ -503,7 +362,6 @@
 
 .personInfo p,
 .personInfo small {
-    color: #6e6e73;
     font-size: 11px;
     line-height: 1.4;
 }
@@ -556,7 +414,6 @@
 }
 
 .linkMeta > div > span {
-    color: #a1a1a6;
     font-size: 9px;
     font-weight: 650;
 }
@@ -575,13 +432,9 @@
 .unlinkTrigger {
     min-height: 38px;
     padding: 0 13px;
-    border: 1px solid #d2d2d7;
     border-radius: 11px;
     color: #6e6e73;
-    background: #fff;
     font-size: 11px;
-    font-weight: 650;
-    cursor: pointer;
     white-space: nowrap;
     transition:
         border-color 140ms ease,
@@ -602,7 +455,6 @@
     align-content: center;
     gap: 8px;
     padding: 40px 20px;
-    text-align: center;
 }
 
 .emptyIcon {
@@ -624,52 +476,6 @@
     letter-spacing: -.02em;
 }
 
-.empty p {
-    max-width: 360px;
-    margin: 0;
-    color: #86868b;
-    font-size: 12px;
-    line-height: 1.55;
-}
-
-.unlinkDialog {
-    width: min(520px, calc(100vw - 32px));
-    max-height: calc(100dvh - 32px);
-    padding: 0;
-    overflow: auto;
-    border: 0;
-    border-radius: 22px;
-    color: #1d1d1f;
-    background: transparent;
-    box-shadow: 0 26px 80px rgb(0 0 0 / 24%);
-}
-
-.unlinkDialog::backdrop {
-    background: rgb(0 0 0 / 38%);
-    backdrop-filter: blur(5px);
-}
-
-.unlinkDialog[open] {
-    animation: dialog-enter 220ms cubic-bezier(.22, 1, .36, 1) both;
-}
-
-.dialogCard {
-    overflow: hidden;
-    border: 1px solid rgb(255 255 255 / 45%);
-    border-radius: 22px;
-    background: #fff;
-}
-
-.dialogHeader {
-    position: relative;
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: start;
-    gap: 14px;
-    padding: 22px;
-    border-bottom: 1px solid #ededf0;
-}
-
 .warningIcon {
     width: 46px;
     height: 46px;
@@ -684,9 +490,6 @@
 
 .dangerLabel {
     color: #b42318;
-    font-size: 9px;
-    font-weight: 750;
-    letter-spacing: .1em;
 }
 
 .dialogHeading h2 {
@@ -698,28 +501,8 @@
 
 .dialogHeading p {
     margin: 0;
-    color: #6e6e73;
     font-size: 12px;
     line-height: 1.55;
-}
-
-.dialogClose {
-    width: 32px;
-    height: 32px;
-    display: grid;
-    place-items: center;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    color: #6e6e73;
-    background: #f2f2f4;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.dialogClose:disabled {
-    cursor: wait;
-    opacity: .5;
 }
 
 .unlinkSummary {
@@ -741,7 +524,6 @@
 }
 
 .unlinkPerson span {
-    color: #86868b;
     font-size: 10px;
     font-weight: 650;
 }
@@ -829,7 +611,6 @@
     padding: 9px 10px;
     border: 1px solid #ffd3cf;
     border-radius: 10px;
-    color: #b42318;
     background: #fff1f0;
     font-size: 11px;
     font-weight: 600;
@@ -842,72 +623,6 @@
     margin-top: 20px;
     padding-top: 18px;
     border-top: 1px solid #ededf0;
-}
-
-.cancelButton,
-.dangerButton {
-    min-height: 42px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0 16px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 680;
-    cursor: pointer;
-}
-
-.cancelButton {
-    border: 1px solid #d2d2d7;
-    color: #515154;
-    background: #fff;
-}
-
-.dangerButton {
-    min-width: 112px;
-    border: 0;
-    color: #fff;
-    background: #d92d20;
-}
-
-.dangerButton:hover:not(:disabled) {
-    background: #b42318;
-}
-
-.cancelButton:disabled,
-.dangerButton:disabled {
-    cursor: wait;
-    opacity: .55;
-}
-
-.skeleton {
-    position: relative;
-    overflow: hidden;
-    border-radius: 8px;
-    background: #ededf0;
-}
-
-.skeleton::after {
-    position: absolute;
-    inset: 0;
-    content: "";
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgb(255 255 255 / 70%),
-        transparent
-    );
-    transform: translateX(-100%);
-    animation: skeleton-shimmer 1.35s ease-in-out infinite;
-}
-
-.loadingHeading {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 24px;
-    margin-bottom: 28px;
 }
 
 .loadingHeading > div,
@@ -1044,18 +759,6 @@
     border-radius: 11px;
 }
 
-.srOnly {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    padding: 0;
-    border: 0;
-    margin: -1px;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-}
-
 .errorState {
     min-height: 520px;
     display: grid;
@@ -1063,11 +766,6 @@
     align-content: center;
     gap: 10px;
     padding: 48px 24px;
-    border: 1px solid rgb(0 0 0 / 7%);
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 10px 34px rgb(0 0 0 / 4%);
-    text-align: center;
 }
 
 .errorIcon {
@@ -1084,8 +782,6 @@
 
 .errorEyebrow {
     color: #b42318;
-    font-size: 10px;
-    font-weight: 750;
     letter-spacing: .1em;
 }
 
@@ -1099,62 +795,21 @@
 .errorState p {
     max-width: 440px;
     margin: 0;
-    color: #6e6e73;
     font-size: 13px;
     line-height: 1.6;
 }
 
 .errorReference {
-    color: #a1a1a6;
     font-size: 10px;
 }
 
-.retryButton {
+.errorRetry {
     margin-top: 10px;
 }
 
-.primaryButton:focus-visible,
-.retryButton:focus-visible,
-.unlinkTrigger:focus-visible,
-.dialogClose:focus-visible,
-.cancelButton:focus-visible,
-.dangerButton:focus-visible {
+.unlinkTrigger:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px rgb(0 113 227 / 18%);
-}
-
-@keyframes page-enter {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes dialog-enter {
-    from {
-        opacity: 0;
-        transform: translateY(12px) scale(.97);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-@keyframes skeleton-shimmer {
-    to {
-        transform: translateX(100%);
-    }
 }
 
 @media (max-width: 900px) {
@@ -1201,7 +856,7 @@
     }
 
     .feedback,
-    .primaryButton,
+    .formFooter button,
     .loadingButton {
         width: 100%;
     }
@@ -1308,19 +963,5 @@
     .errorState {
         min-height: 440px;
         padding: 40px 18px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .page,
-    .unlinkDialog[open],
-    .skeleton::after,
-    .spinner {
-        animation: none;
-    }
-
-    .primaryButton,
-    .retryButton {
-        transition: none;
     }
 }

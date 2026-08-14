@@ -7,6 +7,12 @@ import {
     formatStudentOptionLabel,
     STUDENT_STATUS_METADATA,
 } from "@/features/students/presentation";
+import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import { roleLabels } from "@/lib/role-routes";
 import styles from "./page.module.css";
 
@@ -34,9 +40,12 @@ export default function RoleAssignmentForm({
     return (
         <form action={assignUserRole} className={styles.roleForm}>
             <input type="hidden" name="userId" value={userId} />
-            <label htmlFor={selectId}>부여할 역할</label>
+            <label className={typographyStyles.muted} htmlFor={selectId}>
+                부여할 역할
+            </label>
             <div className={styles.roleControls}>
                 <select
+                    className={cx(fieldStyles.select, styles.roleSelect)}
                     id={selectId}
                     name="role"
                     defaultValue=""
@@ -60,9 +69,10 @@ export default function RoleAssignmentForm({
                 <AssignButton />
             </div>
             {role === "STUDENT" && (
-                <div className={styles.studentLinkField}>
+                <div className={cx(fieldStyles.root, styles.studentLinkField)}>
                     <label htmlFor={studentSelectId}>연결할 기존 학생</label>
                     <select
+                        className={cx(fieldStyles.select, styles.studentSelect)}
                         id={studentSelectId}
                         name="studentId"
                         defaultValue=""
@@ -80,7 +90,7 @@ export default function RoleAssignmentForm({
                 </div>
             )}
             {hasStudentProfile && (
-                <p className={styles.roleHint}>
+                <p className={cx(typographyStyles.hint, styles.roleHint)}>
                     기존 학생 계정의 재등록은 학생 관리에서 처리하세요.
                 </p>
             )}
@@ -102,7 +112,7 @@ function AssignButton() {
     const { pending } = useFormStatus();
 
     return (
-        <button type="submit" disabled={pending}>
+        <button type="submit" className={buttonStyles.assign} disabled={pending}>
             {pending ? "부여 중…" : "역할 부여"}
         </button>
     );

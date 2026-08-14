@@ -1,4 +1,10 @@
 import StatusChip from "@/components/ui/StatusChip";
+import {
+    cx,
+    panelStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import type { StaffStudentRow } from "@/features/students/types";
 import LearningRecordForm from "./LearningRecordForm";
 import {
@@ -22,8 +28,8 @@ export default function StaffStudentDetail({
 
     return (
         <div className={styles.detail}>
-            <article className={styles.panel}>
-                <div className={styles.panelHead}>
+            <article className={cx(surfaceStyles.root, styles.panel)}>
+                <div className={panelStyles.headCompact}>
                     <div>
                         <h2>{student.name}</h2>
                         <p>
@@ -89,12 +95,12 @@ export default function StaffStudentDetail({
 
 function RecentAttendance({ student }: { student: StaffStudentRow }) {
     return (
-        <article className={styles.panel}>
-            <div className={styles.panelHead}>
+        <article className={cx(surfaceStyles.root, styles.panel)}>
+            <div className={panelStyles.headCompact}>
                 <h2>최근 출결</h2>
             </div>
             {student.recentAttendance.length === 0 ? (
-                <p className={styles.muted}>기록 없음</p>
+                <p className={typographyStyles.muted}>기록 없음</p>
             ) : (
                 <ul className={styles.simpleList}>
                     {student.recentAttendance.map((attendance, index) => (
@@ -120,12 +126,12 @@ function RecentAttendance({ student }: { student: StaffStudentRow }) {
 
 function RecentGrades({ student }: { student: StaffStudentRow }) {
     return (
-        <article className={styles.panel}>
-            <div className={styles.panelHead}>
+        <article className={cx(surfaceStyles.root, styles.panel)}>
+            <div className={panelStyles.headCompact}>
                 <h2>최근 성적</h2>
             </div>
             {student.recentGrades.length === 0 ? (
-                <p className={styles.muted}>기록 없음</p>
+                <p className={typographyStyles.muted}>기록 없음</p>
             ) : (
                 <ul className={styles.simpleList}>
                     {student.recentGrades.map((grade) => (
@@ -146,12 +152,14 @@ function RecentGrades({ student }: { student: StaffStudentRow }) {
 
 function RecentLearningRecords({ student }: { student: StaffStudentRow }) {
     return (
-        <article className={styles.panel}>
-            <div className={styles.panelHead}>
+        <article className={cx(surfaceStyles.root, styles.panel)}>
+            <div className={panelStyles.headCompact}>
                 <h2>학습 기록</h2>
             </div>
             {student.recentRecords.length === 0 ? (
-                <p className={styles.muted}>등록된 학습 기록이 없습니다.</p>
+                <p className={typographyStyles.muted}>
+                    등록된 학습 기록이 없습니다.
+                </p>
             ) : (
                 <ul className={styles.simpleList}>
                     {student.recentRecords.map((record) => (

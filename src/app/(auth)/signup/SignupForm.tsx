@@ -2,6 +2,14 @@
 
 import Link from "next/link";
 import { useActionState, useEffect } from "react";
+import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    pageHeadingStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import { completeSignup, type SignupField, type SignupState } from "./actions";
 import styles from "./page.module.css";
 
@@ -32,13 +40,13 @@ export default function SignupForm({ onComplete }: SignupFormProps) {
     if (status === "success") {
         return (
             <section
-                className={`${styles.card} ${styles.welcomeCard}`}
+                className={cx(surfaceStyles.root, styles.card, styles.welcomeCard)}
                 aria-live="polite"
             >
                 <div className={styles.successMark} aria-hidden="true">
                     ✓
                 </div>
-                <span className={styles.eyebrow}>WELCOME TO A ACADEMY</span>
+                <span className={pageHeadingStyles.eyebrow}>WELCOME TO A ACADEMY</span>
                 <h1>{state?.userName}님, 환영합니다!</h1>
                 <p>
                     A학원 가입 정보가 정상적으로 입력되었어요.
@@ -49,7 +57,7 @@ export default function SignupForm({ onComplete }: SignupFormProps) {
                     <span>가입 상태</span>
                     <strong>추가 정보 입력 완료</strong>
                 </div>
-                <Link href="/" className={styles.primaryLink}>
+                <Link href="/" className={cx(buttonStyles.primaryLg, styles.primaryLink)}>
                     지금 메인으로 이동
                 </Link>
             </section>
@@ -57,10 +65,10 @@ export default function SignupForm({ onComplete }: SignupFormProps) {
     }
 
     return (
-        <section className={styles.card}>
+        <section className={cx(surfaceStyles.root, styles.card)}>
             <div className={styles.formHeading}>
                 <div>
-                    <span className={styles.eyebrow}>ADDITIONAL INFO</span>
+                    <span className={pageHeadingStyles.eyebrow}>ADDITIONAL INFO</span>
                     <h1>가입 정보를 알려주세요</h1>
                     <p>학원 서비스를 이용하기 위한 기본 정보예요.</p>
                 </div>
@@ -74,12 +82,12 @@ export default function SignupForm({ onComplete }: SignupFormProps) {
             </div>
 
             {state?.message && (
-                <p className={styles.formError} role="alert">
+                <p className={cx(typographyStyles.error, styles.formError)} role="alert">
                     {state.message}
                 </p>
             )}
 
-            <form action={formAction} className={styles.form}>
+            <form action={formAction} className={cx(fieldStyles.form, styles.signupForm)}>
                 <Field
                     id="name"
                     label="이름"
@@ -126,13 +134,13 @@ export default function SignupForm({ onComplete }: SignupFormProps) {
                 />
 
                 <button
-                    className={styles.submitButton}
+                    className={cx(buttonStyles.primaryLg, styles.submitButton)}
                     type="submit"
                     disabled={pending}
                 >
                     {pending ? "가입 정보를 확인하는 중..." : "가입 완료하기"}
                 </button>
-                <p className={styles.privacyNotice}>
+                <p className={cx(typographyStyles.hint, styles.privacyNotice)}>
                     입력한 정보는 학원 등록 확인과 서비스 제공을 위해서만
                     사용됩니다.
                 </p>
@@ -165,7 +173,7 @@ function Field({
     const errorId = `${id}-error`;
 
     return (
-        <label className={styles.field} htmlFor={id}>
+        <label className={cx(fieldStyles.root, styles.field)} htmlFor={id}>
             <span>
                 {label}
                 {optional ? (
@@ -175,6 +183,7 @@ function Field({
                 )}
             </span>
             <input
+                className={cx(fieldStyles.control, styles.signupControl)}
                 id={id}
                 name={id}
                 placeholder={placeholder}
@@ -184,7 +193,7 @@ function Field({
                 {...inputProps}
             />
             {error && (
-                <small id={errorId} className={styles.fieldError}>
+                <small id={errorId} className={typographyStyles.error}>
                     {error}
                 </small>
             )}

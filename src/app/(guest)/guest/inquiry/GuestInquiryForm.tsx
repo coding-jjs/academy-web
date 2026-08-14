@@ -6,6 +6,13 @@ import {
     type InquiryField,
     type InquiryState,
 } from "@/features/inquiries/actions";
+import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import styles from "./GuestInquiryScreen.module.css";
 
 const initialState: InquiryState = {
@@ -23,13 +30,13 @@ export default function GuestInquiryForm() {
 
     if (state.status === "success") {
         return (
-            <div className={styles.success} aria-live="polite">
+            <div className={cx(surfaceStyles.root, styles.success)} aria-live="polite">
                 <span className={styles.successMark} aria-hidden="true">
                     ✓
                 </span>
                 <h2>문의가 접수되었습니다</h2>
-                <p>{state.message}</p>
-                <a href="/guest/inquiry" className={styles.secondaryBtn}>
+                <p className={typographyStyles.hint}>{state.message}</p>
+                <a href="/guest/inquiry" className={cx(buttonStyles.secondary, styles.secondaryBtn)}>
                     새 문의 작성
                 </a>
             </div>
@@ -37,9 +44,13 @@ export default function GuestInquiryForm() {
     }
 
     return (
-        <form action={formAction} className={styles.form} noValidate>
+        <form
+            action={formAction}
+            className={cx(surfaceStyles.root, fieldStyles.form, styles.form)}
+            noValidate
+        >
             {state.message && (
-                <p className={styles.formError} role="alert">
+                <p className={cx(typographyStyles.error, styles.formError)} role="alert">
                     {state.message}
                 </p>
             )}
@@ -78,20 +89,25 @@ export default function GuestInquiryForm() {
                 error={errors.preferredTime}
             />
 
-            <label className={styles.field}>
+            <label className={cx(fieldStyles.root, styles.field)}>
                 <span>문의 내용</span>
                 <textarea
+                    className={cx(fieldStyles.control, fieldStyles.textarea, styles.inquiryTextarea)}
                     name="message"
                     rows={5}
                     placeholder="학년, 과목, 상담할 내용을 적어 주세요"
                     maxLength={1000}
                 />
                 {errors.message && (
-                    <small className={styles.fieldError}>{errors.message}</small>
+                    <small className={typographyStyles.error}>{errors.message}</small>
                 )}
             </label>
 
-            <button type="submit" className={styles.primaryBtn} disabled={pending}>
+            <button
+                type="submit"
+                className={cx(buttonStyles.primaryLg, styles.primaryBtn)}
+                disabled={pending}
+            >
                 {pending ? "접수 중…" : "문의 보내기"}
             </button>
         </form>
@@ -114,19 +130,20 @@ function Field({
     error?: string;
 }) {
     return (
-        <label className={styles.field}>
+        <label className={cx(fieldStyles.root, styles.field)}>
             <span>
                 {label}
                 {required ? " *" : ""}
             </span>
             <input
+                className={cx(fieldStyles.control, styles.inquiryControl)}
                 type={type}
                 name={name}
                 required={required}
                 placeholder={placeholder}
                 aria-invalid={Boolean(error)}
             />
-            {error && <small className={styles.fieldError}>{error}</small>}
+            {error && <small className={typographyStyles.error}>{error}</small>}
         </label>
     );
 }

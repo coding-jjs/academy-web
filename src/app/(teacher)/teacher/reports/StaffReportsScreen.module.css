@@ -1,105 +1,25 @@
-.page {
-    animation: screen-enter 360ms cubic-bezier(.22, 1, .36, 1) both;
-  }
-  
-  .heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 24px;
-    margin-bottom: 28px;
-  }
-  
-  .heading > div > span {
-    color: #0066cc;
-    font-size: 11px;
-    font-weight: 750;
-    letter-spacing: .12em;
-  }
-  
-  .heading h1 {
-    margin: 8px 0 8px;
-    font-family: "SF Pro Display", system-ui, sans-serif;
-    font-size: clamp(31px, 5vw, 45px);
-    line-height: 1.08;
-    letter-spacing: -.045em;
-  }
-  
-  .heading p {
-    margin: 0;
-    color: #6e6e73;
-    font-size: 15px;
-  }
-  
-  .metrics {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-    margin-bottom: 18px;
-  }
-  
-  .metrics article,
-  .listPanel,
-  .editorPanel,
-  .emptyPanel {
-    border: 1px solid rgb(0 0 0 / 7%);
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 9px 30px rgb(0 0 0 / 5%);
-  }
-  
-  .metrics article {
-    padding: 20px;
-  }
-  
-  .metrics article > strong {
-    display: block;
-    margin: 18px 0 4px;
-    font-size: 31px;
-    letter-spacing: -.04em;
-  }
-  
-  .metrics article p {
-    margin: 0;
-    color: #86868b;
-    font-size: 12px;
-  }
-  
-  .layout {
+.layout {
     display: grid;
     grid-template-columns: minmax(260px, .9fr) minmax(0, 1.4fr);
     gap: 18px;
-  }
-  
-  .listPanel,
-  .editorPanel {
+}
+
+.listPanel,
+.editorPanel {
     padding: 22px;
-  }
-  
-  .panelHead {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
-  }
-  
-  .panelHead h2 {
-    margin: 0;
-    font-size: 17px;
-  }
-  
-  .studentList {
+}
+
+.studentList {
     list-style: none;
     margin: 0;
     padding: 0;
-  }
-  
-  .studentList li + li {
+}
+
+.studentList li + li {
     margin-top: 8px;
-  }
-  
-  .studentList button {
+}
+
+.studentList button {
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -111,263 +31,211 @@
     background: #f5f5f7;
     text-align: left;
     cursor: pointer;
-  }
-  
-  .studentList button strong {
+}
+
+.studentList button strong {
     display: block;
     font-size: 14px;
-  }
-  
-  .studentList button small {
+}
+
+.studentList button small {
     color: #86868b;
     font-size: 12px;
-  }
-  
-  .activeStudent {
+}
+
+.activeStudent {
     border-color: #0071e3 !important;
     background: #f5f9ff !important;
-  }
-  
-  .meta {
+}
+
+.metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.metrics article {
+    padding: 20px;
+}
+
+.metrics article > strong {
+    display: block;
+    margin: 18px 0 4px;
+    font-size: 31px;
+    letter-spacing: -.04em;
+}
+
+.metrics article p {
+    margin: 0;
+    color: #86868b;
+    font-size: 12px;
+}
+
+.meta {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
     margin-bottom: 16px;
-  }
-  
-  .meta > div {
+}
+
+.meta > div {
     display: grid;
     gap: 4px;
     padding: 12px 14px;
     border-radius: 13px;
     background: #f5f5f7;
-  }
-  
-  .meta span {
+}
+
+.meta span {
     color: #86868b;
     font-size: 12px;
-  }
-  
-  .meta strong {
+}
+
+.meta strong {
     font-size: 14px;
-  }
-  
-  .rejectBox {
+}
+
+.rejectBox {
     margin-bottom: 14px;
     padding: 12px 14px;
     border-radius: 13px;
     background: #fff5f5;
     color: #b91c1c;
-  }
-  
-  .rejectBox strong {
+}
+
+.rejectBox strong {
     display: block;
     margin-bottom: 4px;
     font-size: 13px;
-  }
-  
-  .rejectBox p {
+}
+
+.rejectBox p {
     margin: 0;
     font-size: 13px;
-  }
+}
 
-  .submittedBox {
+.submittedBox {
     margin-bottom: 16px;
     padding: 14px 16px;
     border-radius: 14px;
     border: 1px solid #dce8f5;
     background: #f7fbff;
-  }
+}
 
-  .submittedList {
+.submittedList {
     display: grid;
     gap: 10px;
     margin-bottom: 16px;
-  }
+}
 
-  .submittedList .submittedBox {
+.submittedList .submittedBox {
     margin-bottom: 0;
-  }
+}
 
-  .submittedList .submittedBox:not(:first-child) {
+.submittedList .submittedBox:not(:first-child) {
     border-color: #e5e5ea;
     background: #fafafa;
-  }
+}
 
-  .submittedHead {
+.submittedHead {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
     margin-bottom: 8px;
-  }
+}
 
-  .submittedHead strong {
+.submittedHead strong {
     font-size: 14px;
     color: #1d1d1f;
-  }
+}
 
-  .submittedMeta {
+.submittedMeta {
     margin: 0 0 10px;
     color: #6e6e73;
     font-size: 12px;
-  }
+}
 
-  .submittedBody {
+.submittedBody {
     margin: 0;
     white-space: pre-wrap;
     color: #1d1d1f;
     font-size: 14px;
     line-height: 1.55;
-  }
+}
 
-  .composeBanner {
+.composeBanner {
     margin-bottom: 14px;
     padding: 12px 14px;
     border-radius: 13px;
     background: #f5f5f7;
-  }
+}
 
-  .composeBanner strong {
+.composeBanner strong {
     display: block;
     margin-bottom: 4px;
     font-size: 13px;
     color: #1d1d1f;
-  }
+}
 
-  .composeBanner p {
+.composeBanner p {
     margin: 0;
     color: #6e6e73;
     font-size: 13px;
-  }
-  
-  .field {
-    display: grid;
-    gap: 8px;
-    margin-bottom: 14px;
-    color: #6e6e73;
-    font-size: 13px;
-  }
+}
 
-  .periodRow {
+.periodRow {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
-  }
+}
 
-  .periodRow .field {
+.periodRow .field {
     margin-bottom: 14px;
-  }
-  
-  .field select,
-  .field textarea,
-  .field input {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #d2d2d7;
-    border-radius: 12px;
-    font: inherit;
-    color: #1d1d1f;
-    background: #fff;
-  }
-  
-  .field textarea {
-    resize: vertical;
-  }
-  
-  .field select:disabled,
-  .field textarea:disabled,
-  .field input:disabled {
-    background: #f5f5f7;
-    color: #86868b;
-  }
+}
 
-  .evidenceBox {
+.field {
+    margin-bottom: 14px;
+}
+
+.evidenceBox {
     margin-bottom: 14px;
     padding: 12px 14px;
     border-radius: 13px;
     background: #f2f7fc;
     color: #1d1d1f;
-  }
+}
 
-  .evidenceBox strong {
+.evidenceBox strong {
     display: block;
     margin-bottom: 4px;
     color: #0066cc;
     font-size: 13px;
-  }
+}
 
-  .evidenceBox p {
+.evidenceBox p {
     margin: 0;
     color: #6e6e73;
     font-size: 13px;
-  }
-  
-  .actions {
+}
+
+.actions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-  }
-  
-  .actions button {
-    min-height: 42px;
-    padding: 0 17px;
-    border: 0;
-    border-radius: 12px;
-    color: #fff;
-    background: #0071e3;
-    font-size: 13px;
-    font-weight: 650;
-    cursor: pointer;
-  }
-  
-  .actions button:disabled {
-    opacity: .45;
-    cursor: not-allowed;
-  }
-  
-  .secondary {
-    color: #1d1d1f !important;
-    background: #e8e8ed !important;
-  }
-  
-  .hint,
-  .empty {
+}
+
+.empty {
     margin: 14px 0 0;
     color: #86868b;
     font-size: 13px;
-  }
-  
-  .emptyPanel {
-    padding: 48px 24px;
-    text-align: center;
-  }
-  
-  .emptyPanel h2 {
-    margin: 0 0 8px;
-    font-size: 20px;
-  }
-  
-  .emptyPanel p {
-    margin: 0;
-    color: #6e6e73;
-  }
-  
-  @keyframes screen-enter {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @media (max-width: 900px) {
+}
+
+@media (max-width: 900px) {
     .metrics,
     .layout,
     .meta {
-      grid-template-columns: 1fr;
+        grid-template-columns: 1fr;
     }
-  }
+}

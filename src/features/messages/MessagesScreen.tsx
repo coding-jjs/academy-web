@@ -7,6 +7,14 @@ import type {
     MessageListItem,
     MessageRecipientOption,
 } from "@/features/messages/types";
+import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    pageHeadingStyles,
+    screenStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import styles from "./MessagesScreen.module.css";
 
 type MessageTab = "compose" | "pending" | "mine";
@@ -40,10 +48,10 @@ export default function MessagesScreen({
 
     if (!canCompose && mode === "staff") {
         return (
-            <section className={styles.page}>
-                <header className={styles.heading}>
+            <section className={screenStyles.animatedPage}>
+                <header className={cx(pageHeadingStyles.root, styles.heading)}>
                     <div>
-                        <span>MESSAGES</span>
+                        <span className={pageHeadingStyles.eyebrow}>MESSAGES</span>
                         <h1>쪽지</h1>
                         <p>{deniedMessage ?? "쪽지 발송 권한이 없습니다."}</p>
                     </div>
@@ -53,10 +61,10 @@ export default function MessagesScreen({
     }
 
     return (
-        <section className={styles.page}>
-            <header className={styles.heading}>
+        <section className={screenStyles.animatedPage}>
+            <header className={cx(pageHeadingStyles.root, styles.heading)}>
                 <div>
-                    <span>MESSAGES</span>
+                    <span className={pageHeadingStyles.eyebrow}>MESSAGES</span>
                     <h1>쪽지</h1>
                     <p>
                         {mode === "director"
@@ -89,7 +97,9 @@ export default function MessagesScreen({
                 </TabButton>
             </div>
 
-            {feedback && <p className={styles.feedback}>{feedback}</p>}
+            {feedback && (
+                <p className={cx(typographyStyles.success, styles.feedback)}>{feedback}</p>
+            )}
 
             <div hidden={activeTab !== "compose"}>
                 <MessageComposer

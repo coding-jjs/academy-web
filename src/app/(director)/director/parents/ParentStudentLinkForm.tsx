@@ -6,6 +6,15 @@ import {
     type ParentLinkState,
 } from "@/features/families/actions";
 import { formatStudentOptionLabel } from "@/features/students/presentation";
+import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    pageHeadingStyles,
+    spinnerStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import styles from "./page.module.css";
 
 const initialState: ParentLinkState = {
@@ -69,27 +78,28 @@ export default function ParentStudentLinkForm({
         <form
             ref={formRef}
             action={formAction}
-            className={styles.linkForm}
+            className={cx(surfaceStyles.soft, styles.linkForm)}
         >
             <header className={styles.formHeader}>
                 <div className={styles.formIcon} aria-hidden="true">
                     +
                 </div>
                 <div className={styles.formHeading}>
-                    <span className={styles.sectionLabel}>
+                    <span className={pageHeadingStyles.sectionLabel}>
                         FAMILY CONNECTION
                     </span>
                     <h2>새로운 가족 연결</h2>
-                    <p>가입이 완료된 학부모와 학생 계정을 연결합니다.</p>
+                    <p className={typographyStyles.hint}>가입이 완료된 학부모와 학생 계정을 연결합니다.</p>
                 </div>
             </header>
 
             <div className={styles.formGrid}>
-                <label className={styles.field}>
+                <label className={cx(fieldStyles.root, styles.field)}>
                     <span className={styles.fieldLabel}>
                         학부모 <small>필수</small>
                     </span>
                     <select
+                        className={fieldStyles.select}
                         name="parentUserId"
                         defaultValue=""
                         required
@@ -104,16 +114,17 @@ export default function ParentStudentLinkForm({
                             </option>
                         ))}
                     </select>
-                    <small className={styles.fieldHint}>
+                    <small className={fieldStyles.hint}>
                         한 학부모에게 여러 자녀를 연결할 수 있습니다.
                     </small>
                 </label>
 
-                <label className={styles.field}>
+                <label className={cx(fieldStyles.root, styles.field)}>
                     <span className={styles.fieldLabel}>
                         학생 <small>필수</small>
                     </span>
                     <select
+                        className={fieldStyles.select}
                         name="studentId"
                         defaultValue=""
                         required
@@ -128,16 +139,17 @@ export default function ParentStudentLinkForm({
                             </option>
                         ))}
                     </select>
-                    <small className={styles.fieldHint}>
+                    <small className={fieldStyles.hint}>
                         현재 학부모가 연결되지 않은 학생만 표시됩니다.
                     </small>
                 </label>
 
-                <label className={styles.field}>
+                <label className={cx(fieldStyles.root, styles.field)}>
                     <span className={styles.fieldLabel}>
                         학생과의 관계 <small>필수</small>
                     </span>
                     <select
+                        className={fieldStyles.select}
                         name="relationship"
                         defaultValue=""
                         required
@@ -151,7 +163,7 @@ export default function ParentStudentLinkForm({
                         <option value="조부모">조부모</option>
                         <option value="기타 보호자">기타 보호자</option>
                     </select>
-                    <small className={styles.fieldHint}>
+                    <small className={fieldStyles.hint}>
                         학부모 계정과 학생의 관계입니다.
                     </small>
                 </label>
@@ -160,17 +172,21 @@ export default function ParentStudentLinkForm({
             <footer className={styles.formFooter}>
                 <div className={styles.feedbackArea} aria-live="polite">
                     {unavailableMessage ? (
-                        <p className={styles.notice}>{unavailableMessage}</p>
+                        <p className={cx(typographyStyles.hint, styles.notice)}>{unavailableMessage}</p>
                     ) : state.message ? (
                         <p
                             role={
                                 state.status === "error" ? "alert" : "status"
                             }
-                            className={`${styles.feedback} ${
+                            className={cx(
+                                styles.feedback,
+                                state.status === "success"
+                                    ? typographyStyles.success
+                                    : typographyStyles.error,
                                 state.status === "success"
                                     ? styles.feedbackSuccess
-                                    : styles.feedbackError
-                            }`}
+                                    : styles.feedbackError,
+                            )}
                         >
                             <span aria-hidden="true">
                                 {state.status === "success" ? "✓" : "!"}
@@ -178,7 +194,7 @@ export default function ParentStudentLinkForm({
                             {state.message}
                         </p>
                     ) : (
-                        <p className={styles.defaultHint}>
+                        <p className={cx(typographyStyles.hint, styles.defaultHint)}>
                             연결 후 학부모 계정에서 자녀 정보를 확인할 수
                             있습니다.
                         </p>
@@ -187,11 +203,11 @@ export default function ParentStudentLinkForm({
 
                 <button
                     type="submit"
-                    className={styles.primaryButton}
+                    className={buttonStyles.primaryLg}
                     disabled={Boolean(unavailableMessage) || pending}
                 >
                     {pending && (
-                        <span className={styles.spinner} aria-hidden="true" />
+                        <span className={spinnerStyles.root} aria-hidden="true" />
                     )}
                     {pending ? "연결하는 중…" : "학부모 연결"}
                 </button>

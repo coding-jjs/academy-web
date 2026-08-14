@@ -10,6 +10,15 @@ import {
     unlinkParentStudent,
     type ParentLinkState,
 } from "@/features/families/actions";
+import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    dialogStyles,
+    pageHeadingStyles,
+    spinnerStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import styles from "./page.module.css";
 
 const initialState: ParentLinkState = {
@@ -56,7 +65,7 @@ export default function UnlinkParentStudentButton({
         <>
             <button
                 type="button"
-                className={styles.unlinkTrigger}
+                className={cx(buttonStyles.cancel, styles.unlinkTrigger)}
                 onClick={openDialog}
             >
                 연결 해제
@@ -64,31 +73,34 @@ export default function UnlinkParentStudentButton({
 
             <dialog
                 ref={dialogRef}
-                className={styles.unlinkDialog}
+                className={dialogStyles.overlay}
                 aria-labelledby={`unlink-title-${linkId}`}
                 aria-describedby={`unlink-description-${linkId}`}
                 onCancel={handleCancel}
             >
-                <section className={styles.dialogCard}>
-                    <header className={styles.dialogHeader}>
+                <section className={dialogStyles.card}>
+                    <header className={dialogStyles.header}>
                         <div className={styles.warningIcon} aria-hidden="true">
                             !
                         </div>
                         <div className={styles.dialogHeading}>
-                            <span className={styles.dangerLabel}>
+                            <span className={cx(pageHeadingStyles.sectionLabel, styles.dangerLabel)}>
                                 DISCONNECT FAMILY
                             </span>
                             <h2 id={`unlink-title-${linkId}`}>
                                 가족 연결을 해제할까요?
                             </h2>
-                            <p id={`unlink-description-${linkId}`}>
+                            <p
+                                id={`unlink-description-${linkId}`}
+                                className={typographyStyles.hint}
+                            >
                                 연결 기록은 삭제하지 않고 해제 사유와 처리자를
                                 함께 기록합니다.
                             </p>
                         </div>
                         <button
                             type="button"
-                            className={styles.dialogClose}
+                            className={dialogStyles.close}
                             onClick={closeDialog}
                             disabled={pending}
                             aria-label="연결 해제 창 닫기"
@@ -99,14 +111,14 @@ export default function UnlinkParentStudentButton({
 
                     <div className={styles.unlinkSummary}>
                         <div className={styles.unlinkPerson}>
-                            <span>학부모</span>
+                            <span className={typographyStyles.muted}>학부모</span>
                             <strong>{parentName}</strong>
                         </div>
                         <div className={styles.unlinkArrow} aria-hidden="true">
                             →
                         </div>
                         <div className={styles.unlinkPerson}>
-                            <span>학생</span>
+                            <span className={typographyStyles.muted}>학생</span>
                             <strong>{studentName}</strong>
                         </div>
                     </div>
@@ -121,11 +133,12 @@ export default function UnlinkParentStudentButton({
 
                     <form action={formAction} className={styles.unlinkForm}>
                         <input type="hidden" name="linkId" value={linkId} />
-                        <label className={styles.reasonField}>
+                        <label className={cx(fieldStyles.root, styles.reasonField)}>
                             <span>
                                 해제 사유 <small>필수</small>
                             </span>
                             <select
+                                className={fieldStyles.select}
                                 name="reason"
                                 defaultValue=""
                                 required
@@ -143,7 +156,10 @@ export default function UnlinkParentStudentButton({
                         </label>
 
                         {state.status === "error" && (
-                            <p className={styles.dialogError} role="alert">
+                            <p
+                                className={cx(typographyStyles.error, styles.dialogError)}
+                                role="alert"
+                            >
                                 <span aria-hidden="true">!</span>
                                 {state.message}
                             </p>
@@ -152,7 +168,7 @@ export default function UnlinkParentStudentButton({
                         <footer className={styles.dialogActions}>
                             <button
                                 type="button"
-                                className={styles.cancelButton}
+                                className={buttonStyles.cancel}
                                 onClick={closeDialog}
                                 disabled={pending}
                             >
@@ -160,12 +176,12 @@ export default function UnlinkParentStudentButton({
                             </button>
                             <button
                                 type="submit"
-                                className={styles.dangerButton}
+                                className={buttonStyles.dangerSolid}
                                 disabled={pending}
                             >
                                 {pending && (
                                     <span
-                                        className={styles.spinner}
+                                        className={spinnerStyles.root}
                                         aria-hidden="true"
                                     />
                                 )}

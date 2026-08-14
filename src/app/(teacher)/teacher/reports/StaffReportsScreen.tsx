@@ -3,6 +3,17 @@
 import { useMemo, useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
 import type { StaffReportStudent } from "@/features/reports/types";
+import {
+    buttonStyles,
+    cx,
+    emptyStateStyles,
+    fieldStyles,
+    pageHeadingStyles,
+    panelStyles,
+    screenStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import ReportEditor from "./components/ReportEditor";
 import ReportStudentList from "./components/ReportStudentList";
 import { getStudentReportStatus } from "@/features/reports/presentation";
@@ -64,10 +75,10 @@ export default function StaffReportsScreen({
     }, [students]);
 
     return (
-        <section className={styles.page}>
-            <header className={styles.heading}>
+        <section className={screenStyles.animatedPage}>
+            <header className={pageHeadingStyles.root}>
                 <div>
-                    <span>AI REPORT</span>
+                    <span className={pageHeadingStyles.eyebrow}>AI REPORT</span>
                     <h1>AI 리포트 작성</h1>
                     <p>학습 기록을 바탕으로 리포트 초안을 만들고 검토합니다.</p>
                 </div>
@@ -75,7 +86,7 @@ export default function StaffReportsScreen({
 
             <div className={styles.metrics}>
                 {metrics.map((metric) => (
-                    <article key={metric.label}>
+                    <article key={metric.label} className={surfaceStyles.root}>
                         <StatusChip tone={metric.tone}>
                             {metric.label}
                         </StatusChip>
@@ -86,7 +97,7 @@ export default function StaffReportsScreen({
             </div>
 
             {!selectedStudent ? (
-                <div className={styles.emptyPanel}>
+                <div className={cx(surfaceStyles.root, emptyStateStyles.root)}>
                     <h2>표시할 학생이 없습니다</h2>
                     <p>학생 역할이 부여되면 이곳에 나타납니다.</p>
                 </div>

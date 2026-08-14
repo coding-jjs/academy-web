@@ -1,4 +1,5 @@
 import StatusChip from "@/components/ui/StatusChip";
+import { cx, panelStyles, surfaceStyles } from "@/components/ui/shared-styles";
 import { REPORT_STATUS_METADATA } from "@/features/reports/presentation";
 import type { DirectorReportStudent } from "@/features/reports/types";
 import { getStudentReportStatus } from "@/features/reports/presentation";
@@ -15,8 +16,8 @@ export default function DirectorReportStudentTable({
     onSelect: (studentId: string) => void;
 }) {
     return (
-        <article className={styles.tablePanel}>
-            <div className={styles.panelHead}>
+        <article className={cx(surfaceStyles.root, styles.tablePanel)}>
+            <div className={panelStyles.head}>
                 <h2>학생 목록</h2>
                 <StatusChip>{students.length}명</StatusChip>
             </div>

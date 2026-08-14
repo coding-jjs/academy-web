@@ -3,6 +3,14 @@ import type {
     UnlinkedStudentOption,
 } from "@/features/users/types";
 import { formatStudentSchool } from "@/features/students/presentation";
+import {
+    cx,
+    emptyStateStyles,
+    pageHeadingStyles,
+    screenStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import RoleAssignmentForm from "./RoleAssignmentForm";
 import styles from "./page.module.css";
 
@@ -14,10 +22,10 @@ export default function DirectorUsersScreen({
     unlinkedStudents: UnlinkedStudentOption[];
 }) {
     return (
-        <section className={styles.page}>
-            <header className={styles.heading}>
+        <section className={screenStyles.animatedPage}>
+            <header className={pageHeadingStyles.root}>
                 <div>
-                    <span className={styles.eyebrow}>NEW USERS</span>
+                    <span className={pageHeadingStyles.eyebrow}>NEW USERS</span>
                     <h1>가입 사용자</h1>
                     <p>가입 정보를 확인하고 학원에서 사용할 역할을 부여하세요.</p>
                 </div>
@@ -28,56 +36,73 @@ export default function DirectorUsersScreen({
             </header>
 
             <div className={styles.summary}>
-                <article className={styles.summaryPrimary}>
+                <article className={cx(surfaceStyles.soft, styles.summaryPrimary)}>
                     <div className={styles.summaryIcon} aria-hidden="true">
                         {users.length}
                     </div>
                     <div>
-                        <span>현재 대기 인원</span>
+                        <span className={typographyStyles.muted}>현재 대기 인원</span>
                         <strong>{users.length}명</strong>
-                        <p>Google 인증과 가입 정보 입력을 완료했습니다.</p>
+                        <p className={typographyStyles.hint}>
+                            Google 인증과 가입 정보 입력을 완료했습니다.
+                        </p>
                     </div>
                 </article>
-                <article className={styles.guide}>
-                    <span>역할 부여 안내</span>
-                    <p>역할을 부여하면 즉시 전용 화면에 접근할 수 있습니다.</p>
+                <article className={cx(surfaceStyles.soft, styles.guide)}>
+                    <span className={typographyStyles.muted}>역할 부여 안내</span>
+                    <p className={typographyStyles.hint}>
+                        역할을 부여하면 즉시 전용 화면에 접근할 수 있습니다.
+                    </p>
                 </article>
             </div>
 
-            <div className={styles.listPanel}>
+            <div className={cx(surfaceStyles.soft, styles.listPanel)}>
                 <div className={styles.listHeader}>
                     <div>
                         <h2>역할 부여 대기</h2>
-                        <p>최근 가입한 사용자 순서로 표시됩니다.</p>
+                        <p className={typographyStyles.hint}>
+                            최근 가입한 사용자 순서로 표시됩니다.
+                        </p>
                     </div>
-                    <span>{users.length} USERS</span>
+                    <span className={typographyStyles.muted}>{users.length} USERS</span>
                 </div>
 
                 {users.length === 0 ? (
-                    <div className={styles.empty}>
+                    <div className={cx(emptyStateStyles.root, styles.empty)}>
                         <div aria-hidden="true">✓</div>
                         <h2>모든 역할 부여를 완료했어요</h2>
-                        <p>새롭게 가입한 사용자가 생기면 이곳에 표시됩니다.</p>
+                        <p className={typographyStyles.muted}>
+                            새롭게 가입한 사용자가 생기면 이곳에 표시됩니다.
+                        </p>
                     </div>
                 ) : (
                     <ul className={styles.userList}>
                         {users.map((user) => (
-                            <li className={styles.userCard} key={user.id}>
+                            <li key={user.id} className={styles.userCard}>
                                 <div className={styles.identity}>
-                                    <div className={styles.avatar} aria-hidden="true">
-                                        {user.name.trim().charAt(0).toUpperCase() ||
-                                            "A"}
+                                    <div
+                                        className={styles.avatar}
+                                        aria-hidden="true"
+                                    >
+                                        {user.name.trim().charAt(0) || "?"}
                                     </div>
                                     <div className={styles.person}>
                                         <div className={styles.nameLine}>
                                             <strong>{user.name}</strong>
-                                            <span>신규</span>
+                                            <span>NEW</span>
                                         </div>
                                         <a href={`mailto:${user.email}`}>
                                             {user.email}
                                         </a>
                                         <time dateTime={user.joinedAt}>
-                                            {formatJoinedAt(user.joinedAt)} 가입
+                                            {new Date(
+                                                user.joinedAt,
+                                            ).toLocaleDateString("ko-KR", {
+                                                year: "numeric",
+                                                month: "long",
+                                                day: "numeric",
+                                            })}{" "}
+                                            가입
                                         </time>
                                     </div>
                                 </div>
@@ -88,6 +113,10 @@ export default function DirectorUsersScreen({
                                         <dd>{user.phone ?? "미입력"}</dd>
                                     </div>
                                     <div>
+                                        <dt>주소</dt>
+                                        <dd>{user.address ?? "미입력"}</dd>
+                                    </div>
+                                    <div>
                                         <dt>학교·학년</dt>
                                         <dd>
                                             {formatStudentSchool(
@@ -95,10 +124,6 @@ export default function DirectorUsersScreen({
                                                 user.grade,
                                             )}
                                         </dd>
-                                    </div>
-                                    <div>
-                                        <dt>주소</dt>
-                                        <dd>{user.address ?? "미입력"}</dd>
                                     </div>
                                 </dl>
 
@@ -115,12 +140,4 @@ export default function DirectorUsersScreen({
             </div>
         </section>
     );
-}
-
-function formatJoinedAt(date: string) {
-    return new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Seoul",
-        month: "long",
-        day: "numeric",
-    }).format(new Date(date));
 }

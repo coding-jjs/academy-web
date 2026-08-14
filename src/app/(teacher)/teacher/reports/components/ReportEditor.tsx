@@ -3,6 +3,14 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
+import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    panelStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import type {
     StaffReportItem,
     StaffReportStudent,
@@ -262,8 +270,8 @@ export default function ReportEditor({
     }
 
     return (
-        <article className={styles.editorPanel}>
-            <div className={styles.panelHead}>
+        <article className={cx(surfaceStyles.root, styles.editorPanel)}>
+            <div className={panelStyles.head}>
                 <h2>{student.name} 보고서</h2>
                 <StatusChip
                     tone={isComposingNew ? "neutral" : statusMetadata.tone}
@@ -311,6 +319,7 @@ export default function ReportEditor({
                 <div className={styles.actions}>
                     <button
                         type="button"
+                        className={buttonStyles.primary}
                         disabled={isProcessing || !student.studentProfileId}
                         onClick={startNewPeriodDraft}
                     >
@@ -339,7 +348,7 @@ export default function ReportEditor({
                     )}
 
                     <div className={styles.periodRow}>
-                        <label className={styles.field}>
+                        <label className={cx(fieldStyles.root, styles.field)}>
                             기간 시작
                             <input
                                 type="date"
@@ -350,7 +359,7 @@ export default function ReportEditor({
                                 disabled={isProcessing}
                             />
                         </label>
-                        <label className={styles.field}>
+                        <label className={cx(fieldStyles.root, styles.field)}>
                             기간 종료
                             <input
                                 type="date"
@@ -363,7 +372,7 @@ export default function ReportEditor({
                         </label>
                     </div>
 
-                    <label className={styles.field}>
+                    <label className={cx(fieldStyles.root, styles.field)}>
                         평가 키워드
                         <select
                             value={keyword}
@@ -377,7 +386,7 @@ export default function ReportEditor({
                             ))}
                         </select>
                     </label>
-                    <label className={styles.field}>
+                    <label className={cx(fieldStyles.root, styles.field)}>
                         톤
                         <select
                             value={tone}
@@ -391,7 +400,7 @@ export default function ReportEditor({
                             ))}
                         </select>
                     </label>
-                    <label className={styles.field}>
+                    <label className={cx(fieldStyles.root, styles.field)}>
                         초안
                         <textarea
                             value={content}
@@ -406,7 +415,7 @@ export default function ReportEditor({
                         {isComposingNew && (
                             <button
                                 type="button"
-                                className={styles.secondary}
+                                className={buttonStyles.secondary}
                                 disabled={isProcessing}
                                 onClick={cancelCompose}
                             >
@@ -415,7 +424,7 @@ export default function ReportEditor({
                         )}
                         <button
                             type="button"
-                            className={styles.secondary}
+                            className={buttonStyles.secondary}
                             disabled={
                                 isProcessing || !student.studentProfileId
                             }
@@ -425,6 +434,7 @@ export default function ReportEditor({
                         </button>
                         <button
                             type="button"
+                            className={buttonStyles.primary}
                             disabled={
                                 isProcessing || !student.studentProfileId
                             }
@@ -440,6 +450,7 @@ export default function ReportEditor({
                         </button>
                         <button
                             type="button"
+                            className={buttonStyles.primary}
                             disabled={isProcessing || !content.trim()}
                             onClick={requestApproval}
                         >
@@ -450,12 +461,12 @@ export default function ReportEditor({
             )}
 
             {!showComposer && !lockedOnly && !hasNothing && (
-                <p className={styles.hint}>표시할 리포트가 없습니다.</p>
+                <p className={typographyStyles.hint}>표시할 리포트가 없습니다.</p>
             )}
 
-            {feedback && <p className={styles.hint}>{feedback}</p>}
+            {feedback && <p className={typographyStyles.hint}>{feedback}</p>}
             {!student.studentProfileId && (
-                <p className={styles.hint}>
+                <p className={typographyStyles.hint}>
                     학생 프로필이 없어 아직 리포트를 저장할 수 없습니다.
                 </p>
             )}

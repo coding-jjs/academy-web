@@ -1,4 +1,5 @@
 import StatusChip from "@/components/ui/StatusChip";
+import { cx, panelStyles, surfaceStyles } from "@/components/ui/shared-styles";
 import type { StaffReportStudent } from "@/features/reports/types";
 import {
     getStudentReportStatus,
@@ -17,8 +18,8 @@ export default function ReportStudentList({
     onSelect: (studentId: string) => void;
 }) {
     return (
-        <article className={styles.listPanel}>
-            <div className={styles.panelHead}>
+        <article className={cx(surfaceStyles.root, styles.listPanel)}>
+            <div className={panelStyles.head}>
                 <h2>학생 목록</h2>
                 <StatusChip>{students.length}명</StatusChip>
             </div>

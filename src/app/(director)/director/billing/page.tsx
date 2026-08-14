@@ -1,12 +1,18 @@
 import Link from "next/link";
+import {
+    buttonStyles,
+    cx,
+    pageHeadingStyles,
+    screenStyles,
+} from "@/components/ui/shared-styles";
 import styles from "./DirectorBillingScreen.module.css";
 
 export default function DirectorBillingPage() {
     return (
-        <section className={styles.page}>
-            <header className={styles.heading}>
+        <section className={screenStyles.animatedPage}>
+            <header className={pageHeadingStyles.root}>
                 <div>
-                    <span>BILLING</span>
+                    <span className={pageHeadingStyles.eyebrow}>BILLING</span>
                     <h1>청구·수납</h1>
                     <p>학생들의 수강료와 교재비를 관리할 수 있습니다.</p>
                 </div>
@@ -29,7 +35,7 @@ export default function DirectorBillingPage() {
 
                 <Link
                     href="/director/dashboard"
-                    className={styles.dashboardLink}
+                    className={cx(buttonStyles.primary, styles.dashboardLink)}
                 >
                     대시보드로 돌아가기
                 </Link>

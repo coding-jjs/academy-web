@@ -1,6 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    panelStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import type { BillingStudentOption } from "@/features/billing/types";
 import styles from "../BillingManagementScreen.module.css";
 
@@ -19,15 +27,15 @@ export default function InvoiceCreationPanel({ students, isPending, onCreate }: 
     }
 
     return (
-        <article className={styles.panel}>
-            <div className={styles.panelHead}><h2>청구서 작성</h2></div>
-            {linkedStudents.length === 0 ? <p className={styles.hint}>학부모가 연결된 학생이 없습니다. 원장 화면에서 학부모–학생을 먼저 연결하세요.</p> : <div className={styles.form}>
-                <label className={styles.field}><span>학생</span><select value={studentId} onChange={(event) => setStudentId(event.target.value)} disabled={isPending}>{linkedStudents.map((student) => <option key={student.id} value={student.id}>{student.name}{student.parentName ? ` · 학부모 ${student.parentName}` : ""}{student.className ? ` · ${student.className}` : ""}</option>)}</select></label>
-                <label className={styles.field}><span>제목</span><input value={title} onChange={(event) => setTitle(event.target.value)} disabled={isPending} maxLength={120} /></label>
-                <label className={styles.field}><span>항목명</span><input value={itemName} onChange={(event) => setItemName(event.target.value)} disabled={isPending} maxLength={120} /></label>
-                <label className={styles.field}><span>금액 (원)</span><input type="number" min={1} step={1} value={amount} onChange={(event) => setAmount(event.target.value)} disabled={isPending} /></label>
-                <label className={styles.field}><span>납기일</span><input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} disabled={isPending} /></label>
-                <div className={styles.actions}><button type="button" className={styles.secondaryBtn} disabled={isPending || !studentId} onClick={() => create(false)}>{isPending ? "처리 중…" : "초안 저장"}</button><button type="button" className={styles.primaryBtn} disabled={isPending || !studentId} onClick={() => create(true)}>{isPending ? "처리 중…" : "바로 발행"}</button></div>
+        <article className={cx(surfaceStyles.root, styles.panel)}>
+            <div className={panelStyles.head}><h2>청구서 작성</h2></div>
+            {linkedStudents.length === 0 ? <p className={typographyStyles.hint}>학부모가 연결된 학생이 없습니다. 원장 화면에서 학부모–학생을 먼저 연결하세요.</p> : <div className={fieldStyles.form}>
+                <label className={fieldStyles.root}><span>학생</span><select value={studentId} onChange={(event) => setStudentId(event.target.value)} disabled={isPending}>{linkedStudents.map((student) => <option key={student.id} value={student.id}>{student.name}{student.parentName ? ` · 학부모 ${student.parentName}` : ""}{student.className ? ` · ${student.className}` : ""}</option>)}</select></label>
+                <label className={fieldStyles.root}><span>제목</span><input value={title} onChange={(event) => setTitle(event.target.value)} disabled={isPending} maxLength={120} /></label>
+                <label className={fieldStyles.root}><span>항목명</span><input value={itemName} onChange={(event) => setItemName(event.target.value)} disabled={isPending} maxLength={120} /></label>
+                <label className={fieldStyles.root}><span>금액 (원)</span><input type="number" min={1} step={1} value={amount} onChange={(event) => setAmount(event.target.value)} disabled={isPending} /></label>
+                <label className={fieldStyles.root}><span>납기일</span><input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} disabled={isPending} /></label>
+                <div className={styles.actions}><button type="button" className={buttonStyles.secondary} disabled={isPending || !studentId} onClick={() => create(false)}>{isPending ? "처리 중…" : "초안 저장"}</button><button type="button" className={buttonStyles.primary} disabled={isPending || !studentId} onClick={() => create(true)}>{isPending ? "처리 중…" : "바로 발행"}</button></div>
             </div>}
         </article>
     );

@@ -11,6 +11,12 @@ import type {
     MessageParentOption,
     MessageRecipientOption,
 } from "@/features/messages/types";
+import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import styles from "../MessagesScreen.module.css";
 
 type MessageMode = "director" | "staff";
@@ -129,7 +135,7 @@ export default function MessageComposer({
     return (
         <div className={styles.composeSplit}>
             <div className={styles.composeMain}>
-                <label className={styles.field}>
+                <label className={fieldStyles.root}>
                     <span>제목</span>
                     <input
                         value={title}
@@ -138,7 +144,7 @@ export default function MessageComposer({
                         placeholder="쪽지 제목"
                     />
                 </label>
-                <label className={styles.field}>
+                <label className={fieldStyles.root}>
                     <span>본문</span>
                     <textarea
                         value={content}
@@ -149,7 +155,7 @@ export default function MessageComposer({
                 </label>
                 <button
                     type="button"
-                    className={styles.primaryBtn}
+                    className={buttonStyles.primary}
                     disabled={!canSubmit}
                     onClick={sendMessage}
                 >
@@ -158,7 +164,7 @@ export default function MessageComposer({
             </div>
 
             <aside className={styles.composeSide}>
-                <label className={styles.field}>
+                <label className={fieldStyles.root}>
                     <span>수신 대상</span>
                     <select
                         value={audience}
@@ -180,7 +186,7 @@ export default function MessageComposer({
                 </label>
 
                 {audience === "STUDENT" ? (
-                    <div className={styles.field}>
+                    <div className={fieldStyles.root}>
                         <div className={styles.listHeader}>
                             <span>
                                 {studentListLabel} ({selectedStudentIds.length}/
@@ -210,7 +216,7 @@ export default function MessageComposer({
                             </div>
                         </div>
                         {students.length === 0 ? (
-                            <p className={styles.listEmpty}>{emptyStudentLabel}</p>
+                            <p className={cx(typographyStyles.hint, styles.listEmpty)}>{emptyStudentLabel}</p>
                         ) : (
                             <ul className={styles.checkList}>
                                 {students.map((student) => (
@@ -237,7 +243,7 @@ export default function MessageComposer({
                         )}
                     </div>
                 ) : (
-                    <div className={styles.field}>
+                    <div className={fieldStyles.root}>
                         <div className={styles.listHeader}>
                             <span>
                                 {parentListLabel} ({selectedParentIds.length}/
@@ -267,7 +273,7 @@ export default function MessageComposer({
                             </div>
                         </div>
                         {parentOptions.length === 0 ? (
-                            <p className={styles.listEmpty}>{emptyParentLabel}</p>
+                            <p className={cx(typographyStyles.hint, styles.listEmpty)}>{emptyParentLabel}</p>
                         ) : (
                             <ul className={styles.checkList}>
                                 {parentOptions.map((parent) => (

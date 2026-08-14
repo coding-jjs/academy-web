@@ -6,6 +6,15 @@ import {
     createLearningRecord,
     type LearningRecordState,
 } from "@/features/students/staff-actions";
+import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    panelStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
+
 import { getTodayDateInput } from "@/features/students/presentation";
 import styles from "../StaffStudentsScreen.module.css";
 
@@ -27,13 +36,13 @@ export default function LearningRecordForm({
     );
 
     return (
-        <article className={styles.panel}>
-            <div className={styles.panelHead}>
+        <article className={cx(surfaceStyles.root, styles.panel)}>
+            <div className={panelStyles.headCompact}>
                 <h2>기록 작성</h2>
             </div>
-            <form action={formAction} className={styles.form}>
+            <form action={formAction} className={cx(fieldStyles.form, styles.form)}>
                 <input type="hidden" name="studentId" value={student.id} />
-                <label className={styles.field}>
+                <label className={cx(fieldStyles.root, styles.field)}>
                     <span>유형</span>
                     <select name="type" defaultValue="CLASS_NOTE">
                         <option value="CLASS_NOTE">수업 기록</option>
@@ -41,7 +50,7 @@ export default function LearningRecordForm({
                         <option value="LIFE_RECORD">생활 기록</option>
                     </select>
                 </label>
-                <label className={styles.field}>
+                <label className={cx(fieldStyles.root, styles.field)}>
                     <span>반 (선택)</span>
                     <select name="classId" defaultValue="">
                         <option value="">없음</option>
@@ -59,7 +68,7 @@ export default function LearningRecordForm({
                             ))}
                     </select>
                 </label>
-                <label className={styles.field}>
+                <label className={cx(fieldStyles.root, styles.field)}>
                     <span>날짜</span>
                     <input
                         type="date"
@@ -68,7 +77,7 @@ export default function LearningRecordForm({
                         required
                     />
                 </label>
-                <label className={styles.field}>
+                <label className={cx(fieldStyles.root, styles.field)}>
                     <span>제목</span>
                     <input
                         name="title"
@@ -77,7 +86,7 @@ export default function LearningRecordForm({
                         placeholder="예: 오늘 수업 참여도"
                     />
                 </label>
-                <label className={styles.field}>
+                <label className={cx(fieldStyles.root, styles.field)}>
                     <span>내용</span>
                     <textarea
                         name="content"
@@ -89,7 +98,7 @@ export default function LearningRecordForm({
                 </label>
                 <button
                     type="submit"
-                    className={styles.primaryBtn}
+                    className={buttonStyles.primary}
                     disabled={isSaving}
                 >
                     {isSaving ? "저장 중…" : "기록 저장"}
@@ -98,8 +107,8 @@ export default function LearningRecordForm({
                     <p
                         className={
                             actionState.status === "success"
-                                ? styles.success
-                                : styles.error
+                                ? typographyStyles.success
+                                : typographyStyles.error
                         }
                         role="alert"
                     >

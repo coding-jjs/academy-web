@@ -128,12 +128,7 @@
 
 .card {
   padding: 48px;
-  border: 1px solid rgb(0 0 0 / 8%);
   border-radius: 30px;
-  background: rgb(255 255 255 / 93%);
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 4%),
-    0 24px 70px rgb(0 0 0 / 9%);
   backdrop-filter: blur(22px);
   animation: card-enter 480ms cubic-bezier(.22, 1, .36, 1) both;
 }
@@ -141,13 +136,6 @@
 .authIntro {
   margin-bottom: 34px;
   text-align: center;
-}
-
-.eyebrow {
-  color: #0066cc;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .12em;
 }
 
 .authIntro h1,
@@ -234,7 +222,6 @@
 .terms,
 .privacyNotice {
   margin: 22px auto 0;
-  color: #86868b;
   font-size: 12px;
   line-height: 1.55;
   text-align: center;
@@ -301,19 +288,17 @@
   white-space: nowrap;
 }
 
-.form {
-  display: grid;
-  gap: 20px;
-}
-
 .fieldRow {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(96px, .7fr);
   gap: 14px;
 }
 
+.signupForm {
+  gap: 20px;
+}
+
 .field {
-  display: grid;
   gap: 8px;
 }
 
@@ -336,46 +321,27 @@
   font-weight: 400;
 }
 
-.field input {
-  width: 100%;
+.signupControl {
   height: 52px;
   padding: 0 15px;
-  border: 1px solid #d2d2d7;
   border-radius: 13px;
-  outline: none;
-  color: #1d1d1f;
-  background: #fff;
   font-size: 15px;
-  transition:
-    border-color 140ms ease,
-    box-shadow 140ms ease;
+  box-shadow: none;
 }
 
-.field input::placeholder {
+.signupControl::placeholder {
   color: #a1a1a6;
 }
 
-.field input:focus {
-  border-color: #0071e3;
-  box-shadow: 0 0 0 4px rgb(0 113 227 / 12%);
-}
-
-.field input[aria-invalid="true"] {
+.signupControl[aria-invalid="true"] {
   border-color: #ff3b30;
-}
-
-.fieldError {
-  color: #b42318;
-  font-size: 11px;
 }
 
 .formError {
   margin: 0 0 20px;
   padding: 13px 15px;
   border-radius: 12px;
-  color: #b42318;
   background: #fef3f2;
-  font-size: 13px;
   line-height: 1.45;
 }
 
@@ -386,34 +352,12 @@
   display: grid;
   place-items: center;
   margin-top: 4px;
-  border: 0;
   border-radius: 14px;
-  color: #fff;
-  background: #0071e3;
   font-size: 15px;
-  font-weight: 650;
   text-decoration: none;
-  cursor: pointer;
-  transition:
-    transform 140ms ease,
-    background 140ms ease,
-    box-shadow 140ms ease;
-}
-
-.submitButton:hover,
-.primaryLink:hover {
-  background: #0077ed;
-  box-shadow: 0 7px 18px rgb(0 113 227 / 22%);
-}
-
-.submitButton:active,
-.primaryLink:active {
-  transform: scale(.985);
 }
 
 .submitButton:disabled {
-  color: #f5f5f7;
-  background: #86868b;
   cursor: wait;
 }
 
@@ -547,7 +491,7 @@
   .googleButton,
   .submitButton,
   .primaryLink,
-  .field input {
+  .signupControl {
     transition-duration: .01ms;
   }
 }

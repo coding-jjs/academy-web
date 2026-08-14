@@ -4,6 +4,14 @@ import type {
     LinkableStudent,
 } from "@/features/families/types";
 import { formatStudentSchool } from "@/features/students/presentation";
+import {
+    cx,
+    emptyStateStyles,
+    pageHeadingStyles,
+    screenStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import ParentStudentLinkForm from "./ParentStudentLinkForm";
 import UnlinkParentStudentButton from "./UnlinkParentStudentButton";
 import styles from "./page.module.css";
@@ -18,10 +26,10 @@ export default function DirectorParentsScreen({
     activeLinks: ActiveFamilyLink[];
 }) {
     return (
-        <section className={styles.page}>
-            <header className={styles.heading}>
+        <section className={screenStyles.animatedPage}>
+            <header className={pageHeadingStyles.root}>
                 <div>
-                    <span className={styles.eyebrow}>PARENTS</span>
+                    <span className={pageHeadingStyles.eyebrow}>PARENTS</span>
                     <h1>학부모 관리</h1>
                     <p>가입이 완료된 학부모와 학생을 연결하고 관리합니다.</p>
                 </div>
@@ -48,22 +56,24 @@ export default function DirectorParentsScreen({
 
             <ParentStudentLinkForm parents={parents} students={students} />
 
-            <section className={styles.linkListPanel}>
+            <section className={cx(surfaceStyles.soft, styles.linkListPanel)}>
                 <header className={styles.listHeader}>
                     <div>
-                        <span className={styles.sectionLabel}>
+                        <span className={pageHeadingStyles.sectionLabel}>
                             ACTIVE CONNECTIONS
                         </span>
                         <h2>현재 가족 연결</h2>
-                        <p>학부모 계정과 연결된 학생을 확인하고 관리합니다.</p>
+                        <p className={typographyStyles.hint}>
+                            학부모 계정과 연결된 학생을 확인하고 관리합니다.
+                        </p>
                     </div>
-                    <span className={styles.linkCount}>
+                    <span className={cx(typographyStyles.muted, styles.linkCount)}>
                         {activeLinks.length} CONNECTIONS
                     </span>
                 </header>
 
                 {activeLinks.length === 0 ? (
-                    <div className={styles.empty}>
+                    <div className={cx(emptyStateStyles.compact, styles.empty)}>
                         <div className={styles.emptyIcon} aria-hidden="true">
                             ✓
                         </div>
@@ -107,7 +117,7 @@ export default function DirectorParentsScreen({
                                         {link.relationship ?? "보호자"}
                                     </span>
                                     <div>
-                                        <span>연결일</span>
+                                        <span className={typographyStyles.muted}>연결일</span>
                                         <time dateTime={link.linkedAt}>
                                             {formatLinkedAt(link.linkedAt)}
                                         </time>
@@ -141,7 +151,7 @@ function SummaryCard({
     description: string;
 }) {
     return (
-        <article className={styles.summaryCard}>
+        <article className={cx(surfaceStyles.soft, styles.summaryCard)}>
             <div
                 className={
                     kind === "parent"
@@ -153,9 +163,9 @@ function SummaryCard({
                 {kind === "parent" ? "P" : "S"}
             </div>
             <div className={styles.summaryContent}>
-                <span>{label}</span>
+                <span className={typographyStyles.muted}>{label}</span>
                 <strong>{value}명</strong>
-                <p>{description}</p>
+                <p className={typographyStyles.hint}>{description}</p>
             </div>
         </article>
     );
@@ -187,8 +197,10 @@ function Person({
             <div className={styles.personInfo}>
                 <span className={styles.personRole}>{role}</span>
                 <strong>{name}</strong>
-                <p>{primary}</p>
-                {secondary && <small>{secondary}</small>}
+                <p className={typographyStyles.hint}>{primary}</p>
+                {secondary && (
+                    <small className={typographyStyles.muted}>{secondary}</small>
+                )}
             </div>
         </div>
     );

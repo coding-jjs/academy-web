@@ -1,5 +1,13 @@
 import Link from "next/link";
 import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    pageHeadingStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
+import {
     DEV_LOGIN_ROLES,
     isDevLoginEnabled,
 } from "@/lib/dev-login";
@@ -32,9 +40,9 @@ export default async function LoginPage({
             </header>
 
             <section className={styles.loginArea}>
-                <div className={styles.loginCard}>
+                <div className={cx(surfaceStyles.root, styles.loginCard)}>
                     <div className={styles.intro}>
-                        <span className={styles.eyebrow}>A ACADEMY</span>
+                        <span className={pageHeadingStyles.eyebrow}>A ACADEMY</span>
                         <h1>A학원에 로그인</h1>
                         <p>
                             출결, 수업 일정, 학습 리포트를
@@ -44,7 +52,7 @@ export default async function LoginPage({
                     </div>
 
                     {params.error && (
-                        <p className={styles.error} role="alert">
+                        <p className={cx(typographyStyles.error, styles.error)} role="alert">
                             로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.
                         </p>
                     )}
@@ -73,9 +81,9 @@ export default async function LoginPage({
 
                                 {testUsers.length > 0 ? (
                                     <form action={signInAsTestUser}>
-                                        <label className={styles.devField}>
+                                        <label className={cx(fieldStyles.root, styles.devField)}>
                                             <span>테스트 계정</span>
-                                            <select name="email" required defaultValue="">
+                                            <select className={fieldStyles.select} name="email" required defaultValue="">
                                                 <option value="" disabled>
                                                     역할과 계정을 선택하세요
                                                 </option>
@@ -105,7 +113,7 @@ export default async function LoginPage({
                                         </label>
                                         <button
                                             type="submit"
-                                            className={styles.devLoginButton}
+                                            className={cx(buttonStyles.primaryLg, styles.devLoginButton)}
                                         >
                                             선택한 계정으로 로그인
                                         </button>
@@ -120,7 +128,7 @@ export default async function LoginPage({
                         </section>
                     )}
 
-                    <p className={styles.notice}>
+                    <p className={cx(typographyStyles.hint, styles.notice)}>
                         로그인하면 A학원의 서비스 이용약관과 개인정보 처리방침에
                         동의하게 됩니다.
                     </p>

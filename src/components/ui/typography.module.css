@@ -1,0 +1,21 @@
+.muted {
+    color: #86868b;
+}
+
+.hint {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 13px;
+}
+
+.success {
+    margin: 0;
+    color: #248a3d;
+    font-size: 13px;
+}
+
+.error {
+    margin: 0;
+    color: #c9342d;
+    font-size: 13px;
+}

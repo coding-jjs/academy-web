@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HOME_BANNERS } from "@/features/home/content";
 import type { Notice } from "@/features/notices/types";
+import { buttonStyles, cx, pageHeadingStyles, surfaceStyles, typographyStyles } from "@/components/ui/shared-styles";
 import styles from "../HomeScreen.module.css";
 
 export default function HomeShowcase({
@@ -54,7 +55,9 @@ export default function HomeShowcase({
                 {...pauseEvents}
             >
                 <div className={styles.noticeInner}>
-                    <strong className={styles.noticeLabel}>NOTICE</strong>
+                    <strong className={cx(pageHeadingStyles.sectionLabel, styles.noticeLabel)}>
+                        NOTICE
+                    </strong>
                     <Link
                         href="/notices"
                         className={styles.noticeContent}
@@ -64,13 +67,13 @@ export default function HomeShowcase({
                             <>
                                 <span>{activeNotice.audience}</span>
                                 <p>{activeNotice.title}</p>
-                                <time>{activeNotice.date}</time>
+                                <time className={typographyStyles.muted}>{activeNotice.date}</time>
                             </>
                         ) : (
                             <>
                                 <span>전체</span>
                                 <p>등록된 공지가 없습니다</p>
-                                <time>—</time>
+                                <time className={typographyStyles.muted}>—</time>
                             </>
                         )}
                     </Link>
@@ -83,7 +86,7 @@ export default function HomeShowcase({
                         >
                             ↑
                         </button>
-                        <span>
+                        <span className={typographyStyles.muted}>
                             {String(
                                 notices.length === 0 ? 0 : noticeIndex + 1,
                             ).padStart(2, "0")}{" "}
@@ -101,8 +104,8 @@ export default function HomeShowcase({
                 </div>
             </section>
             <section className={styles.hero} id="about" {...pauseEvents}>
-                <div className={styles.heroCopy}>
-                    <p className={styles.eyebrow}>LEARN · RECORD · GROW</p>
+                <div className={cx(surfaceStyles.root, styles.heroCopy)}>
+                    <p className={pageHeadingStyles.eyebrowBlock}>LEARN · RECORD · GROW</p>
                     <h1>
                         <span className={styles.heroLine}>
                             배움의 오늘을{" "}
@@ -113,14 +116,14 @@ export default function HomeShowcase({
                             <span className={styles.mobileLine}>만듭니다</span>
                         </span>
                     </h1>
-                    <p className={styles.heroDescription}>
+                    <p className={cx(typographyStyles.hint, styles.heroDescription)}>
                         A학원은 수업만 제공하지 않습니다. 학생의 과정과 변화를
                         세심하게 기록하고, 가정과 함께 다음 걸음을 설계합니다.
                     </p>
                     <div className={styles.heroActions}>
                         <Link
                             href="/guest/inquiry"
-                            className={styles.primaryButton}
+                            className={cx(buttonStyles.cta, styles.heroCta)}
                         >
                             상담 신청하기 <span aria-hidden="true">→</span>
                         </Link>
@@ -128,7 +131,7 @@ export default function HomeShowcase({
                             학부모 · 학생 로그인
                         </Link>
                     </div>
-                    <div className={styles.heroSummary}>
+                    <div className={cx(typographyStyles.muted, styles.heroSummary)}>
                         <span>수업</span>
                         <i aria-hidden="true" />
                         <span>기록</span>
@@ -138,7 +141,7 @@ export default function HomeShowcase({
                         <span>성장</span>
                     </div>
                 </div>
-                <div className={`${styles.visual} ${styles[activeBanner.tone]}`}>
+                <div className={cx(surfaceStyles.root, styles.visual, styles[activeBanner.tone])}>
                     {HOME_BANNERS.map((banner, index) => (
                         <Image
                             key={banner.src}
