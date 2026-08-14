@@ -2,6 +2,15 @@
 
 import { useMemo, useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
+import {
+    buttonStyles,
+    cx,
+    emptyStateStyles,
+    fieldStyles,
+    pageHeadingStyles,
+    screenStyles,
+    surfaceStyles,
+} from "@/components/ui/shared-styles";
 import type {
     StaffClassOption,
     StaffStudentRow,
@@ -63,8 +72,8 @@ export default function StaffStudentsScreen({
     }
 
     return (
-        <section className={styles.page}>
-            <header className={styles.heading}>
+        <section className={screenStyles.animatedPage}>
+            <header className={pageHeadingStyles.root}>
                 <div>
                     <span>MY STUDENTS</span>
                     <h1>학생 관리</h1>
@@ -72,7 +81,7 @@ export default function StaffStudentsScreen({
                 </div>
                 <button
                     type="button"
-                    className={styles.primaryBtn}
+                    className={buttonStyles.primary}
                     disabled={!selectedStudent}
                     onClick={() =>
                         setShowLearningRecordForm((isVisible) => !isVisible)
@@ -83,7 +92,7 @@ export default function StaffStudentsScreen({
             </header>
 
             <div className={styles.filters}>
-                <label className={styles.field}>
+                <label className={cx(fieldStyles.root, styles.field)}>
                     <span>학생 검색</span>
                     <input
                         type="search"
@@ -92,7 +101,7 @@ export default function StaffStudentsScreen({
                         onChange={(event) => setSearchQuery(event.target.value)}
                     />
                 </label>
-                <label className={styles.field}>
+                <label className={cx(fieldStyles.root, styles.field)}>
                     <span>반</span>
                     <select
                         value={selectedClassId}
@@ -115,7 +124,7 @@ export default function StaffStudentsScreen({
             </div>
 
             {students.length === 0 ? (
-                <div className={styles.empty}>
+                <div className={cx(surfaceStyles.root, emptyStateStyles.root, styles.empty)}>
                     <h2>담당 학생이 없습니다</h2>
                     <p>반 배정이 되면 이곳에 학생이 표시됩니다.</p>
                 </div>

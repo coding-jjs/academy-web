@@ -1,111 +1,66 @@
-.page {
-    animation: screen-enter 360ms cubic-bezier(.22, 1, .36, 1) both;
-  }
-  
-  .heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
+.heading {
     gap: 16px;
     margin-bottom: 18px;
-  }
-  
-  .heading > div > span {
-    color: #0066cc;
-    font-size: 11px;
-    font-weight: 750;
-    letter-spacing: .12em;
-  }
-  
-  .heading h1 {
-    margin: 8px 0;
-    font-family: "SF Pro Display", system-ui, sans-serif;
-    font-size: clamp(31px, 5vw, 42px);
-    line-height: 1.08;
-    letter-spacing: -.045em;
-  }
-  
-  .heading p {
-    margin: 0;
-    color: #6e6e73;
-    font-size: 15px;
-  }
-  
-  .filters {
+}
+
+.filters {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
     align-items: end;
     margin-bottom: 16px;
-  }
-  
-  .field {
-    display: grid;
+}
+
+.field {
     gap: 6px;
     min-width: 180px;
-    font-size: 12px;
-    font-weight: 650;
-  }
-  
-  .field input,
-  .field select,
-  .field textarea {
+}
+
+.field input,
+.field select,
+.field textarea {
     min-height: 40px;
-    padding: 0 12px;
-    border: 1px solid #d2d2d7;
-    border-radius: 12px;
-    background: #fff;
-    font: inherit;
+    border-color: #d2d2d7;
+    box-shadow: none;
     font-weight: 500;
-  }
-  
-  .field textarea {
+}
+
+.field textarea {
     padding: 12px;
-    resize: vertical;
-  }
-  
-  .layout {
+}
+
+.layout {
     display: grid;
-    grid-template-columns: minmax(240px, .85fr) minmax(0, 1.35fr);
+    grid-template-columns: minmax(240px, 0.85fr) minmax(0, 1.35fr);
     gap: 18px;
     align-items: start;
-  }
-  
-  .empty,
-  .listPanel,
-  .panel {
-    border: 1px solid rgb(0 0 0 / 7%);
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 9px 30px rgb(0 0 0 / 5%);
-  }
-  
-  .empty {
-    padding: 28px 24px;
-    text-align: center;
-  }
-  
-  .listPanel {
+}
+
+.listPanel {
     padding: 10px;
     max-height: 75vh;
     overflow: auto;
-  }
-  
-  .detail {
+}
+
+.empty {
+    padding: 28px 24px;
+}
+
+.detail {
     display: grid;
     gap: 14px;
-  }
-  
-  .list,
-  .metaList,
-  .simpleList {
+}
+
+.list,
+.metaList,
+.simpleList {
     margin: 0;
     padding: 0;
     list-style: none;
-  }
-  
-  .item,
-  .itemActive {
+}
+
+.item,
+.itemActive {
     width: 100%;
     padding: 12px;
     border: 0;
@@ -113,38 +68,37 @@
     background: transparent;
     text-align: left;
     cursor: pointer;
-  }
-  
-  .item:hover {
+}
+
+.item:hover {
     background: #f5f5f7;
-  }
-  
-  .itemActive {
+}
+
+.itemActive {
     background: #eef5ff;
-  }
-  
-  .item strong,
-  .itemActive strong {
+}
+
+.item strong,
+.itemActive strong {
     display: block;
     margin-bottom: 4px;
     font-size: 14px;
-  }
-  
-  .item span,
-  .itemActive span,
-  .muted {
+}
+
+.item span,
+.itemActive span {
     color: #6e6e73;
     font-size: 12px;
-  }
+}
 
-  .classChips {
+.classChips {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
-  }
+}
 
-  .item .classChips span,
-  .itemActive .classChips span {
+.item .classChips span,
+.itemActive .classChips span {
     display: inline-flex;
     min-height: 24px;
     align-items: center;
@@ -154,145 +108,85 @@
     background: #f2f2f7;
     font-size: 11px;
     font-weight: 650;
-  }
+}
 
-  .itemActive .classChips span {
+.itemActive .classChips span {
     color: #0058b0;
     background: #dcecff;
-  }
+}
 
-  .studentGrade {
+.studentGrade {
     display: block;
     margin-top: 6px;
-  }
-  
-  .itemMeta {
+}
+
+.itemMeta {
     display: flex;
     gap: 6px;
     margin-top: 8px;
-  }
-  
-  .panel {
+}
+
+.panel {
     padding: 20px;
-  }
-  
-  .panelHead {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-  
-  .panelHead h2 {
-    margin: 0 0 4px;
-    font-size: 18px;
-  }
-  
-  .panelHead p {
-    margin: 0;
-    color: #6e6e73;
-    font-size: 13px;
-  }
-  
-  .metaList li,
-  .simpleList li {
+}
+
+.metaList li,
+.simpleList li {
     display: grid;
     gap: 4px;
     padding: 10px 0;
     border-top: 1px solid #ededf0;
-  }
-  
-  .metaList li {
+}
+
+.metaList li {
     grid-template-columns: 72px 1fr;
-  }
-  
-  .metaList li:first-child,
-  .simpleList li:first-child {
+}
+
+.metaList li:first-child,
+.simpleList li:first-child {
     border-top: 0;
     padding-top: 0;
-  }
-  
-  .simpleList strong {
+}
+
+.simpleList strong {
     font-size: 13px;
-  }
-  
-  .simpleList span,
-  .simpleList p {
+}
+
+.simpleList span,
+.simpleList p {
     color: #6e6e73;
     font-size: 12px;
-  }
-  
-  .simpleList p {
+}
+
+.simpleList p {
     margin: 4px 0 0;
     white-space: pre-wrap;
-  }
-  
-  .grid {
+}
+
+.grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px;
-  }
-  
-  .form {
-    display: grid;
+}
+
+.form {
     gap: 12px;
-  }
-  
-  .primaryBtn {
-    min-height: 42px;
-    padding: 0 16px;
-    border: 0;
-    border-radius: 12px;
-    color: #fff;
-    background: #0071e3;
-    font-size: 13px;
-    font-weight: 650;
-    cursor: pointer;
-  }
-  
-  .primaryBtn:disabled {
-    opacity: .55;
-    cursor: not-allowed;
-  }
-  
-  .success {
-    margin: 0;
-    color: #248a3d;
-    font-size: 13px;
-  }
-  
-  .error {
-    margin: 0;
-    color: #c9342d;
-    font-size: 13px;
-  }
-  
-  @keyframes screen-enter {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @media (max-width: 900px) {
+}
+
+@media (max-width: 900px) {
     .layout,
     .grid {
-      grid-template-columns: 1fr;
+        grid-template-columns: 1fr;
     }
-  
+
     .listPanel {
-      max-height: 280px;
+        max-height: 280px;
     }
-  }
-  
-  @media (max-width: 800px) {
-    .heading {
-      align-items: start;
-      flex-direction: column;
+}
+
+@media (max-width: 800px) {
+    .headingStack {
+        align-items: start;
+        flex-direction: column;
     }
-  }
+}

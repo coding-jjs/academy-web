@@ -1,5 +1,12 @@
 import Link from "next/link";
 import StatusChip from "@/components/ui/StatusChip";
+import {
+    buttonStyles,
+    cx,
+    emptyStateStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import type { DirectorStudent } from "@/features/students/types";
 import {
     STUDENT_STATUS_METADATA,
@@ -24,7 +31,7 @@ export default function DirectorStudentTable({
 }) {
     if (students.length === 0) {
         return (
-            <div className={styles.emptyPanel}>
+            <div className={cx(surfaceStyles.root, emptyStateStyles.root)}>
                 <h2>
                     {totalStudentCount === 0
                         ? "등록된 학생이 없습니다"
@@ -83,7 +90,7 @@ export default function DirectorStudentTable({
                                 </td>
                                 <td>
                                     {student.classes.length === 0 ? (
-                                        <span className={styles.muted}>
+                                        <span className={typographyStyles.muted}>
                                             반 미배정
                                         </span>
                                     ) : (
@@ -131,10 +138,12 @@ export default function DirectorStudentTable({
                                 <td>
                                     <button
                                         type="button"
-                                        className={styles.actionBtn}
-                                        data-active={
-                                            isActive && panelMode === "class"
-                                        }
+                                        className={cx(
+                                            buttonStyles.action,
+                                            isActive &&
+                                                panelMode === "class" &&
+                                                styles.actionActive,
+                                        )}
                                         onClick={() =>
                                             onSelectClass(student.id)
                                         }
@@ -145,11 +154,12 @@ export default function DirectorStudentTable({
                                 <td>
                                     <button
                                         type="button"
-                                        className={styles.actionBtn}
-                                        data-active={
+                                        className={cx(
+                                            buttonStyles.action,
                                             isActive &&
-                                            panelMode === "counseling"
-                                        }
+                                                panelMode === "counseling" &&
+                                                styles.actionActive,
+                                        )}
                                         onClick={() =>
                                             onSelectCounseling(student.id)
                                         }

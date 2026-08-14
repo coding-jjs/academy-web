@@ -1,0 +1,32 @@
+.root {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #ededf0;
+}
+
+.root::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgb(255 255 255 / 70%),
+        transparent
+    );
+    transform: translateX(-100%);
+    animation: skeleton-shimmer 1.35s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .root::after {
+        animation: none;
+    }
+}
+
+@keyframes skeleton-shimmer {
+    to {
+        transform: translateX(100%);
+    }
+}

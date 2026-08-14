@@ -9,6 +9,13 @@ import type {
     StudentStatus,
 } from "@/features/students/types";
 import { STUDENT_STATUS_METADATA } from "@/features/students/presentation";
+import {
+    cx,
+    fieldStyles,
+    pageHeadingStyles,
+    screenStyles,
+    surfaceStyles,
+} from "@/components/ui/shared-styles";
 import DirectorStudentCounseling from "./components/DirectorStudentCounseling";
 import DirectorStudentDetail from "./components/DirectorStudentDetail";
 import DirectorStudentTable from "./components/DirectorStudentTable";
@@ -116,8 +123,8 @@ export default function DirectorStudentsScreen({
     }
 
     return (
-        <section className={styles.page}>
-            <header className={styles.heading}>
+        <section className={screenStyles.animatedPage}>
+            <header className={pageHeadingStyles.root}>
                 <div>
                     <span>STUDENTS</span>
                     <h1>학생 관리</h1>
@@ -130,7 +137,10 @@ export default function DirectorStudentsScreen({
 
             <div className={styles.metrics}>
                 {metrics.map((metric) => (
-                    <article key={metric.label}>
+                    <article
+                        key={metric.label}
+                        className={surfaceStyles.root}
+                    >
                         <span>{metric.label}</span>
                         <strong>{metric.value}</strong>
                         <p>{metric.detail}</p>
@@ -139,9 +149,9 @@ export default function DirectorStudentsScreen({
             </div>
 
             <div className={styles.layout} data-open={Boolean(selectedStudent)}>
-                <div className={styles.tablePanel}>
+                <div className={cx(surfaceStyles.root, styles.tablePanel)}>
                     <div className={styles.filters}>
-                        <label className={styles.field}>
+                        <label className={fieldStyles.root}>
                             학생 검색
                             <input
                                 type="search"
@@ -152,7 +162,7 @@ export default function DirectorStudentsScreen({
                                 }
                             />
                         </label>
-                        <label className={styles.field}>
+                        <label className={fieldStyles.root}>
                             상태
                             <select
                                 value={statusFilter}
@@ -170,7 +180,7 @@ export default function DirectorStudentsScreen({
                                 <option value="WITHDRAWN">퇴원</option>
                             </select>
                         </label>
-                        <label className={styles.field}>
+                        <label className={fieldStyles.root}>
                             반
                             <select
                                 value={classFilter}

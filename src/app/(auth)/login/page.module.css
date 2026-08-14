@@ -53,12 +53,7 @@
 .loginCard {
   width: min(100%, 440px);
   padding: 52px 44px 40px;
-  border: 1px solid rgb(0 0 0 / 8%);
   border-radius: 28px;
-  background: rgb(255 255 255 / 92%);
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 4%),
-    0 18px 48px rgb(0 0 0 / 8%);
   text-align: center;
   backdrop-filter: blur(20px);
   animation: card-enter 520ms 80ms cubic-bezier(.22, 1, .36, 1) both;
@@ -66,13 +61,6 @@
 
 .intro {
   margin-bottom: 32px;
-}
-
-.eyebrow {
-  color: #0066cc;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .12em;
 }
 
 .intro h1 {
@@ -195,44 +183,23 @@
 }
 
 .devField {
-  display: grid;
   gap: 6px;
-  color: #515154;
   font-size: 11px;
-  font-weight: 650;
 }
 
 .devField select {
-  width: 100%;
   min-height: 42px;
-  padding: 0 11px;
-  border: 1px solid #b9d4f7;
+  border-color: #b9d4f7;
   border-radius: 11px;
-  color: #1d1d1f;
-  background: #fff;
-  font: inherit;
-  font-weight: 500;
+  box-shadow: none;
 }
 
 .devLoginButton {
   width: 100%;
   min-height: 42px;
   margin-top: 10px;
-  border: 0;
   border-radius: 11px;
-  color: #fff;
-  background: #0071e3;
   font-size: 13px;
-  font-weight: 650;
-  cursor: pointer;
-}
-
-.devLoginButton:hover {
-  background: #0068d1;
-}
-
-.devLoginButton:active {
-  transform: scale(.98);
 }
 
 .devLoginButton:focus-visible,
@@ -250,18 +217,16 @@
   margin: 0 0 16px;
   padding: 12px 14px;
   border-radius: 12px;
-  color: #b42318;
   background: #fef3f2;
-  font-size: 13px;
   line-height: 1.45;
   animation: message-enter 260ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
 .notice {
   margin: 22px 0 0;
-  color: #86868b;
   font-size: 12px;
   line-height: 1.5;
+  text-align: center;
 }
 
 .backLink {

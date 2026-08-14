@@ -1,0 +1,34 @@
+.root {
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.root h2,
+.root h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+}
+
+.root p {
+    margin: 0 0 16px;
+    color: #6e6e73;
+}
+
+.compact {
+    padding: 28px 24px;
+    text-align: center;
+}
+
+.compact h3 {
+    margin: 0 0 8px;
+    font-size: 17px;
+    letter-spacing: -0.02em;
+}
+
+.compact p {
+    max-width: 360px;
+    margin: 0 auto;
+    color: #6e6e73;
+    font-size: 12px;
+    line-height: 1.55;
+}

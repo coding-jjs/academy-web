@@ -20,6 +20,18 @@ import {
     filterNoticesByTitle,
     type Notice,
 } from "@/features/notices/types";
+import {
+    a11yStyles,
+    buttonStyles,
+    cx,
+    dialogStyles,
+    emptyStateStyles,
+    fieldStyles,
+    pageHeadingStyles,
+    screenStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import styles from "./NoticesScreen.module.css";
 
 const URL_REGEX =
@@ -323,7 +335,7 @@ export default function NoticesScreen({
     }
 
     return (
-        <main className={styles.page}>
+        <main className={cx(styles.page, screenStyles.animatedPage)}>
             <header className={styles.topBar}>
                 <Link href="/" className={styles.brand} aria-label="A학원 홈">
                     <span className={styles.brandMark}>A</span>
@@ -335,18 +347,19 @@ export default function NoticesScreen({
             </header>
 
             <section className={styles.content}>
-                <header className={styles.heading}>
+                <header className={cx(pageHeadingStyles.root, styles.heading)}>
                     <div>
-                        <span>NOTICE</span>
+                        <span className={pageHeadingStyles.eyebrow}>NOTICE</span>
                         <h1>공지사항</h1>
                         <p>학원의 주요 안내와 일정을 확인합니다.</p>
                     </div>
                     <div className={styles.headingActions}>
-                        <label className={styles.searchField}>
-                            <span className={styles.searchLabel}>
+                        <label className={cx(fieldStyles.root, styles.searchField)}>
+                            <span className={a11yStyles.srOnly}>
                                 제목 검색
                             </span>
                             <input
+                                className={cx(fieldStyles.control, styles.searchInput)}
                                 type="search"
                                 value={searchQuery}
                                 onChange={(event) =>
@@ -359,7 +372,7 @@ export default function NoticesScreen({
                         {canWrite ? (
                             <button
                                 type="button"
-                                className={styles.writeBtn}
+                                className={cx(buttonStyles.primary, styles.writeBtn)}
                                 onClick={openCompose}
                             >
                                 작성
@@ -369,7 +382,7 @@ export default function NoticesScreen({
                 </header>
 
                 {notices.length === 0 ? (
-                    <div className={styles.empty}>
+                    <div className={cx(surfaceStyles.root, emptyStateStyles.root, styles.empty)}>
                         <h2>등록된 공지가 없습니다</h2>
                         <p>
                             {canWrite
@@ -378,7 +391,7 @@ export default function NoticesScreen({
                         </p>
                     </div>
                 ) : filteredNotices.length === 0 ? (
-                    <div className={styles.empty}>
+                    <div className={cx(surfaceStyles.root, emptyStateStyles.root, styles.empty)}>
                         <h2>검색 결과가 없습니다</h2>
                         <p>다른 제목으로 다시 검색해 주세요.</p>
                     </div>
@@ -389,14 +402,16 @@ export default function NoticesScreen({
                                 <li key={notice.id}>
                                     <button
                                         type="button"
-                                        className={styles.card}
+                                        className={cx(surfaceStyles.root, styles.card)}
                                         onClick={() => openNotice(notice)}
                                     >
                                         <div className={styles.cardTop}>
                                             <span className={styles.audience}>
                                                 {notice.audience}
                                             </span>
-                                            <time>{notice.date}</time>
+                                            <time className={typographyStyles.muted}>
+                                                {notice.date}
+                                            </time>
                                         </div>
                                         <h2>{notice.title}</h2>
                                     </button>
@@ -410,13 +425,13 @@ export default function NoticesScreen({
                             aria-live="polite"
                         >
                             {hasMore ? (
-                                <p>
+                                <p className={typographyStyles.muted}>
                                     {isLoadingMore
                                         ? "공지를 불러오는 중…"
                                         : "아래로 스크롤하면 더 불러옵니다"}
                                 </p>
                             ) : (
-                                <p>
+                                <p className={typographyStyles.muted}>
                                     전체 {filteredNotices.length}건을 모두
                                     확인했습니다
                                 </p>
@@ -428,20 +443,22 @@ export default function NoticesScreen({
 
             <dialog
                 ref={detailDialogRef}
-                className={styles.dialog}
+                className={dialogStyles.overlayWide}
                 aria-labelledby="notice-dialog-title"
                 onClose={resetDetailState}
                 onClick={handleDialogClick}
             >
                 {selected ? (
-                    <section className={styles.dialogCard}>
-                        <header className={styles.dialogHeader}>
+                    <section className={dialogStyles.card}>
+                        <header className={dialogStyles.headerSimple}>
                             <div className={styles.dialogHeading}>
                                 <div className={styles.dialogMeta}>
                                     <span className={styles.audience}>
                                         {selected.audience}
                                     </span>
-                                    <time>{selected.date}</time>
+                                    <time className={typographyStyles.muted}>
+                                        {selected.date}
+                                    </time>
                                 </div>
                                 {!isEditing ? (
                                     <h2 id="notice-dialog-title">
@@ -453,7 +470,7 @@ export default function NoticesScreen({
                             </div>
                             <button
                                 type="button"
-                                className={styles.dialogClose}
+                                className={dialogStyles.close}
                                 onClick={closeNotice}
                                 disabled={isSubmitting}
                                 aria-label="공지 닫기"
@@ -464,10 +481,10 @@ export default function NoticesScreen({
 
                         {isEditing ? (
                             <form
-                                className={styles.composeForm}
+                                className={cx(fieldStyles.form, styles.composeForm)}
                                 onSubmit={handleUpdateSubmit}
                             >
-                                <label className={styles.composeField}>
+                                <label className={fieldStyles.root}>
                                     제목
                                     <input
                                         type="text"
@@ -481,7 +498,7 @@ export default function NoticesScreen({
                                     />
                                 </label>
 
-                                <label className={styles.composeField}>
+                                <label className={fieldStyles.root}>
                                     본문
                                     <textarea
                                         value={draftBody}
@@ -494,7 +511,7 @@ export default function NoticesScreen({
                                     />
                                 </label>
 
-                                <label className={styles.composeField}>
+                                <label className={cx(fieldStyles.root, styles.fileField)}>
                                     이미지 (선택)
                                     <input
                                         type="file"
@@ -517,7 +534,10 @@ export default function NoticesScreen({
                                         />
                                         <button
                                             type="button"
-                                            className={styles.imagePreviewAction}
+                                            className={cx(
+                                                buttonStyles.cancelMuted,
+                                                styles.imagePreviewAction,
+                                            )}
                                             onClick={clearDraftImage}
                                             disabled={isSubmitting}
                                         >
@@ -537,7 +557,10 @@ export default function NoticesScreen({
                                         />
                                         <button
                                             type="button"
-                                            className={styles.imagePreviewAction}
+                                            className={cx(
+                                                buttonStyles.cancelMuted,
+                                                styles.imagePreviewAction,
+                                            )}
                                             onClick={() =>
                                                 setRemoveExistingImage(true)
                                             }
@@ -549,14 +572,14 @@ export default function NoticesScreen({
                                 ) : null}
 
                                 {removeExistingImage && !draftPreviewUrl ? (
-                                    <p className={styles.composeHint}>
+                                    <p className={typographyStyles.hint}>
                                         저장 시 기존 이미지가 삭제됩니다.
                                     </p>
                                 ) : null}
 
                                 {detailError ? (
                                     <p
-                                        className={styles.composeError}
+                                        className={typographyStyles.error}
                                         role="alert"
                                     >
                                         {detailError}
@@ -566,7 +589,7 @@ export default function NoticesScreen({
                                 <footer className={styles.composeActions}>
                                     <button
                                         type="button"
-                                        className={styles.composeCancel}
+                                        className={buttonStyles.cancelMuted}
                                         onClick={cancelEditing}
                                         disabled={isSubmitting}
                                     >
@@ -574,7 +597,7 @@ export default function NoticesScreen({
                                     </button>
                                     <button
                                         type="submit"
-                                        className={styles.composeSubmit}
+                                        className={buttonStyles.primary}
                                         disabled={isSubmitting}
                                     >
                                         {isSubmitting ? "저장 중…" : "저장"}
@@ -611,7 +634,7 @@ export default function NoticesScreen({
 
                                 {detailError ? (
                                     <p
-                                        className={styles.detailError}
+                                        className={cx(typographyStyles.error, styles.detailError)}
                                         role="alert"
                                     >
                                         {detailError}
@@ -622,7 +645,7 @@ export default function NoticesScreen({
                                     <footer className={styles.detailActions}>
                                         <button
                                             type="button"
-                                            className={styles.deleteBtn}
+                                            className={cx(buttonStyles.danger, styles.deleteBtn)}
                                             onClick={handleDelete}
                                             disabled={isSubmitting}
                                         >
@@ -630,7 +653,7 @@ export default function NoticesScreen({
                                         </button>
                                         <button
                                             type="button"
-                                            className={styles.editBtn}
+                                            className={buttonStyles.primary}
                                             onClick={startEditing}
                                             disabled={isSubmitting}
                                         >
@@ -647,22 +670,22 @@ export default function NoticesScreen({
             {canWrite ? (
                 <dialog
                     ref={composeDialogRef}
-                    className={styles.dialog}
+                    className={dialogStyles.overlayWide}
                     aria-labelledby="notice-compose-title"
                     onClose={resetComposeForm}
                     onClick={handleDialogClick}
                 >
-                    <section className={styles.dialogCard}>
-                        <header className={styles.dialogHeader}>
+                    <section className={dialogStyles.card}>
+                        <header className={dialogStyles.headerSimple}>
                             <div className={styles.dialogHeading}>
-                                <span className={styles.composeEyebrow}>
+                                <span className={pageHeadingStyles.eyebrow}>
                                     WRITE NOTICE
                                 </span>
                                 <h2 id="notice-compose-title">공지 작성</h2>
                             </div>
                             <button
                                 type="button"
-                                className={styles.dialogClose}
+                                className={dialogStyles.close}
                                 onClick={closeCompose}
                                 disabled={isSubmitting}
                                 aria-label="작성 창 닫기"
@@ -672,10 +695,10 @@ export default function NoticesScreen({
                         </header>
 
                         <form
-                            className={styles.composeForm}
+                            className={cx(fieldStyles.form, styles.composeForm)}
                             onSubmit={handleComposeSubmit}
                         >
-                            <label className={styles.composeField}>
+                            <label className={fieldStyles.root}>
                                 제목
                                 <input
                                     type="text"
@@ -689,7 +712,7 @@ export default function NoticesScreen({
                                 />
                             </label>
 
-                            <label className={styles.composeField}>
+                            <label className={fieldStyles.root}>
                                 본문
                                 <textarea
                                     value={draftBody}
@@ -702,7 +725,7 @@ export default function NoticesScreen({
                                 />
                             </label>
 
-                            <label className={styles.composeField}>
+                            <label className={cx(fieldStyles.root, styles.fileField)}>
                                 이미지 (선택)
                                 <input
                                     type="file"
@@ -725,7 +748,10 @@ export default function NoticesScreen({
                                     />
                                     <button
                                         type="button"
-                                        className={styles.imagePreviewAction}
+                                        className={cx(
+                                            buttonStyles.cancelMuted,
+                                            styles.imagePreviewAction,
+                                        )}
                                         onClick={clearDraftImage}
                                         disabled={isSubmitting}
                                     >
@@ -735,7 +761,7 @@ export default function NoticesScreen({
                             ) : null}
 
                             {composeError ? (
-                                <p className={styles.composeError} role="alert">
+                                <p className={typographyStyles.error} role="alert">
                                     {composeError}
                                 </p>
                             ) : null}
@@ -743,7 +769,7 @@ export default function NoticesScreen({
                             <footer className={styles.composeActions}>
                                 <button
                                     type="button"
-                                    className={styles.composeCancel}
+                                    className={buttonStyles.cancelMuted}
                                     onClick={closeCompose}
                                     disabled={isSubmitting}
                                 >
@@ -751,7 +777,7 @@ export default function NoticesScreen({
                                 </button>
                                 <button
                                     type="submit"
-                                    className={styles.composeSubmit}
+                                    className={buttonStyles.primary}
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? "등록 중…" : "등록"}

@@ -12,6 +12,17 @@ import {
     approveAndSendReport,
     rejectReport,
 } from "@/features/reports/director-actions";
+import {
+    buttonStyles,
+    cx,
+    emptyStateStyles,
+    fieldStyles,
+    pageHeadingStyles,
+    panelStyles,
+    screenStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import DirectorReportDetail from "./components/DirectorReportDetail";
 import DirectorReportStudentTable from "./components/DirectorReportStudentTable";
 import styles from "./DirectorReportsScreen.module.css";
@@ -57,10 +68,10 @@ export default function DirectorReportsScreen({ students }: { students: Director
     }
 
     return (
-        <section className={styles.page}>
-            <header className={styles.heading}><div><span>AI REPORT</span><h1>리포트 승인</h1><p>역할이 학생인 사용자를 기준으로 리포트 상태를 확인합니다.</p></div></header>
-            <div className={styles.metrics}>{statistics.map((item) => <article key={item.label}><StatusChip tone={item.tone}>{item.label}</StatusChip><strong>{item.value}</strong><p>{item.detail}</p></article>)}</div>
-            {students.length === 0 ? <div className={styles.emptyPanel}><h2>표시할 학생이 없습니다</h2><p>가입 사용자에서 역할을 학생으로 부여하면 이곳에 나타납니다.</p></div> : (
+        <section className={screenStyles.animatedPage}>
+            <header className={pageHeadingStyles.root}><div><span className={pageHeadingStyles.eyebrow}>AI REPORT</span><h1>리포트 승인</h1><p>역할이 학생인 사용자를 기준으로 리포트 상태를 확인합니다.</p></div></header>
+            <div className={styles.metrics}>{statistics.map((item) => <article key={item.label} className={surfaceStyles.root}><StatusChip tone={item.tone}>{item.label}</StatusChip><strong>{item.value}</strong><p>{item.detail}</p></article>)}</div>
+            {students.length === 0 ? <div className={cx(surfaceStyles.root, emptyStateStyles.root)}><h2>표시할 학생이 없습니다</h2><p>가입 사용자에서 역할을 학생으로 부여하면 이곳에 나타납니다.</p></div> : (
                 <div className={styles.layout}>
                     <DirectorReportStudentTable students={students} activeStudentId={activeStudentId} onSelect={selectStudent} />
                     <DirectorReportDetail student={activeStudent} status={activeStatus} rejectionReason={rejectionReason} feedback={feedback} isPending={isPending} onRejectionReasonChange={setRejectionReason} onReject={rejectActiveReport} onApprove={approveReport} />

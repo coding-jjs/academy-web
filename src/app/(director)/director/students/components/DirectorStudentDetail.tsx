@@ -3,6 +3,14 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
+import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    panelStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import type {
     DirectorClassOption,
     DirectorStudent,
@@ -93,8 +101,8 @@ export default function DirectorStudentDetail({
     }
 
     return (
-        <aside className={styles.detailPanel}>
-            <div className={styles.panelHead}>
+        <aside className={cx(surfaceStyles.root, styles.detailPanel)}>
+            <div className={panelStyles.head}>
                 <div>
                     <h2>{student.name}</h2>
                     <p>
@@ -107,7 +115,7 @@ export default function DirectorStudentDetail({
                 </div>
                 <button
                     type="button"
-                    className={styles.secondaryBtn}
+                    className={buttonStyles.secondary}
                     onClick={onClose}
                 >
                     닫기
@@ -153,7 +161,7 @@ export default function DirectorStudentDetail({
             />
             <RecentEnrollmentChanges student={student} />
 
-            {feedback && <p className={styles.hint}>{feedback}</p>}
+            {feedback && <p className={typographyStyles.hint}>{feedback}</p>}
         </aside>
     );
 }
@@ -189,7 +197,7 @@ function StudentStatusEditor({
                     <option value="WITHDRAWN">퇴원</option>
                 </select>
             </div>
-            <p className={styles.muted}>
+            <p className={typographyStyles.muted}>
                 휴원·퇴원 학생은 청구·성적 등 재원 목록에서 제외됩니다. 퇴원은
                 수강도 해제합니다.
             </p>
@@ -210,7 +218,7 @@ function CurrentEnrollments({
         <section className={styles.block}>
             <h3>현재 수강</h3>
             {student.classes.length === 0 ? (
-                <p className={styles.muted}>배정된 반이 없습니다.</p>
+                <p className={typographyStyles.muted}>배정된 반이 없습니다.</p>
             ) : (
                 <ul className={styles.enrollmentList}>
                     {student.classes.map((enrollment) => (
@@ -224,7 +232,7 @@ function CurrentEnrollments({
                             </div>
                             <button
                                 type="button"
-                                className={styles.dangerBtn}
+                                className={buttonStyles.danger}
                                 disabled={isSaving}
                                 onClick={() =>
                                     onEnd(
@@ -262,12 +270,13 @@ function AddEnrollment({
         <section className={styles.block}>
             <h3>반 추가</h3>
             {!hasClasses ? (
-                <p className={styles.muted}>등록된 활성 반이 없습니다.</p>
+                <p className={typographyStyles.muted}>등록된 활성 반이 없습니다.</p>
             ) : classes.length === 0 ? (
-                <p className={styles.muted}>추가할 수 있는 반이 없습니다.</p>
+                <p className={typographyStyles.muted}>추가할 수 있는 반이 없습니다.</p>
             ) : (
                 <div className={styles.addRow}>
                     <select
+                        className={cx(fieldStyles.control, fieldStyles.select)}
                         value={selectedClassId}
                         onChange={(event) => onClassChange(event.target.value)}
                         disabled={isSaving}
@@ -287,7 +296,7 @@ function AddEnrollment({
                     </select>
                     <button
                         type="button"
-                        className={styles.actionBtn}
+                        className={buttonStyles.action}
                         disabled={isSaving || !selectedClassId}
                         onClick={onAdd}
                     >
@@ -304,7 +313,7 @@ function RecentEnrollmentChanges({ student }: { student: DirectorStudent }) {
         <section className={styles.block}>
             <h3>최근 변경</h3>
             {student.recentChanges.length === 0 ? (
-                <p className={styles.muted}>최근 해제 이력이 없습니다.</p>
+                <p className={typographyStyles.muted}>최근 해제 이력이 없습니다.</p>
             ) : (
                 <ul className={styles.historyList}>
                     {student.recentChanges.map((change) => (

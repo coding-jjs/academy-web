@@ -48,8 +48,8 @@ export const roleNavigation: Record<RolePrefix, NavItem[]> = {
         { href: "/student/inbox", label: "쪽지", icon: "□" },
     ],
     guest: [
-        { href: "/guest/waiting", label: "학원 소개", icon: "⌂" },
-        { href: "/", label: "프로그램", icon: "✦" },
+        { href: "/", label: "학원 소개", icon: "⌂" },
+        { href: "/#programs", label: "프로그램", icon: "✦" },
         { href: "/guest/inquiry", label: "상담 문의", icon: "◎" },
     ],
 };

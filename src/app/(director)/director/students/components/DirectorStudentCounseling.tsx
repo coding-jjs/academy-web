@@ -4,6 +4,14 @@ import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
 import {
+    buttonStyles,
+    cx,
+    fieldStyles,
+    panelStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
+import {
     createDirectorCounselingMemo,
     type CounselingActionState,
 } from "@/features/counseling/actions";
@@ -43,8 +51,8 @@ export default function DirectorStudentCounseling({
     const maxCounseledAt = getCurrentLocalDateTimeInput();
 
     return (
-        <aside className={styles.detailPanel}>
-            <div className={styles.panelHead}>
+        <aside className={cx(surfaceStyles.root, styles.detailPanel)}>
+            <div className={panelStyles.head}>
                 <div>
                     <h2>{student.name}</h2>
                     <p>
@@ -57,7 +65,7 @@ export default function DirectorStudentCounseling({
                 </div>
                 <button
                     type="button"
-                    className={styles.secondaryBtn}
+                    className={buttonStyles.secondary}
                     onClick={onClose}
                 >
                     닫기
@@ -66,9 +74,9 @@ export default function DirectorStudentCounseling({
 
             <section className={styles.block}>
                 <h3>상담 등록</h3>
-                <form ref={formRef} action={formAction} className={styles.form}>
+                <form ref={formRef} action={formAction} className={fieldStyles.form}>
                     <input type="hidden" name="studentId" value={student.id} />
-                    <label className={styles.field}>
+                    <label className={fieldStyles.root}>
                         상담 일시
                         <input
                             type="datetime-local"
@@ -78,7 +86,7 @@ export default function DirectorStudentCounseling({
                             required
                         />
                     </label>
-                    <label className={styles.field}>
+                    <label className={fieldStyles.root}>
                         상담 내용
                         <textarea
                             name="content"
@@ -90,7 +98,7 @@ export default function DirectorStudentCounseling({
                     </label>
                     <button
                         type="submit"
-                        className={styles.primaryBtn}
+                        className={buttonStyles.primary}
                         disabled={isPending}
                     >
                         {isPending ? "등록 중…" : "상담 등록"}
@@ -99,8 +107,8 @@ export default function DirectorStudentCounseling({
                         <p
                             className={
                                 state.status === "success"
-                                    ? styles.success
-                                    : styles.error
+                                    ? typographyStyles.success
+                                    : typographyStyles.error
                             }
                             role="alert"
                         >
@@ -116,7 +124,7 @@ export default function DirectorStudentCounseling({
                     <StatusChip>{memos.length}건</StatusChip>
                 </div>
                 {memos.length === 0 ? (
-                    <p className={styles.muted}>
+                    <p className={typographyStyles.muted}>
                         등록된 상담 기록이 없습니다.
                     </p>
                 ) : (

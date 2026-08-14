@@ -1,0 +1,37 @@
+.head {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.head h2 {
+    margin: 0 0 4px;
+    font-size: 20px;
+}
+
+.head p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 13px;
+}
+
+.headCompact {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.headCompact h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+}
+
+.headCompact p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 13px;
+}

@@ -10,6 +10,14 @@ import {
 } from "@/features/messages/actions";
 import { MESSAGE_STATUS_METADATA } from "@/features/messages/presentation";
 import type { MessageListItem } from "@/features/messages/types";
+import {
+    a11yStyles,
+    buttonStyles,
+    cx,
+    fieldStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import styles from "../MessagesScreen.module.css";
 
 type MessageListPanelProps = {
@@ -106,7 +114,7 @@ export default function MessageListPanel({
 
     return (
         <div className={styles.layout}>
-            <aside className={styles.listPanel}>
+            <aside className={cx(surfaceStyles.root, styles.listPanel)}>
                 {canBulkApprove && messages.length > 0 && (
                     <div className={styles.bulkBar}>
                         <div className={styles.listActions}>
@@ -131,7 +139,7 @@ export default function MessageListPanel({
                         </div>
                         <button
                             type="button"
-                            className={styles.primaryBtn}
+                            className={cx(buttonStyles.primary, styles.fullWidthBtn)}
                             disabled={
                                 isProcessing || visibleCheckedIds.length === 0
                             }
@@ -145,7 +153,7 @@ export default function MessageListPanel({
                 )}
 
                 {messages.length === 0 ? (
-                    <p className={styles.empty}>목록이 비어 있습니다.</p>
+                    <p className={cx(typographyStyles.hint, styles.empty)}>목록이 비어 있습니다.</p>
                 ) : (
                     <ul className={styles.messageList}>
                         {messages.map((message) => {
@@ -170,7 +178,7 @@ export default function MessageListPanel({
                                                     event.stopPropagation()
                                                 }
                                             />
-                                            <span className={styles.srOnly}>
+                                            <span className={a11yStyles.srOnly}>
                                                 {message.title} 선택
                                             </span>
                                         </label>
@@ -194,7 +202,7 @@ export default function MessageListPanel({
                                                 {statusMetadata.label}
                                             </StatusChip>
                                         </div>
-                                        <span>
+                                        <span className={typographyStyles.hint}>
                                             {message.authorName} ·{" "}
                                             {message.targetSummary}
                                         </span>
@@ -243,14 +251,14 @@ function MessageDetail({
         mode === "director" && message.status === "PENDING_APPROVAL";
 
     return (
-        <article className={styles.detail}>
+        <article className={cx(surfaceStyles.root, styles.detail)}>
             <div className={styles.detailHead}>
                 <h2>{message.title}</h2>
                 <StatusChip tone={statusMetadata.tone}>
                     {statusMetadata.label}
                 </StatusChip>
             </div>
-            <p className={styles.meta}>
+            <p className={cx(typographyStyles.hint, styles.meta)}>
                 {message.authorName}
                 {` · ${message.targetSummary}`}
                 {message.recipientCount > 0
@@ -260,7 +268,7 @@ function MessageDetail({
             <div className={styles.content}>{message.content}</div>
 
             {message.status === "REJECTED" && message.rejectionReason && (
-                <p className={styles.rejectBox}>
+                <p className={cx(typographyStyles.error, styles.rejectBox)}>
                     반려 사유: {message.rejectionReason}
                 </p>
             )}
@@ -269,13 +277,13 @@ function MessageDetail({
                 <div className={styles.detailActions}>
                     <button
                         type="button"
-                        className={styles.primaryBtn}
+                        className={buttonStyles.primary}
                         disabled={isProcessing}
                         onClick={() => onApprove(message.id)}
                     >
                         승인·발송
                     </button>
-                    <label className={styles.field}>
+                    <label className={fieldStyles.root}>
                         <span>반려 사유</span>
                         <input
                             value={rejectionReason}
@@ -287,7 +295,7 @@ function MessageDetail({
                     </label>
                     <button
                         type="button"
-                        className={styles.secondaryBtn}
+                        className={buttonStyles.cancel}
                         disabled={isProcessing || !rejectionReason.trim()}
                         onClick={() => onReject(message.id)}
                     >

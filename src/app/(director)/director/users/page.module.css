@@ -1,37 +1,3 @@
-.page {
-    animation: page-enter 380ms cubic-bezier(.22, 1, .36, 1) both;
-}
-
-.heading {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 24px;
-    margin-bottom: 28px;
-}
-
-.eyebrow {
-    color: #0066cc;
-    font-size: 11px;
-    font-weight: 750;
-    letter-spacing: .12em;
-}
-
-.heading h1 {
-    margin: 8px 0;
-    font-family: "SF Pro Display", system-ui, sans-serif;
-    font-size: clamp(32px, 5vw, 46px);
-    line-height: 1.06;
-    letter-spacing: -.045em;
-}
-
-.heading p,
-.listHeader p {
-    margin: 0;
-    color: #6e6e73;
-    font-size: 14px;
-}
-
 .pendingBadge {
     min-height: 42px;
     display: inline-flex;
@@ -72,15 +38,6 @@
     margin-bottom: 18px;
 }
 
-.summaryPrimary,
-.guide,
-.listPanel {
-    border: 1px solid rgb(0 0 0 / 7%);
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 10px 34px rgb(0 0 0 / 4%);
-}
-
 .summaryPrimary {
     display: flex;
     align-items: center;
@@ -109,7 +66,6 @@
 
 .summaryPrimary span,
 .guide span {
-    color: #86868b;
     font-size: 11px;
     font-weight: 700;
 }
@@ -122,7 +78,6 @@
 .summaryPrimary p,
 .guide p {
     margin: 0;
-    color: #6e6e73;
     font-size: 12px;
     line-height: 1.5;
 }
@@ -157,8 +112,12 @@
     letter-spacing: -.02em;
 }
 
+.listHeader p {
+    margin: 0;
+    font-size: 14px;
+}
+
 .listHeader > span {
-    color: #86868b;
     font-size: 10px;
     font-weight: 750;
     letter-spacing: .09em;
@@ -290,7 +249,6 @@
 }
 
 .roleForm > label {
-    color: #86868b;
     font-size: 10px;
     font-weight: 650;
 }
@@ -301,35 +259,21 @@
     gap: 8px;
 }
 
-.roleControls select,
-.roleControls button {
-    min-height: 40px;
-    border-radius: 11px;
-    font: inherit;
-}
-
-.roleControls select {
+.roleSelect {
     min-width: 0;
+    min-height: 40px;
     padding: 0 32px 0 11px;
-    border: 1px solid #d2d2d7;
-    outline: none;
-    color: #1d1d1f;
-    background: #fff;
+    border-radius: 11px;
     font-size: 12px;
-}
-
-.roleControls select:focus {
-    border-color: #0071e3;
-    box-shadow: 0 0 0 3px rgb(0 113 227 / 13%);
+    box-shadow: none;
 }
 
 .studentLinkField {
-    display: grid;
-    gap: 6px;
     padding: 10px;
     border: 1px solid #d9e8fb;
     border-radius: 12px;
     background: #f4f9ff;
+    gap: 6px;
 }
 
 .studentLinkField label {
@@ -338,17 +282,14 @@
     font-weight: 700;
 }
 
-.studentLinkField select {
+.studentSelect {
     min-width: 0;
     min-height: 40px;
     padding: 0 32px 0 11px;
-    border: 1px solid #b8d4f2;
+    border-color: #b8d4f2;
     border-radius: 10px;
-    outline: none;
-    color: #1d1d1f;
-    background: #fff;
-    font: inherit;
     font-size: 12px;
+    box-shadow: none;
 }
 
 .roleHint {
@@ -358,33 +299,6 @@
     line-height: 1.4;
 }
 
-.roleControls button {
-    padding: 0 14px;
-    border: 0;
-    color: #fff;
-    background: #0071e3;
-    font-size: 12px;
-    font-weight: 680;
-    cursor: pointer;
-    transition:
-        background 140ms ease,
-        transform 140ms ease;
-}
-
-.roleControls button:hover:not(:disabled) {
-    background: #0077ed;
-    transform: translateY(-1px);
-}
-
-.roleControls button:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-.roleControls button:disabled {
-    cursor: wait;
-    opacity: .62;
-}
-
 .empty {
     min-height: 320px;
     display: grid;
@@ -392,7 +306,6 @@
     align-content: center;
     gap: 8px;
     padding: 40px 20px;
-    text-align: center;
 }
 
 .empty > div {
@@ -415,20 +328,7 @@
 
 .empty p {
     margin: 0;
-    color: #86868b;
     font-size: 13px;
-}
-
-@keyframes page-enter {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 @media (max-width: 1100px) {
@@ -445,11 +345,6 @@
 }
 
 @media (max-width: 760px) {
-    .heading {
-        align-items: start;
-        flex-direction: column;
-    }
-
     .summary {
         grid-template-columns: 1fr;
     }
@@ -472,10 +367,6 @@
 }
 
 @media (max-width: 480px) {
-    .heading h1 {
-        font-size: 34px;
-    }
-
     .pendingBadge {
         width: 100%;
     }
@@ -503,19 +394,10 @@
     .roleControls {
         grid-template-columns: 1fr;
     }
-
-    .roleControls button {
-        min-height: 44px;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .page {
-        animation: none;
-    }
-
-    .userCard,
-    .roleControls button {
+    .userCard {
         transition: none;
     }
 }

@@ -9,6 +9,15 @@ import {
     saveChurnThreshold,
     sendChurnParentNote,
 } from "@/features/churn/actions";
+import {
+    buttonStyles,
+    cx,
+    emptyStateStyles,
+    fieldStyles,
+    pageHeadingStyles,
+    screenStyles,
+    surfaceStyles,
+} from "@/components/ui/shared-styles";
 import ChurnCaseTable from "./components/ChurnCaseTable";
 import ChurnThresholdForm from "./components/ChurnThresholdForm";
 import styles from "./DirectorChurnScreen.module.css";
@@ -32,10 +41,10 @@ export default function DirectorChurnScreen({ cases, threshold }: { cases: Direc
     }
 
     return (
-        <section className={styles.page}>
-            <header className={styles.heading}><div><span>STUDENT CARE</span><h1>이탈 위험</h1><p>출결, 성적, 연속 결석과 미납 신호를 함께 확인합니다.</p></div><div className={styles.headerActions}><button type="button" className={styles.actionBtn} disabled={isPending} onClick={() => runAction(runChurnDetection)}>{isPending ? "감지 중…" : "이탈 감지 실행"}</button><button type="button" className={styles.thresholdBtn} disabled={isPending} onClick={() => setShowThreshold((visible) => !visible)}>임계값 설정</button></div></header>
+        <section className={screenStyles.animatedPage}>
+            <header className={pageHeadingStyles.root}><div><span className={pageHeadingStyles.eyebrow}>STUDENT CARE</span><h1>이탈 위험</h1><p>출결, 성적, 연속 결석과 미납 신호를 함께 확인합니다.</p></div><div className={styles.headerActions}><button type="button" className={cx(buttonStyles.primary, styles.toolbarBtn)} disabled={isPending} onClick={() => runAction(runChurnDetection)}>{isPending ? "감지 중…" : "이탈 감지 실행"}</button><button type="button" className={cx(buttonStyles.secondary, styles.toolbarBtn)} disabled={isPending} onClick={() => setShowThreshold((visible) => !visible)}>임계값 설정</button></div></header>
             {showThreshold && <ChurnThresholdForm threshold={threshold} isPending={isPending} onSave={(input) => runAction(() => saveChurnThreshold(input), () => setShowThreshold(false))} />}
-            <div className={styles.metrics}>{statistics.map((item) => <article key={item.label}><span>{item.label}</span><strong>{item.value}</strong><p>{item.detail}</p></article>)}</div>
+            <div className={styles.metrics}>{statistics.map((item) => <article key={item.label} className={surfaceStyles.root}><span>{item.label}</span><strong>{item.value}</strong><p>{item.detail}</p></article>)}</div>
             <ChurnCaseTable cases={cases} threshold={threshold} isPending={isPending} onAction={handleCaseAction} />
             {feedback && <p className={styles.feedback}>{feedback}</p>}
         </section>

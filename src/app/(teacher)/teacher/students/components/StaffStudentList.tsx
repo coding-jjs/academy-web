@@ -1,4 +1,5 @@
 import StatusChip from "@/components/ui/StatusChip";
+import { cx, surfaceStyles, typographyStyles } from "@/components/ui/shared-styles";
 import type { StaffStudentRow } from "@/features/students/types";
 import styles from "../StaffStudentsScreen.module.css";
 
@@ -12,9 +13,9 @@ export default function StaffStudentList({
     onSelect: (studentId: string) => void;
 }) {
     return (
-        <aside className={styles.listPanel}>
+        <aside className={cx(surfaceStyles.root, styles.listPanel)}>
             {students.length === 0 ? (
-                <p className={styles.muted}>검색 결과가 없습니다.</p>
+                <p className={typographyStyles.muted}>검색 결과가 없습니다.</p>
             ) : (
                 <ul className={styles.list}>
                     {students.map((student) => (

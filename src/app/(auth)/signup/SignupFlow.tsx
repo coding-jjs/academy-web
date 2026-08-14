@@ -1,6 +1,12 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import {
+    cx,
+    pageHeadingStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import SignupForm from "./SignupForm";
 import styles from "./page.module.css";
 
@@ -41,9 +47,9 @@ export default function SignupFlow({
             </ol>
 
             {step === "google" ? (
-                <section className={styles.card}>
+                <section className={cx(surfaceStyles.root, styles.card)}>
                     <div className={styles.authIntro}>
-                        <span className={styles.eyebrow}>JOIN A ACADEMY</span>
+                        <span className={pageHeadingStyles.eyebrow}>JOIN A ACADEMY</span>
                         <h1>A학원과 함께 시작해요</h1>
                         <p>
                             Google 로그인 버튼을 누른 뒤
@@ -70,7 +76,7 @@ export default function SignupFlow({
                         </div>
                     </div>
 
-                    <p className={styles.terms}>
+                    <p className={cx(typographyStyles.hint, styles.terms)}>
                         계속하면 A학원의 서비스 이용약관 및 개인정보 처리방침에
                         동의하는 것으로 간주합니다.
                     </p>

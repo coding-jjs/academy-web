@@ -92,36 +92,30 @@
     min-width: 0;
 }
 
-.loginButton,
-.signupButton,
-.dashboardButton {
-    display: inline-flex;
+.authButton {
     min-height: 38px;
-    align-items: center;
-    justify-content: center;
     padding: 0 15px;
     border-radius: 11px;
     font-size: 12px;
-    font-weight: 650;
     text-decoration: none;
+}
+
+.loginButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #0066cc;
+    background: #edf5ff;
+    font-weight: 650;
     transition:
         transform 140ms ease,
         background 140ms ease;
 }
 
 .logoutButton {
-    display: inline-flex;
     min-height: 38px;
-    align-items: center;
-    justify-content: center;
     padding: 0 13px;
-    border: 1px solid #d2d2d7;
-    border-radius: 11px;
-    color: #515154;
-    background: #fff;
     font-size: 12px;
-    font-weight: 650;
-    cursor: pointer;
 }
 
 .logoutButton:hover {
@@ -135,14 +129,8 @@
     cursor: wait;
 }
 
-.loginButton {
-    color: #0066cc;
-    background: #edf5ff;
-}
-
-.signupButton {
-    color: #fff;
-    background: #0071e3;
+.dashboardButton {
+    gap: 12px;
 }
 
 .profileSummary {
@@ -183,29 +171,16 @@
 
 .profileText small {
     margin-top: 3px;
-    color: #86868b;
     font-size: 9px;
     font-weight: 650;
-}
-
-.dashboardButton {
-    gap: 12px;
-    color: #fff;
-    background: #0071e3;
 }
 
 .loginButton:hover {
     background: #e2efff;
 }
-.signupButton:hover {
-    background: #0068d1;
-}
-.dashboardButton:hover {
-    background: #0068d1;
-}
+
 .loginButton:active,
-.signupButton:active,
-.dashboardButton:active {
+.authButton:active {
     transform: scale(0.97);
 }
 
@@ -224,9 +199,7 @@
 }
 
 .noticeLabel {
-    color: #0066cc;
     font-size: 10px;
-    font-weight: 750;
     letter-spacing: 0.14em;
 }
 
@@ -307,10 +280,6 @@
 .heroCopy,
 .visual {
     min-height: 650px;
-    border: 1px solid rgb(0 0 0 / 7%);
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 9px 30px rgb(0 0 0 / 5%);
 }
 
 .heroCopy {
@@ -318,18 +287,6 @@
     flex-direction: column;
     justify-content: center;
     padding: clamp(38px, 5vw, 72px);
-}
-
-.eyebrow,
-.sectionHeading > p,
-.processIntro > p,
-.finalCta > p,
-.quickLinks > div > span {
-    margin: 0 0 18px;
-    color: #0066cc;
-    font-size: 11px;
-    font-weight: 750;
-    letter-spacing: 0.12em;
 }
 
 .hero h1 {
@@ -348,7 +305,6 @@
 .heroDescription {
     max-width: 580px;
     margin: 28px 0 0;
-    color: #6e6e73;
     font-size: 15px;
     line-height: 1.75;
     word-break: keep-all;
@@ -359,34 +315,6 @@
     align-items: center;
     gap: 20px;
     margin-top: 34px;
-}
-
-.primaryButton,
-.lightButton {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-    min-height: 44px;
-    padding: 0 18px;
-    border-radius: 12px;
-    color: #fff;
-    background: #0071e3;
-    font-size: 13px;
-    font-weight: 650;
-    text-decoration: none;
-    transition:
-        transform 140ms ease,
-        background 140ms ease;
-}
-
-.primaryButton:hover,
-.lightButton:hover {
-    background: #0068d1;
-}
-.primaryButton:active,
-.lightButton:active {
-    transform: scale(0.98);
 }
 
 .textButton {
@@ -406,7 +334,6 @@
     gap: 12px;
     margin-top: auto;
     padding-top: 40px;
-    color: #86868b;
     font-size: 11px;
     font-weight: 650;
 }
@@ -540,28 +467,33 @@
     margin: 0 auto;
 }
 
-.quickLinks > div,
-.quickLinks > a {
-    min-height: 160px;
-    padding: 24px;
-    border: 1px solid rgb(0 0 0 / 7%);
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 9px 30px rgb(0 0 0 / 5%);
+.sectionHeading > span,
+.processIntro > span {
+    display: none;
 }
 
-.quickLinks > div > span {
+.sectionLead,
+.processLead {
+    display: block;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.processLead {
+    line-height: 1.65;
+}
+
+.quickLinksIntro,
+.quickLinkCard {
+    min-height: 160px;
+    padding: 24px;
+}
+
+.quickLinksIntro > span {
     margin-bottom: 10px;
 }
 
-.quickLinks h2 {
-    margin: 0;
-    font-size: 20px;
-    line-height: 1.3;
-    letter-spacing: -0.03em;
-}
-
-.quickLinks > a {
+.quickLinkCard {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -575,14 +507,21 @@
         transform 140ms ease;
 }
 
-.quickLinks > a:hover {
+.quickLinksIntro h2 {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.3;
+    letter-spacing: -0.03em;
+}
+
+.quickLinks > a:hover,
+.quickLinkCard:hover {
     border-color: rgb(0 113 227 / 28%);
     transform: translateY(-2px);
 }
 
 .quickLinks a small {
     margin-bottom: 7px;
-    color: #86868b;
     font-size: 10px;
 }
 
@@ -613,14 +552,6 @@
     letter-spacing: -0.048em;
 }
 
-.sectionHeading > span,
-.processIntro > span {
-    display: block;
-    margin-top: 20px;
-    color: #6e6e73;
-    font-size: 14px;
-}
-
 .programGrid {
     display: grid;
     gap: 14px;
@@ -631,20 +562,14 @@
     grid-template-columns: 54px 1fr;
     gap: 18px;
     padding: 24px;
-    border: 1px solid rgb(0 0 0 / 7%);
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 9px 30px rgb(0 0 0 / 5%);
 }
 
 .programCard > span {
-    color: #0066cc;
     font-size: 11px;
     font-weight: 750;
 }
 
 .programCard small {
-    color: #86868b;
     font-size: 10px;
 }
 
@@ -657,7 +582,6 @@
 .programCard p {
     max-width: 560px;
     margin: 0;
-    color: #6e6e73;
     font-size: 13px;
     line-height: 1.65;
     word-break: keep-all;
@@ -718,7 +642,6 @@
 
 .stepList p {
     margin: 9px 0 0;
-    color: #6e6e73;
     font-size: 12px;
     line-height: 1.6;
     word-break: keep-all;
@@ -739,8 +662,6 @@
     margin: 0 auto 28px;
     padding: 28px;
     border-radius: 28px;
-    background: #fff;
-    border: 1px solid rgb(0 0 0 / 6%);
 }
 
 .locationGrid {
@@ -759,14 +680,6 @@
     padding: 8px 4px;
 }
 
-.locationEyebrow {
-    margin: 0 0 10px;
-    color: #86868b;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-}
-
 .locationInfo h2 {
     margin: 0;
     color: #1d1d1f;
@@ -777,7 +690,6 @@
 
 .locationLead {
     margin: 12px 0 0;
-    color: #6e6e73;
     font-size: 15px;
     line-height: 1.55;
 }
@@ -794,7 +706,6 @@
 }
 
 .locationMeta dt {
-    color: #86868b;
     font-size: 12px;
     font-weight: 650;
 }
@@ -814,34 +725,8 @@
     margin-top: 28px;
 }
 
-.locationPrimary,
-.locationSecondary {
-    display: inline-flex;
-    min-height: 42px;
-    align-items: center;
-    padding: 0 16px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 650;
-    text-decoration: none;
-}
-
-.locationPrimary {
-    color: #fff;
-    background: #1d1d1f;
-}
-
-.locationPrimary:hover {
-    background: #000;
-}
-
-.locationSecondary {
-    color: #1d1d1f;
-    background: #f5f5f7;
-}
-
-.locationSecondary:hover {
-    background: #ebebed;
+.locationActionBtn {
+    justify-content: center;
 }
 
 .map {
@@ -862,10 +747,11 @@
     border: 0;
 }
 
-.finalCta > p {
+.finalCtaEyebrow {
     color: #7fbdff;
 }
-.lightButton {
+
+.finalCtaButton {
     margin-top: 32px;
 }
 
@@ -888,7 +774,6 @@
 
 .footer p {
     margin: 3px 0;
-    color: #86868b;
     font-size: 10px;
 }
 
@@ -974,8 +859,7 @@
         gap: 6px;
     }
     .loginButton,
-    .signupButton,
-    .dashboardButton {
+    .authButton {
         min-height: 34px;
         padding: 0 11px;
         font-size: 11px;
@@ -1048,7 +932,8 @@
         gap: 15px;
         margin-top: 28px;
     }
-    .primaryButton {
+    .heroCta,
+    .finalCtaButton {
         width: 100%;
     }
     .textButton {
@@ -1073,8 +958,8 @@
     .quickLinks {
         grid-template-columns: 1fr;
     }
-    .quickLinks > div,
-    .quickLinks > a {
+    .quickLinksIntro,
+    .quickLinkCard {
         min-height: 126px;
         padding: 22px;
     }
@@ -1145,10 +1030,8 @@
         width: 100%;
     }
 
-    .locationPrimary,
-    .locationSecondary {
+    .locationActionBtn {
         flex: 1 1 auto;
-        justify-content: center;
     }
 }
 
@@ -1169,8 +1052,7 @@
 
 @media (max-width: 390px) {
     .loginButton,
-    .signupButton,
-    .dashboardButton {
+    .authButton {
         padding: 0 9px;
     }
     .dashboardButton span {
@@ -1188,8 +1070,8 @@
     .image,
     .imageActive,
     .noticeContent,
-    .primaryButton,
-    .lightButton,
+    .heroCta,
+    .finalCtaButton,
     .quickLinks > a {
         animation: none;
         transition: none;
