@@ -736,46 +736,130 @@
 
 .location {
     width: min(calc(100% - 48px), 1280px);
-    margin: 0 auto 18px;
-    background: #f5f5f7;
-    border-radius: 24px;
+    margin: 0 auto 28px;
+    padding: 28px;
+    border-radius: 28px;
+    background: #fff;
+    border: 1px solid rgb(0 0 0 / 6%);
 }
 
-.locationHead {
+.locationGrid {
+    display: grid;
+    grid-template-columns: minmax(240px, 0.9fr) minmax(0, 1.3fr);
+    gap: 28px;
+    align-items: stretch;
+    min-width: 0;
+}
+
+.locationInfo {
     display: flex;
-    align-items: baseline;
-    gap: 12px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    padding: 8px 4px;
+}
+
+.locationEyebrow {
+    margin: 0 0 10px;
+    color: #86868b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+}
+
+.locationInfo h2 {
+    margin: 0;
     color: #1d1d1f;
-    padding-left: 14px;
-    padding-top: 24px;
-    padding-bottom: 10px;
+    font-size: clamp(28px, 3vw, 40px);
+    letter-spacing: -0.04em;
+    line-height: 1.15;
 }
 
-.locationHead h2 {
-    margin: 0;
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-}
-
-.locationHead p {
-    margin: 0;
-    font-size: 14px;
+.locationLead {
+    margin: 12px 0 0;
     color: #6e6e73;
-    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.55;
+}
+
+.locationMeta {
+    display: grid;
+    gap: 14px;
+    margin: 28px 0 0;
+}
+
+.locationMeta div {
+    display: grid;
+    gap: 4px;
+}
+
+.locationMeta dt {
+    color: #86868b;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.locationMeta dd {
+    margin: 0;
+    color: #1d1d1f;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.locationActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.locationPrimary,
+.locationSecondary {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    padding: 0 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.locationPrimary {
+    color: #fff;
+    background: #1d1d1f;
+}
+
+.locationPrimary:hover {
+    background: #000;
+}
+
+.locationSecondary {
+    color: #1d1d1f;
+    background: #f5f5f7;
+}
+
+.locationSecondary:hover {
+    background: #ebebed;
 }
 
 .map {
-    width: 100%;
-    margin: 0;
-    aspect-ratio: 16 / 5;
+    min-height: 320px;
+    aspect-ratio: 4 / 3;
     overflow: hidden;
+    border-radius: 20px;
+    background: #f5f5f7;
+    min-width: 0;  
+    max-width: 100%;
+    width: 100%;    
 }
 
 .map iframe {
-    border-radius: 24px;
-    overflow: hidden;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
 }
 
 .finalCta > p {
@@ -858,6 +942,16 @@
     .processIntro > span {
         grid-column: 2;
     }
+
+    .locationGrid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .map {
+        min-height: 260px;
+        aspect-ratio: 16 / 10;
+    }
 }
 
 @media (max-width: 720px) {
@@ -903,6 +997,7 @@
     .section,
     .process,
     .finalCta,
+    .location,
     .footer {
         width: min(calc(100% - 28px), 1280px);
     }
@@ -1032,6 +1127,43 @@
         min-height: 34px;
         padding: 0 9px;
         font-size: 11px;
+    }
+
+    .location {
+        padding: 18px;
+        border-radius: 22px;
+    }
+
+    .map {
+        min-height: unset;   /* 또는 0 / auto */
+        aspect-ratio: 16 / 10;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .locationActions {
+        width: 100%;
+    }
+
+    .locationPrimary,
+    .locationSecondary {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 490px) {
+    .location {
+        padding: 14px;
+    }
+
+    .locationGrid {
+        gap: 16px;
+    }
+
+    .map {
+        min-height: unset;
+        aspect-ratio: 4 / 3;
     }
 }
 
