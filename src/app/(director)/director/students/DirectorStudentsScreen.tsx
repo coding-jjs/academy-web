@@ -2,23 +2,30 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import type { StaffCounselingMemo } from "@/features/counseling/types";
 import type {
     DirectorClassOption,
     DirectorStudent,
     StudentStatus,
 } from "@/features/students/types";
 import { STUDENT_STATUS_METADATA } from "@/features/students/presentation";
+import DirectorStudentCounseling from "./components/DirectorStudentCounseling";
 import DirectorStudentDetail from "./components/DirectorStudentDetail";
 import DirectorStudentTable from "./components/DirectorStudentTable";
 import styles from "./DirectorStudentsScreen.module.css";
 
+type PanelMode = "class" | "counseling";
+
 export default function DirectorStudentsScreen({
     students,
     classOptions,
+    counselingMemos,
 }: {
     students: DirectorStudent[];
     classOptions: DirectorClassOption[];
+    counselingMemos: StaffCounselingMemo[];
 }) {
+    const [panelMode, setPanelMode] = useState<PanelMode | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<"ALL" | StudentStatus>(
         "ALL",
@@ -91,6 +98,23 @@ export default function DirectorStudentsScreen({
     const selectedStudent =
         students.find((student) => student.id === selectedStudentId) ?? null;
 
+    const selectedMemos = useMemo(() => {
+        if (!selectedStudentId) return [];
+        return counselingMemos.filter(
+            (memo) => memo.studentId === selectedStudentId,
+        );
+    }, [counselingMemos, selectedStudentId]);
+
+    function openPanel(studentId: string, mode: PanelMode) {
+        setSelectedStudentId(studentId);
+        setPanelMode(mode);
+    }
+
+    function closePanel() {
+        setSelectedStudentId(null);
+        setPanelMode(null);
+    }
+
     return (
         <section className={styles.page}>
             <header className={styles.heading}>
@@ -114,10 +138,7 @@ export default function DirectorStudentsScreen({
                 ))}
             </div>
 
-            <div
-                className={styles.layout}
-                data-open={Boolean(selectedStudent)}
-            >
+            <div className={styles.layout} data-open={Boolean(selectedStudent)}>
                 <div className={styles.tablePanel}>
                     <div className={styles.filters}>
                         <label className={styles.field}>
@@ -174,16 +195,31 @@ export default function DirectorStudentsScreen({
                         students={filteredStudents}
                         totalStudentCount={students.length}
                         selectedStudentId={selectedStudentId}
-                        onSelect={setSelectedStudentId}
+                        panelMode={panelMode}
+                        onSelectClass={(studentId) =>
+                            openPanel(studentId, "class")
+                        }
+                        onSelectCounseling={(studentId) =>
+                            openPanel(studentId, "counseling")
+                        }
                     />
                 </div>
 
-                {selectedStudent && (
+                {selectedStudent && panelMode === "class" && (
                     <DirectorStudentDetail
-                        key={selectedStudent.id}
+                        key={`class-${selectedStudent.id}`}
                         student={selectedStudent}
                         classOptions={classOptions}
-                        onClose={() => setSelectedStudentId(null)}
+                        onClose={closePanel}
+                    />
+                )}
+
+                {selectedStudent && panelMode === "counseling" && (
+                    <DirectorStudentCounseling
+                        key={`counseling-${selectedStudent.id}`}
+                        student={selectedStudent}
+                        memos={selectedMemos}
+                        onClose={closePanel}
                     />
                 )}
             </div>

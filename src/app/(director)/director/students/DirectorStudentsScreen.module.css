@@ -1,5 +1,5 @@
 .page {
-    animation: screen-enter 360ms cubic-bezier(.22, 1, .36, 1) both;
+    animation: screen-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .heading {
@@ -14,7 +14,7 @@
     color: #0066cc;
     font-size: 11px;
     font-weight: 750;
-    letter-spacing: .12em;
+    letter-spacing: 0.12em;
 }
 
 .heading h1 {
@@ -22,7 +22,7 @@
     font-family: "SF Pro Display", system-ui, sans-serif;
     font-size: clamp(31px, 5vw, 45px);
     line-height: 1.08;
-    letter-spacing: -.045em;
+    letter-spacing: -0.045em;
 }
 
 .heading p {
@@ -75,7 +75,7 @@
     display: block;
     margin: 18px 0 4px;
     font-size: 31px;
-    letter-spacing: -.04em;
+    letter-spacing: -0.04em;
 }
 
 .metrics article p {
@@ -91,7 +91,7 @@
 }
 
 .layout[data-open="true"] {
-    grid-template-columns: minmax(0, 1.45fr) minmax(280px, .9fr);
+    grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.9fr);
 }
 
 .tablePanel,
@@ -101,7 +101,7 @@
 
 .filters {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(120px, .7fr));
+    grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(120px, 0.7fr));
     gap: 12px;
     margin-bottom: 16px;
 }
@@ -110,20 +110,65 @@
     display: grid;
     gap: 8px;
     color: #6e6e73;
-    font-size: 13px;
+    font-size: 12px;
+    font-weight: 650;
 }
 
 .field input,
 .field select,
+.field textarea,
 .addRow select {
     width: 100%;
     min-height: 42px;
     padding: 0 12px;
-    border: 1px solid #d2d2d7;
+    border: 1px solid rgb(0 0 0 / 10%);
     border-radius: 12px;
     font: inherit;
+    font-size: 14px;
+    font-weight: 400;
     color: #1d1d1f;
     background: #fff;
+    box-shadow: 0 4px 14px rgb(0 0 0 / 4%);
+    transition:
+        border-color 140ms ease,
+        box-shadow 140ms ease,
+        background 140ms ease;
+}
+
+.field select,
+.addRow select {
+    appearance: none;
+    padding-right: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1.5 1.75L6 6.25L10.5 1.75' stroke='%236e6e73' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 12px 8px;
+    cursor: pointer;
+}
+
+.field input:hover,
+.field select:hover,
+.field textarea:hover,
+.addRow select:hover {
+    border-color: rgb(0 0 0 / 18%);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+.addRow select:focus {
+    outline: none;
+    border-color: rgb(0 113 227 / 45%);
+    box-shadow: 0 0 0 3px rgb(0 113 227 / 16%);
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible,
+.addRow select:focus-visible {
+    outline: none;
+    border-color: rgb(0 113 227 / 45%);
+    box-shadow: 0 0 0 3px rgb(0 113 227 / 16%);
 }
 
 .tableWrap {
@@ -168,6 +213,13 @@
     gap: 6px;
 }
 
+.layout[data-open="true"] .chips {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    justify-content: start;
+    gap: 6px;
+}
+
 .classChip {
     display: inline-flex;
     align-items: center;
@@ -178,6 +230,7 @@
     background: #f0f6ff;
     font-size: 11px;
     font-weight: 650;
+    white-space: nowrap;
 }
 
 .muted {
@@ -214,7 +267,7 @@
 .actionBtn:disabled,
 .secondaryBtn:disabled,
 .dangerBtn:disabled {
-    opacity: .45;
+    opacity: 0.45;
     cursor: not-allowed;
 }
 
@@ -270,6 +323,56 @@
     font-size: 14px;
 }
 
+.statusRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.statusSelect {
+    min-width: 140px;
+    min-height: 42px;
+    padding: 0 36px 0 12px;
+    border: 1px solid rgb(0 0 0 / 10%);
+    border-radius: 12px;
+    appearance: none;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    color: #1d1d1f;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1.5 1.75L6 6.25L10.5 1.75' stroke='%236e6e73' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 12px 8px;
+    box-shadow: 0 4px 14px rgb(0 0 0 / 4%);
+    cursor: pointer;
+    transition:
+        border-color 140ms ease,
+        box-shadow 140ms ease,
+        background-color 140ms ease;
+}
+
+.statusSelect:hover:not(:disabled) {
+    border-color: rgb(0 0 0 / 18%);
+}
+
+.statusSelect:focus,
+.statusSelect:focus-visible {
+    outline: none;
+    border-color: rgb(0 113 227 / 45%);
+    box-shadow: 0 0 0 3px rgb(0 113 227 / 16%);
+}
+
+.statusSelect:disabled {
+    color: #86868b;
+    background-color: #f5f5f7;
+    cursor: not-allowed;
+    opacity: 0.75;
+}
+
 .enrollmentList,
 .historyList {
     margin: 0;
@@ -317,6 +420,103 @@
     margin: 0;
     color: #6e6e73;
     font-size: 13px;
+}
+
+.form {
+    display: grid;
+    gap: 14px;
+}
+
+.field textarea {
+    min-height: 140px;
+    padding: 10px 12px;
+    resize: vertical;
+    font: inherit;
+}
+
+.primaryBtn {
+    min-height: 42px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 12px;
+    color: #fff;
+    background: #0071e3;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.primaryBtn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.success {
+    margin: 0;
+    color: #248a3d;
+    font-size: 13px;
+}
+
+.error {
+    margin: 0;
+    color: #c9342d;
+    font-size: 13px;
+}
+
+.counselingHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.counselingHead h3 {
+    margin: 0;
+}
+
+.counselingList {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.counselingList li {
+    padding: 14px 0;
+    border-top: 1px solid #ededf0;
+}
+
+.counselingList li:first-child {
+    border-top: 0;
+    padding-top: 0;
+}
+
+.counselingItemTop {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.counselingItemTop strong {
+    font-size: 14px;
+}
+
+.counselingItemTop span {
+    color: #86868b;
+    font-size: 12px;
+}
+
+.counselingList p {
+    margin: 0;
+    color: #515154;
+    font-size: 13px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+}
+
+.actionBtn[data-active="true"] {
+    box-shadow: 0 0 0 3px rgb(0 113 227 / 22%);
 }
 
 .emptyPanel {

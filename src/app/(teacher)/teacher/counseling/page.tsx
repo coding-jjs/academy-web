@@ -11,6 +11,7 @@ export default async function TeacherCounselingPage() {
     const counselingData = await getStaffCounselingData({
         staffScope,
         includeInquiries: false,
+        onlyOwnMemos: true,
     });
 
     return <StaffCounselingScreen role="TEACHER" {...counselingData} />;

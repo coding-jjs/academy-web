@@ -734,6 +734,50 @@
     text-align: center;
 }
 
+.location {
+    width: min(calc(100% - 48px), 1280px);
+    margin: 0 auto 18px;
+    background: #f5f5f7;
+    border-radius: 24px;
+}
+
+.locationHead {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    color: #1d1d1f;
+    padding-left: 14px;
+    padding-top: 24px;
+    padding-bottom: 10px;
+}
+
+.locationHead h2 {
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
+.locationHead p {
+    margin: 0;
+    font-size: 14px;
+    color: #6e6e73;
+    font-weight: 400;
+}
+
+.map {
+    width: 100%;
+    margin: 0;
+    aspect-ratio: 16 / 5;
+    overflow: hidden;
+}
+
+.map iframe {
+    border-radius: 24px;
+    overflow: hidden;
+}
+
 .finalCta > p {
     color: #7fbdff;
 }

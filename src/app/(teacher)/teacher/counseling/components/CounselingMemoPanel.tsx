@@ -66,6 +66,7 @@ export default function CounselingMemoPanel({
                                 type="datetime-local"
                                 name="counseledAt"
                                 defaultValue={getCurrentLocalDateTimeInput()}
+                                max={getCurrentLocalDateTimeInput()}
                                 required
                             />
                         </label>
@@ -121,12 +122,7 @@ export default function CounselingMemoPanel({
                                     </span>
                                 </div>
                                 <p>{memo.content}</p>
-                                <small>
-                                    {memo.authorName}
-                                    {memo.studentGrade
-                                        ? ` · ${memo.studentGrade}`
-                                        : ""}
-                                </small>
+                                <small>{memo.authorName}</small>
                             </li>
                         ))}
                     </ul>
