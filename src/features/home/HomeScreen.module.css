@@ -93,23 +93,35 @@
 }
 
 .authButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-height: 38px;
     padding: 0 15px;
     border-radius: 11px;
     font-size: 12px;
     text-decoration: none;
-}
-
-.loginButton {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #0066cc;
-    background: #edf5ff;
-    font-weight: 650;
     transition:
         transform 140ms ease,
         background 140ms ease;
+}
+
+.primaryAuthButton {
+    border: 0;
+    color: #fff;
+    background: #0071e3;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.primaryAuthButton:hover {
+    background: #0077ed;
+}
+
+.loginButton {
+    color: #0066cc;
+    background: #edf5ff;
+    font-weight: 650;
 }
 
 .logoutButton {
