@@ -22,6 +22,33 @@ async function requireStaff() {
     return session;
 }
 
+function parseCounselingMemoInput(formData: FormData): {
+    studentId: string;
+    content: string;
+    counseledAt: Date;
+} | { error: string } {
+    const studentId = String(formData.get("studentId") ?? "").trim();
+    const content = String(formData.get("content") ?? "").trim();
+    const counseledAtRaw = String(formData.get("counseledAt") ?? "").trim();
+
+    if (!studentId) {
+        return { error: "학생을 선택해 주세요." };
+    }
+    if (content.length < 2 || content.length > 2000) {
+        return { error: "상담 내용은 2~2000자로 입력해 주세요." };
+    }
+
+    const counseledAt = counseledAtRaw ? new Date(counseledAtRaw) : new Date();
+    if (Number.isNaN(counseledAt.getTime())) {
+        return { error: "상담 일시가 올바르지 않습니다." };
+    }
+    if (counseledAt.getTime() > Date.now() + 60_000) {
+        return { error: "미래 일시로는 등록할 수 없습니다." };
+    }
+
+    return { studentId, content, counseledAt };
+}
+
 export async function createCounselingMemo(
     _prev: CounselingActionState,
     formData: FormData,
@@ -43,25 +70,12 @@ export async function createCounselingMemo(
         };
     }
 
-    const studentId = String(formData.get("studentId") ?? "").trim();
-    const content = String(formData.get("content") ?? "").trim();
-    const counseledAtRaw = String(formData.get("counseledAt") ?? "").trim();
-
-    if (!studentId) {
-        return { status: "error", message: "학생을 선택해 주세요." };
-    }
-    if (content.length < 2 || content.length > 2000) {
-        return {
-            status: "error",
-            message: "상담 내용은 2~2000자로 입력해 주세요.",
-        };
+    const parsed = parseCounselingMemoInput(formData);
+    if ("error" in parsed) {
+        return { status: "error", message: parsed.error };
     }
 
-    const counseledAt = counseledAtRaw ? new Date(counseledAtRaw) : new Date();
-    if (Number.isNaN(counseledAt.getTime())) {
-        return { status: "error", message: "상담 일시가 올바르지 않습니다." };
-    }
-
+    const { studentId, content, counseledAt } = parsed;
     const scope = await getStaffScope(session.user.id);
 
     const student = await prisma.student.findFirst({
@@ -89,6 +103,52 @@ export async function createCounselingMemo(
                 counseledAt,
             },
         });
+        revalidatePath("/teacher/counseling");
+        revalidatePath("/employee/counseling");
+        return { status: "success", message: "상담 기록이 등록되었습니다." };
+    } catch {
+        return { status: "error", message: "상담 등록에 실패했습니다." };
+    }
+}
+
+export async function createDirectorCounselingMemo(
+    _prev: CounselingActionState,
+    formData: FormData,
+): Promise<CounselingActionState> {
+    const session = await auth();
+    if (!session?.user?.id || session.user.role !== "DIRECTOR") {
+        return { status: "error", message: "원장 권한이 필요합니다." };
+    }
+
+    const parsed = parseCounselingMemoInput(formData);
+    if ("error" in parsed) {
+        return { status: "error", message: parsed.error };
+    }
+
+    const { studentId, content, counseledAt } = parsed;
+
+    const student = await prisma.student.findFirst({
+        where: { id: studentId },
+        select: { id: true },
+    });
+
+    if (!student) {
+        return {
+            status: "error",
+            message: "상담 가능한 학생을 찾을 수 없습니다.",
+        };
+    }
+
+    try {
+        await prisma.counselingMemo.create({
+            data: {
+                studentId,
+                authorUserId: session.user.id,
+                content,
+                counseledAt,
+            },
+        });
+        revalidatePath("/director/students");
         revalidatePath("/teacher/counseling");
         revalidatePath("/employee/counseling");
         return { status: "success", message: "상담 기록이 등록되었습니다." };

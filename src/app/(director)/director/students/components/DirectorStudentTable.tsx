@@ -11,12 +11,16 @@ export default function DirectorStudentTable({
     students,
     totalStudentCount,
     selectedStudentId,
-    onSelect,
+    panelMode,
+    onSelectClass,
+    onSelectCounseling,
 }: {
     students: DirectorStudent[];
     totalStudentCount: number;
     selectedStudentId: string | null;
-    onSelect: (studentId: string) => void;
+    panelMode: "class" | "counseling" | null;
+    onSelectClass: (studentId: string) => void;
+    onSelectCounseling: (studentId: string) => void;
 }) {
     if (students.length === 0) {
         return (
@@ -51,20 +55,20 @@ export default function DirectorStudentTable({
                         <th>학부모</th>
                         <th>상태</th>
                         <th>조치</th>
+                        <th>상담 관리</th>
                     </tr>
                 </thead>
                 <tbody>
                     {students.map((student) => {
                         const statusMetadata =
                             STUDENT_STATUS_METADATA[student.status];
+                        const isActive = selectedStudentId === student.id;
 
                         return (
                             <tr
                                 key={student.id}
                                 className={
-                                    selectedStudentId === student.id
-                                        ? styles.activeRow
-                                        : undefined
+                                    isActive ? styles.activeRow : undefined
                                 }
                             >
                                 <td>
@@ -128,9 +132,29 @@ export default function DirectorStudentTable({
                                     <button
                                         type="button"
                                         className={styles.actionBtn}
-                                        onClick={() => onSelect(student.id)}
+                                        data-active={
+                                            isActive && panelMode === "class"
+                                        }
+                                        onClick={() =>
+                                            onSelectClass(student.id)
+                                        }
                                     >
                                         반 관리
+                                    </button>
+                                </td>
+                                <td>
+                                    <button
+                                        type="button"
+                                        className={styles.actionBtn}
+                                        data-active={
+                                            isActive &&
+                                            panelMode === "counseling"
+                                        }
+                                        onClick={() =>
+                                            onSelectCounseling(student.id)
+                                        }
+                                    >
+                                        상담 관리
                                     </button>
                                 </td>
                             </tr>

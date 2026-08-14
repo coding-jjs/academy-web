@@ -15,9 +15,11 @@ import type {
 export async function getStaffCounselingData({
     staffScope,
     includeInquiries,
+    onlyOwnMemos = false,
 }: {
     staffScope: StaffScope;
     includeInquiries: boolean;
+    onlyOwnMemos: boolean;
 }): Promise<{
     students: CounselingStudentOption[];
     memos: StaffCounselingMemo[];
@@ -51,9 +53,12 @@ export async function getStaffCounselingData({
             },
         }),
         prisma.counselingMemo.findMany({
-            where: staffScope.viewAllStudents
-                ? undefined
-                : { student: studentScopeWhere(staffScope) },
+            where: {
+                ...(onlyOwnMemos ? { authorUserId: staffScope.userId } : {}),
+                ...(staffScope.viewAllStudents
+                    ? {}
+                    : { student: studentScopeWhere(staffScope) }),
+            },
             orderBy: { counseledAt: "desc" },
             take: 50,
             select: {
@@ -93,8 +98,7 @@ export async function getStaffCounselingData({
             schoolName: student.schoolName,
             grade: student.grade,
             className: student.enrollments[0]?.class.name ?? null,
-            teacherName:
-                student.enrollments[0]?.class.teacher?.name ?? null,
+            teacherName: student.enrollments[0]?.class.teacher?.name ?? null,
         })),
         memos: memoRecords.map((memo) => ({
             id: memo.id,

@@ -15,6 +15,7 @@ import {
 } from "@/features/students/director-actions";
 import {
     formatEnrollmentChangeDate,
+    formatStudentSchool,
     STUDENT_STATUS_METADATA,
 } from "@/features/students/presentation";
 import styles from "../DirectorStudentsScreen.module.css";
@@ -97,9 +98,11 @@ export default function DirectorStudentDetail({
                 <div>
                     <h2>{student.name}</h2>
                     <p>
-                        {[student.schoolName, student.grade]
-                            .filter(Boolean)
-                            .join(" · ") || "학교·학년 미입력"}
+                        {formatStudentSchool(
+                            student.schoolName,
+                            student.grade,
+                            "학교·학년 미입력",
+                        )}
                     </p>
                 </div>
                 <button
@@ -215,7 +218,8 @@ function CurrentEnrollments({
                             <div>
                                 <strong>{enrollment.className}</strong>
                                 <small>
-                                    {enrollment.teacherName ?? "담당 미지정"} · 활성
+                                    {enrollment.teacherName ?? "담당 미지정"} ·
+                                    활성
                                 </small>
                             </div>
                             <button
@@ -270,7 +274,10 @@ function AddEnrollment({
                     >
                         <option value="">반 선택</option>
                         {classes.map((academyClass) => (
-                            <option key={academyClass.id} value={academyClass.id}>
+                            <option
+                                key={academyClass.id}
+                                value={academyClass.id}
+                            >
                                 {academyClass.name}
                                 {academyClass.teacherName
                                     ? ` · ${academyClass.teacherName}`
