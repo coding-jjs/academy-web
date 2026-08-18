@@ -5,6 +5,7 @@ import type { RolePrefix } from "@/types/roles";
 import LogoutButton from "@/components/auth/LogoutButton";
 import NavLink from "./NavLink";
 import styles from "./Shells.module.css";
+import ChatbotWidget from "@/features/chatbot/ChatbotWidget";
 
 export default function MemberShell({
     role,
@@ -45,6 +46,7 @@ export default function MemberShell({
                     </aside>
                     <main className={styles.adminContent}>{children}</main>
                 </div>
+                <ChatbotWidget role={role} />
             </div>
         );
     }
