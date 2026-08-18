@@ -7,17 +7,26 @@
 }
 
 .toggle {
+    display: grid;
+    place-items: center;
     width: 56px;
     height: 56px;
     border: 0;
     border-radius: 999px;
-    color: #fff;
-    background: #0071e3;
-    box-shadow: 0 10px 30px rgb(0 113 227 / 35%);
-    font-size: 14px;
-    font-weight: 700;
+    color: #1d1d1f;
+    background: #fff;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 16%);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1;
     cursor: pointer;
     pointer-events: auto;
+}
+
+.toggleBuddy {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
 }
 
 .toggle:disabled {
@@ -49,6 +58,18 @@
     padding: 14px 16px;
     border-bottom: 1px solid rgb(0 0 0 / 6%);
     background: #f5f5f7;
+}
+
+.headerTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.headerBuddy {
+    flex-shrink: 0;
+    object-fit: contain;
 }
 
 .header strong {
@@ -86,6 +107,21 @@
     line-height: 1.5;
 }
 
+.assistantRow {
+    display: flex;
+    align-items: flex-start;
+    align-self: flex-start;
+    gap: 8px;
+    max-width: 92%;
+}
+
+.bubbleBuddy {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
 .bubble {
     max-width: 88%;
     padding: 10px 12px;
@@ -94,6 +130,11 @@
     line-height: 1.5;
     white-space: pre-wrap;
     word-break: break-word;
+}
+
+.assistantRow .bubble {
+    max-width: none;
+    min-width: 0;
 }
 
 .user {

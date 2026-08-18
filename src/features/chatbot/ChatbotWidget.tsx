@@ -1,8 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import styles from "./ChatbotWidget.module.css";
+
+const BUDDY_SRC = "/mascots/nav-buddy.png";
 
 type ChatRole = "parent" | "student" | "teacher" | "employee" | "director";
 
@@ -160,15 +163,24 @@ export default function ChatbotWidget({ role }: { role: ChatRole }) {
             {open && (
                 <section className={styles.panel} aria-label="학습 도우미">
                     <header className={styles.header}>
-                        <div>
-                            <strong>학습 도우미</strong>
-                            <small>
-                                {role === "parent"
-                                    ? "자녀 출결·성적·오답 정보"
-                                    : role === "student"
-                                      ? "내 출결·성적·오답 정보"
-                                      : "담당·재원 학생 성적·오답·출결"}
-                            </small>
+                        <div className={styles.headerTitle}>
+                            <Image
+                                src={BUDDY_SRC}
+                                alt=""
+                                width={36}
+                                height={36}
+                                className={styles.headerBuddy}
+                            />
+                            <div>
+                                <strong>학습 도우미</strong>
+                                <small>
+                                    {role === "parent"
+                                        ? "자녀 출결·성적·오답 정보"
+                                        : role === "student"
+                                          ? "내 출결·성적·오답 정보"
+                                          : "담당·재원 학생 성적·오답·출결"}
+                                </small>
+                            </div>
                         </div>
                         <button
                             type="button"
@@ -179,23 +191,48 @@ export default function ChatbotWidget({ role }: { role: ChatRole }) {
                         </button>
                     </header>
                     <div className={styles.messages} ref={listRef}>
-                        {messages.map((item) => (
-                            <div
-                                key={item.id}
-                                className={`${styles.bubble} ${
-                                    item.role === "user"
-                                        ? styles.user
-                                        : styles.assistant
-                                }`}
-                            >
-                                {item.content}
-                            </div>
-                        ))}
+                        {messages.map((item) =>
+                            item.role === "user" ? (
+                                <div
+                                    key={item.id}
+                                    className={`${styles.bubble} ${styles.user}`}
+                                >
+                                    {item.content}
+                                </div>
+                            ) : (
+                                <div
+                                    key={item.id}
+                                    className={styles.assistantRow}
+                                >
+                                    <Image
+                                        src={BUDDY_SRC}
+                                        alt=""
+                                        width={32}
+                                        height={32}
+                                        className={styles.bubbleBuddy}
+                                    />
+                                    <div
+                                        className={`${styles.bubble} ${styles.assistant}`}
+                                    >
+                                        {item.content}
+                                    </div>
+                                </div>
+                            ),
+                        )}
                         {pending && (
-                            <div
-                                className={`${styles.bubble} ${styles.assistant}`}
-                            >
-                                답변 생성 중…
+                            <div className={styles.assistantRow}>
+                                <Image
+                                    src={BUDDY_SRC}
+                                    alt=""
+                                    width={32}
+                                    height={32}
+                                    className={styles.bubbleBuddy}
+                                />
+                                <div
+                                    className={`${styles.bubble} ${styles.assistant}`}
+                                >
+                                    답변 생성 중…
+                                </div>
                             </div>
                         )}
                     </div>
@@ -256,7 +293,17 @@ export default function ChatbotWidget({ role }: { role: ChatRole }) {
                     handleOpen();
                 }}
             >
-                {open ? "×" : "AI"}
+                {open ? (
+                    "×"
+                ) : (
+                    <Image
+                        src={BUDDY_SRC}
+                        alt=""
+                        width={44}
+                        height={44}
+                        className={styles.toggleBuddy}
+                    />
+                )}
             </button>
         </div>,
         document.body,
