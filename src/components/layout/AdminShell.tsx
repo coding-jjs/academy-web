@@ -4,6 +4,7 @@ import { roleNavigation } from "@/lib/navigation";
 import { adminRoleLabels } from "@/lib/role-routes";
 import type { RolePrefix } from "@/types/roles";
 import { auth } from "@/lib/auth";
+import ChatbotWidget from "@/features/chatbot/ChatbotWidget";
 import NavLink from "./NavLink";
 import styles from "./Shells.module.css";
 import LogoutButton from "../auth/LogoutButton";
@@ -54,6 +55,7 @@ export default async function AdminShell({
                 </aside>
                 <main className={styles.adminContent}>{children}</main>
             </div>
+            {session?.user ? <ChatbotWidget role={role} /> : null}
         </div>
     );
 }
