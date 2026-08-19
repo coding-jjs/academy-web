@@ -27,7 +27,3 @@ export type ParentPaymentsData = {
     payable: ParentInvoice[];
     history: ParentInvoice[];
 };
-
-export type PaymentConfirmationResult =
-    | { ok: true; message: string; invoiceId: string }
-    | { ok: false; message: string; invoiceId: string | null };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";
 import type { ParentInvoice } from "@/features/billing/parent-types";
 import {
@@ -8,62 +8,23 @@ import {
     formatInvoiceDate,
     PARENT_INVOICE_STATUS_METADATA,
 } from "@/features/billing/presentation";
-import { requestTossPayment } from "@/lib/toss-client";
-import {
-    prepareTossCheckout,
-    type CheckoutState,
-} from "@/features/billing/parent-actions";
 import styles from "./ParentPaymentsScreen.module.css";
 
 const statusMeta = PARENT_INVOICE_STATUS_METADATA;
-
-const initialCheckout: CheckoutState = {
-    status: "idle",
-    message: "",
-    checkout: null,
-};
+const UNAVAILABLE_MESSAGE = "온라인 결제는 준비 중인 기능입니다.";
 
 export default function ParentPaymentsScreen({
     payable,
     history,
-    tossReady,
 }: {
     payable: ParentInvoice[];
     history: ParentInvoice[];
-    tossReady: boolean;
 }) {
     const [selectedId, setSelectedId] = useState(payable[0]?.id ?? "");
-    const [state, formAction, pending] = useActionState(
-        prepareTossCheckout,
-        initialCheckout,
-    );
-    const [payError, setPayError] = useState("");
+    const [message, setMessage] = useState("");
 
     const selected =
         payable.find((inv) => inv.id === selectedId) ?? payable[0] ?? null;
-
-    useEffect(() => {
-        if (state.status !== "ready" || !state.checkout) return;
-
-        let cancelled = false;
-        (async () => {
-            try {
-                setPayError("");
-                await requestTossPayment(state.checkout!);
-            } catch (error) {
-                if (cancelled) return;
-                setPayError(
-                    error instanceof Error
-                        ? error.message
-                        : "결제창을 열지 못했습니다.",
-                );
-            }
-        })();
-
-        return () => {
-            cancelled = true;
-        };
-    }, [state]);
 
     return (
         <section className={styles.page}>
@@ -73,9 +34,6 @@ export default function ParentPaymentsScreen({
                     <h1>결제</h1>
                     <p>수강료와 교재비 청구 내역을 확인하고 결제합니다.</p>
                 </div>
-                {!tossReady && (
-                    <StatusChip tone="warning">토스 키 미설정</StatusChip>
-                )}
             </header>
 
             {selected ? (
@@ -92,33 +50,23 @@ export default function ParentPaymentsScreen({
                         {formatInvoiceDate(selected.dueDate)}
                     </p>
 
-                    <form action={formAction} className={styles.payForm}>
-                        <input
-                            type="hidden"
-                            name="invoiceId"
-                            value={selected.id}
-                        />
-                        <button
-                            type="submit"
-                            className={styles.primaryBtn}
-                            disabled={pending || !tossReady}
-                        >
-                            {pending ? "준비 중…" : "토스로 결제하기"}
+                    <form
+                        className={styles.payForm}
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            setMessage(UNAVAILABLE_MESSAGE);
+                        }}
+                    >
+                        <button type="submit" className={styles.primaryBtn}>
+                            토스로 결제하기
                         </button>
                     </form>
 
-                    {(state.message || payError) && (
-                        <p
-                            className={
-                                state.status === "error" || payError
-                                    ? styles.error
-                                    : styles.hint
-                            }
-                            role="alert"
-                        >
-                            {payError || state.message}
+                    {message ? (
+                        <p className={styles.error} role="alert">
+                            {message}
                         </p>
-                    )}
+                    ) : null}
                 </div>
             ) : (
                 <div className={styles.empty}>
