@@ -53,7 +53,7 @@ export default async function LoginPage({
 
                     {params.error && (
                         <p className={cx(typographyStyles.error, styles.error)} role="alert">
-                            로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.
+                            {getLoginErrorMessage(params.error)}
                         </p>
                     )}
 
@@ -145,6 +145,16 @@ export default async function LoginPage({
             </section>
         </main>
     );
+}
+
+function getLoginErrorMessage(error: string) {
+    if (error === "Unregistered") {
+        return "가입되지 않은 계정입니다. 회원가입을 진행해 주세요.";
+    }
+    if (error === "Blocked") {
+        return "로그인할 수 없는 계정입니다. 학원에 문의해 주세요.";
+    }
+    return "로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.";
 }
 
 function GoogleMark() {

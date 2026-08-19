@@ -70,30 +70,25 @@ export async function completeSignup(
     }
 
     try {
-        const user = await prisma.user.findUnique({
-            where: { email },
-        });
-
-        if (!user || user.onboardingCompleteAt) {
-            return {
-                status: "error",
-                message: "이미 가입된 이메일입니다.",
-                errors: {},
-            };
-        }
-
-        await prisma.user.update({
-            where: { email },
+        const result = await prisma.user.updateMany({
+            where: { email, status: "ACTIVE", onboardingCompleteAt: null },
             data: {
                 name,
                 address,
                 schoolName: school || null,
                 grade: grade || null,
                 phone: phone || null,
-                role: "GUEST",
                 onboardingCompleteAt: new Date(),
             },
         });
+
+        if (result.count === 0) {
+            return {
+                status: "error",
+                message: "이미 가입됐거나 가입할 수 없는 계정입니다.",
+                errors: {},
+            };
+        }
     } catch (error) {
         console.error("회원가입 실패", error);
 

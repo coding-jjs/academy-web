@@ -212,7 +212,7 @@ export async function updateStudentStatus(input: {
             ok: true,
             message:
                 status === "WITHDRAWN"
-                    ? `${result.student.name} 학생을 퇴원 처리했습니다. 계정과 활성 수강 및 가족 연결이 정리되었습니다.`
+                    ? `${result.student.name} 학생을 퇴원 처리했습니다. 당일 24시까지 로그인과 조회가 가능하며, 이후 계정이 탈퇴 처리됩니다.`
                     : `${result.student.name} 학생 상태를 ${label}(으)로 변경했습니다.`,
         };
     } catch (error) {

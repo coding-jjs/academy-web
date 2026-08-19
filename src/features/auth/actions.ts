@@ -8,9 +8,16 @@ import {
     isDevLoginEnabled,
     parseDevTestEmail,
 } from "@/lib/dev-login";
+import { setOAuthIntent } from "@/lib/oauth-intent";
 
 export async function signInWithGoogle() {
+    await setOAuthIntent("login");
     await signIn("google", { redirectTo: "/post-login" });
+}
+
+export async function signUpWithGoogle() {
+    await setOAuthIntent("signup");
+    await signIn("google", { redirectTo: "/signup?step=details" });
 }
 
 export async function signInAsTestUser(formData: FormData) {

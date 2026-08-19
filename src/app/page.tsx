@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
     const [session, notices] = await Promise.all([auth(), getHomeNotices()]);
-    const user = session?.user;
+    const user = session?.user?.id ? session.user : null;
 
     return (
         <HomeScreen
