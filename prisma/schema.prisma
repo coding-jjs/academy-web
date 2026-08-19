@@ -1,3 +1,9 @@
+/*
+ * 파일 역할:
+ * 학원 운영 데이터의 단일 진실 공급원.
+ * 역할·원생·수업·출석·청구 등 테이블과 enum을 정의하고, 앱은 여기서 생성한 클라이언트를 쓴다.
+ */
+
 generator client {
   provider = "prisma-client"
   output   = "../src/generate/prisma"
@@ -184,6 +190,7 @@ enum InquiryStatus {
   @@map("inquiry_status")
 }
 
+/// 로그인 계정. 역할·차단/퇴원 상태·온보딩을 보관한다.
 model User {
   id                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email                String     @unique
@@ -232,6 +239,7 @@ model User {
   @@map("users")
 }
 
+/// Google 등 OAuth 연결. 한 provider 계정은 한 User에만 묶인다.
 model OAuthAccount {
   id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId            String   @map("user_id") @db.Uuid
@@ -255,6 +263,7 @@ model OAuthAccount {
   @@map("oauth_accounts")
 }
 
+/// 교사·직원 개별 권한 플래그. 원장은 이 행 없이 전부 허용이다.
 model PermissionGrant {
   userId                      String   @id @map("user_id") @db.Uuid
   viewAllStudents             Boolean  @default(false) @map("view_all_students")
@@ -274,6 +283,7 @@ model PermissionGrant {
   @@map("permission_grants")
 }
 
+/// 원생 프로필. ENROLLED/PAUSED/WITHDRAWN과 퇴원 시각을 둔다.
 model Student {
   id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId        String?       @unique @map("user_id") @db.Uuid
@@ -307,6 +317,7 @@ model Student {
   @@map("students")
 }
 
+/// 학부모 User와 원생 연결. 퇴원 확정 시 endedAt을 채운다.
 model ParentStudentLink {
   id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   parentUserId String    @map("parent_user_id") @db.Uuid
@@ -330,6 +341,7 @@ model ParentStudentLink {
   @@map("parent_student_links")
 }
 
+/// 반(과목·담임·일정). 비활성은 active=false로 남긴다.
 model Class {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String
@@ -352,6 +364,7 @@ model Class {
   @@map("classes")
 }
 
+/// 원생의 반 수강. ACTIVE이고 endedAt이 없으면 재원 수강이다.
 model ClassEnrollment {
   id         String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   classId    String           @map("class_id") @db.Uuid
@@ -370,6 +383,7 @@ model ClassEnrollment {
   @@map("class_enrollments")
 }
 
+/// 한 회차 수업. classId+startsAt 유니크로 중복 회차를 막는다.
 model ClassSession {
   id        String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   classId   String             @map("class_id") @db.Uuid
@@ -389,6 +403,7 @@ model ClassSession {
   @@map("class_sessions")
 }
 
+/// 회차별 출결. 학생+회차 유니크다.
 model AttendanceRecord {
   id         String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId  String           @map("student_id") @db.Uuid
@@ -412,6 +427,7 @@ model AttendanceRecord {
   @@map("attendance_records")
 }
 
+/// 학부모 등이 넣은 결석 신청.
 model AbsenceRequest {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId   String    @map("student_id") @db.Uuid
@@ -432,6 +448,7 @@ model AbsenceRequest {
   @@map("absence_requests")
 }
 
+/// 수업 노트·과제·생활기록.
 model LearningRecord {
   id           String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId    String             @map("student_id") @db.Uuid
@@ -454,6 +471,7 @@ model LearningRecord {
   @@map("learning_records")
 }
 
+/// 성적. 과목별 하락 감지에 쓴다.
 model GradeRecord {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId  String   @map("student_id") @db.Uuid
@@ -478,6 +496,7 @@ model GradeRecord {
   @@map("grade_records")
 }
 
+/// 오답 노트. 성적에 묶일 수 있다.
 model WrongNote {
   id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId     String          @map("student_id") @db.Uuid
@@ -506,6 +525,7 @@ model WrongNote {
   @@map("wrong_notes")
 }
 
+/// 오답 첨부 이미지.
 model WrongNoteImage {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   wrongNoteId String   @map("wrong_note_id") @db.Uuid
@@ -521,6 +541,7 @@ model WrongNoteImage {
   @@map("wrong_note_images")
 }
 
+/// 상담 메모.
 model CounselingMemo {
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId    String   @map("student_id") @db.Uuid
@@ -538,6 +559,7 @@ model CounselingMemo {
   @@map("counseling_memos")
 }
 
+/// AI 학습 리포트. 초안→승인→발송 상태를 추적한다.
 model AiReport {
   id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId       String         @map("student_id") @db.Uuid
@@ -567,6 +589,7 @@ model AiReport {
   @@map("ai_reports")
 }
 
+/// 이탈 위험 건. DETECTED/COUNSELING이 열린 케이스다.
 model ChurnCase {
   id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId      String          @map("student_id") @db.Uuid
@@ -588,6 +611,7 @@ model ChurnCase {
   @@map("churn_cases")
 }
 
+/// 이탈 신호 한 건(출결·성적·연속결석·미납).
 model ChurnSignalLog {
   id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   churnCaseId String          @map("churn_case_id") @db.Uuid
@@ -603,6 +627,7 @@ model ChurnSignalLog {
   @@map("churn_signal_logs")
 }
 
+/// 이탈 감지 임계값. id=1 한 행만 쓴다.
 model ChurnThresholdConfig {
   id                         Int      @id @default(1)
   attendanceDropPercentPoint Decimal  @default(15) @map("attendance_drop_percent_point") @db.Decimal(5, 2)
@@ -618,6 +643,7 @@ model ChurnThresholdConfig {
   @@map("churn_threshold_configs")
 }
 
+/// 학부모 청구서.
 model Invoice {
   id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId    String        @map("student_id") @db.Uuid
@@ -642,6 +668,7 @@ model Invoice {
   @@map("invoices")
 }
 
+/// 토스 등 결제 시도·결과.
 model Payment {
   id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   invoiceId      String        @map("invoice_id") @db.Uuid
@@ -669,6 +696,7 @@ model Payment {
   @@map("payments")
 }
 
+/// 쪽지. 승인 후 발송한다.
 model Message {
   id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   senderUserId    String?          @map("sender_user_id") @db.Uuid
@@ -709,6 +737,7 @@ model Message {
   @@map("messages")
 }
 
+/// 쪽지 수신자·읽음 시각.
 model MessageRecipient {
   id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   messageId       String    @map("message_id") @db.Uuid
@@ -725,6 +754,7 @@ model MessageRecipient {
   @@map("message_recipients")
 }
 
+/// 웹 푸시 구독.
 model PushSubscription {
   id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId    String    @map("user_id") @db.Uuid
@@ -744,6 +774,7 @@ model PushSubscription {
   @@map("push_subscriptions")
 }
 
+/// 수신자별 푸시 발송 결과.
 model PushDelivery {
   id             String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   recipientId    String             @map("recipient_id") @db.Uuid
@@ -762,6 +793,7 @@ model PushDelivery {
   @@map("push_deliveries")
 }
 
+/// 공지·배너.
 model NewsItem {
   id        String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   kind      NewsKind     @default(NOTICE)
@@ -787,6 +819,7 @@ model NewsItem {
   @@map("news_items")
 }
 
+/// 게스트 상담 문의.
 model Inquiry {
   id                String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   guardianName      String        @map("guardian_name")
@@ -808,6 +841,7 @@ model Inquiry {
   @@map("inquiries")
 }
 
+/// 민감 작업 감사 로그. 행위자·IP·UA를 남긴다.
 model AuditLog {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   actorUserId String?  @map("actor_user_id") @db.Uuid

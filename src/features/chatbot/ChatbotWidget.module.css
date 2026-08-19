@@ -1,3 +1,15 @@
+/*
+ * ChatbotWidget 플로팅 패널·토글 버튼 레이아웃.
+ *
+ * 호출: `ChatbotWidget.tsx`만. 포인터는 .root에서 none, 자식에서 auto.
+ * z-index 50으로 셸 내비 위에 띄운다.
+ *
+ * 의도적으로 하지 않는 일:
+ * - 역할별 색. 질문은 tsx가 POST로 보내고 CSS는 모양만.
+ *
+ * 관련: `ChatbotWidget.tsx`.
+ */
+
 .root {
     position: fixed;
     right: max(20px, env(safe-area-inset-right));

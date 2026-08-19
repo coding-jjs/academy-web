@@ -1,3 +1,5 @@
+/* 파일 역할: 내부 패널. */
+
 .head {
     display: flex;
     justify-content: space-between;

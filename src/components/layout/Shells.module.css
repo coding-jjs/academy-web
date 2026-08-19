@@ -1,3 +1,5 @@
+/* 파일 역할: AdminShell/MemberShell 레이아웃(헤더·사이드바). */
+
 .adminPage,
 .memberPage {
     min-height: 100vh;

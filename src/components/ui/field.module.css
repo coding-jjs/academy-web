@@ -1,3 +1,5 @@
+/* 파일 역할: 폼 필드 공통 스타일. */
+
 .root {
     display: grid;
     gap: 8px;

@@ -1,3 +1,5 @@
+/* 파일 역할: 전역 토큰·리셋·라우트 전환. 역할 화면 CSS 모듈보다 바깥의 문서 스타일. */
+
 :root {
   --background: #f5f5f7;
   --foreground: #1d1d1f;

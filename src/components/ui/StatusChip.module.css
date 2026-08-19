@@ -1,3 +1,5 @@
+/* 파일 역할: 상태 뱃지 색. */
+
 .chip {
     display: inline-flex;
     align-items: center;

@@ -1,3 +1,15 @@
+/*
+ * 원장 청구·수납 화면 2열 레이아웃과 목록 행 간격.
+ *
+ * 호출: `BillingManagementScreen`·작성/목록 패널.
+ * 생성 액션이 없어 버튼 스타일만 두고, 실제 저장은 아직 없다.
+ *
+ * 의도적으로 하지 않는 일:
+ * - 학부모 결제 화면 스타일. 그건 app 쪽 ParentPaymentsScreen.
+ *
+ * 관련: `InvoiceCreationPanel.tsx`, `InvoiceListPanel.tsx`.
+ */
+
 .layout {
     display: grid;
     grid-template-columns: minmax(280px, .95fr) minmax(0, 1.2fr);

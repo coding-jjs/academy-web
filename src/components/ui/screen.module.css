@@ -1,3 +1,5 @@
+/* 파일 역할: 업무 화면 폭·여백. */
+
 .animatedPage {
     animation: screen-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }

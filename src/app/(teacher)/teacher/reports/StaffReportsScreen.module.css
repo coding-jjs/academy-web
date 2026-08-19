@@ -1,3 +1,5 @@
+/* 파일 역할: StaffReports 화면 레이아웃·간격. 도메인 로직은 같은 이름의 tsx에 있다. */
+
 .layout {
     display: grid;
     grid-template-columns: minmax(260px, .9fr) minmax(0, 1.4fr);

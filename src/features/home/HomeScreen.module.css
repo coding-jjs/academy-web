@@ -1,3 +1,15 @@
+/*
+ * 공개 마케팅 홈(`/`) 레이아웃·타이포·배너.
+ *
+ * 호출: `HomeScreen`과 하위 헤더·쇼케이스·안내 섹션.
+ * 역할 대시보드 카드 스타일이 아니다. 로그인 후에도 이 페이지는 마케팅 톤을 유지한다.
+ *
+ * 의도적으로 하지 않는 일:
+ * - 출결/리포트 위젯. 그건 `(role)/dashboard` 화면 CSS.
+ *
+ * 관련: `HomeScreen.tsx`, `content.ts`(배너 tone 클래스명).
+ */
+
 .page {
     min-height: 100vh;
     overflow-x: clip;
