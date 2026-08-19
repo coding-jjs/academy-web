@@ -1,27 +1,17 @@
 import Link from "next/link";
-import { auth, signIn } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { signUpWithGoogle } from "@/features/auth/actions";
 import SignupFlow from "./SignupFlow";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
-export default async function SignupPage({
-    searchParams,
-}: {
-    searchParams: Promise<{ step?: string; error?: string }>;
-}) {
-    const params = await searchParams;
+export default async function SignupPage() {
     const session = await auth();
 
-    const googleVerified =
-        params.step === "details" && Boolean(session?.user?.email);
-
-    async function signUpWithGoogle() {
-        "use server";
-
-        await signIn("google", {
-            redirectTo: "/signup?step=details",
-        });
+    if (session?.user?.id && session.user.onboardingCompleted) {
+        redirect("/post-login");
     }
 
     return (
@@ -39,7 +29,7 @@ export default async function SignupPage({
 
             <div className={styles.content}>
                 <SignupFlow
-                    googleVerified={googleVerified}
+                    googleVerified={Boolean(session?.user?.id)}
                     googleSignInAction={signUpWithGoogle}
                 />
             </div>

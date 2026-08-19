@@ -6,6 +6,7 @@ import {
     buildStudentChatContext,
 } from "@/features/chatbot/context";
 import { buildChatPrompt } from "@/features/chatbot/prompt";
+import { getUsableAccount } from "@/lib/account-access";
 import { getAuditRequestMetadata } from "@/lib/audit";
 import { prisma } from "@/lib/db";
 
@@ -21,7 +22,15 @@ export async function POST(request: Request) {
         );
     }
 
-    const role = session.user.role;
+    const account = await getUsableAccount(session.user.id);
+    if (!account) {
+        return Response.json(
+            { error: "UNAUTHORIZED", message: "로그인이 필요합니다." },
+            { status: 401 },
+        );
+    }
+
+    const role = account.role;
     if (
         role !== "PARENT" &&
         role !== "STUDENT" &&
@@ -76,11 +85,11 @@ export async function POST(request: Request) {
 
         const context =
             role === "PARENT"
-                ? await buildParentChatContext(session.user.id, viewerName)
+                ? await buildParentChatContext(account.id, viewerName)
                 : role === "STUDENT"
-                  ? await buildStudentChatContext(session.user.id, viewerName)
+                  ? await buildStudentChatContext(account.id, viewerName)
                   : await buildStaffChatContext(
-                        session.user.id,
+                        account.id,
                         viewerName,
                         role,
                         message,
@@ -91,10 +100,10 @@ export async function POST(request: Request) {
         const metadata = await getAuditRequestMetadata();
         await prisma.auditLog.create({
             data: {
-                actorUserId: session.user.id,
+                actorUserId: account.id,
                 action: "CHATBOT_REQUEST",
                 targetType: "CHATBOT",
-                targetId: session.user.id,
+                targetId: account.id,
                 details: { role, messageLength: message.length },
                 ipAddress: metadata.ipAddress,
                 userAgent: metadata.userAgent,

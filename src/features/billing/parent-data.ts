@@ -2,7 +2,6 @@ import "server-only";
 
 import type { Prisma } from "@/generate/prisma/client";
 import { prisma } from "@/lib/db";
-import { syncOverdueInvoices } from "@/features/billing/overdue";
 import type {
     InvoiceStatus,
     ParentInvoice,
@@ -40,7 +39,6 @@ type ParentInvoiceRecord = Prisma.InvoiceGetPayload<{
 export async function getParentPaymentsData(
     parentUserId: string,
 ): Promise<ParentPaymentsData> {
-    await syncOverdueInvoices();
     const invoices = await prisma.invoice.findMany({
         where: {
             parentUserId,

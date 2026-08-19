@@ -46,3 +46,4 @@ API_KEY.txt
 # Prisma generated client
 /src/generate/prisma
 
+auth-login-signup-security.md

@@ -1,6 +1,8 @@
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
+import type { JWT } from "@auth/core/jwt";
+import { getUsableAccount, getUsableAccountByEmail } from "@/lib/account-access";
 import { prisma } from "@/lib/db";
 import {
     DEV_LOGIN_PROVIDER_ID,
@@ -8,6 +10,17 @@ import {
     isDevLoginEnabled,
     parseDevTestEmail,
 } from "@/lib/dev-login";
+import { clearOAuthIntent, readOAuthIntent } from "@/lib/oauth-intent";
+
+function clearAccessToken(token: JWT) {
+    token.userId = undefined;
+    token.role = "GUEST";
+    token.onboardingCompleted = false;
+    token.email = undefined;
+    token.name = undefined;
+    token.picture = undefined;
+    return token;
+}
 
 const authConfig = {
     trustHost: true,
@@ -36,7 +49,6 @@ const authConfig = {
                           const user = await prisma.user.findFirst({
                               where: {
                                   email,
-                                  status: "ACTIVE",
                                   role: { in: [...DEV_LOGIN_ROLES] },
                               },
                               select: {
@@ -48,6 +60,9 @@ const authConfig = {
                           });
 
                           if (!user) return null;
+
+                          const usable = await getUsableAccount(user.id);
+                          if (!usable) return null;
 
                           await prisma.user.update({
                               where: { id: user.id },
@@ -68,6 +83,8 @@ const authConfig = {
 
     session: {
         strategy: "jwt",
+        maxAge: 60 * 60 * 8,
+        updateAge: 0,
     },
 
     pages: {
@@ -93,22 +110,37 @@ const authConfig = {
             }
 
             const email = user.email.trim().toLowerCase();
+            const intent = await readOAuthIntent();
+            await clearOAuthIntent();
 
-            const dbUser = await prisma.user.upsert({
-                where: {
-                    email,
-                },
-                create: {
-                    email,
-                    name: user.name?.trim() || email.split("@")[0],
-                    imageUrl: user.image,
-                    lastLoginAt: new Date(),
-                },
-                update: {
-                    imageUrl: user.image,
-                    lastLoginAt: new Date(),
-                },
+            const existing = await prisma.user.findUnique({
+                where: { email },
+                select: { id: true },
             });
+
+            if (existing) {
+                const usable = await getUsableAccount(existing.id);
+                if (!usable) return "/login?error=Blocked";
+            } else if (intent !== "signup") {
+                return "/login?error=Unregistered";
+            }
+
+            const dbUser = existing
+                ? await prisma.user.update({
+                      where: { id: existing.id },
+                      data: {
+                          imageUrl: user.image,
+                          lastLoginAt: new Date(),
+                      },
+                  })
+                : await prisma.user.create({
+                      data: {
+                          email,
+                          name: user.name?.trim() || email.split("@")[0],
+                          imageUrl: user.image,
+                          lastLoginAt: new Date(),
+                      },
+                  });
 
             const accountKey = {
                 provider: account.provider,
@@ -140,40 +172,24 @@ const authConfig = {
                 },
             });
 
-            // Auth.js에 로그인을 허용한다고 명시
             return true;
         },
         async jwt({ token }) {
             const email = token.email?.trim().toLowerCase();
 
             if (!email) {
-                token.userId = undefined;
-                token.role = "GUEST";
-                token.onboardingCompleted = false;
-                return token;
+                return clearAccessToken(token);
             }
 
-            const dbUser = await prisma.user.findUnique({
-                where: {
-                    email,
-                },
-                select: {
-                    id: true,
-                    role: true,
-                    onboardingCompleteAt: true,
-                },
-            });
+            const dbUser = await getUsableAccountByEmail(email);
 
             if (!dbUser) {
-                token.userId = undefined;
-                token.role = "GUEST";
-                token.onboardingCompleted = false;
-                return token;
+                return clearAccessToken(token);
             }
 
             token.userId = dbUser.id;
             token.role = dbUser.role;
-            token.onboardingCompleted = dbUser.onboardingCompleteAt !== null;
+            token.onboardingCompleted = dbUser.onboardingCompleted;
             return token;
         },
         async session({ session, token }) {

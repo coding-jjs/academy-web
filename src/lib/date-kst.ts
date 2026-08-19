@@ -13,6 +13,18 @@ export function getKstDayRange(now = new Date()) {
     return { day, startOfToday, endOfToday };
 }
 
+export function getWithdrawalAccessUntil(withdrawnAt: Date) {
+    return getKstDayRange(withdrawnAt).endOfToday;
+}
+
+export function isPastWithdrawalGrace(
+    withdrawnAt: Date | null | undefined,
+    now = new Date(),
+) {
+    if (!withdrawnAt) return false;
+    return now.getTime() >= getWithdrawalAccessUntil(withdrawnAt).getTime();
+}
+
 export function getKstRecentRange(daysBack: number, now = new Date()) {
     const { startOfToday, endOfToday } = getKstDayRange(now);
     const startRecent = new Date(startOfToday);
