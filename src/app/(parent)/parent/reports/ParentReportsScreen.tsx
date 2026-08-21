@@ -154,11 +154,6 @@ export default function ParentReportsScreen({ // 이 파일의 화면. 학부모
                                 </article> // article 닫기.
                             )}{/* 구문 끝. */}
 
-                            <article className={styles.panel}>{/* SENT 리포트만. 초안/반려는 숨긴다. */}
-                                <h3>선생님 코멘트</h3>{/* 소제목. */}
-                                <p>{activeReport.content}</p>{/* 문장. */}
-                            </article>{/* article 닫기. */}
-
                             <article className={styles.panel}>{/* 지난 보고서 */}
                                 <div className={styles.panelHead}>{/* 레이아웃 상자. */}
                                     <h3>지난 보고서</h3>{/* 소제목. */}

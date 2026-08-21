@@ -34,7 +34,13 @@ export default function StaffDashboardScreen({ // 이 파일의 화면. 교사 �
         { href: "/teacher/attendance", label: "출석 체크" }, // 구문. 교사 라우트 전용. 직원이 쓰지 않는다.
         { href: "/teacher/reports", label: "AI 리포트" }, // 구문. 교사 라우트 전용. 직원이 쓰지 않는다.
         { href: "/teacher/students", label: "담당 학생" }, // 구문. 교사 라우트 전용. 직원이 쓰지 않는다.
-        { href: "/teacher/counseling", label: "상담 관리" }, // 구문. 교사 라우트 전용. 직원이 쓰지 않는다.
+        { // 배정 케어가 있으면 건수를 붙인다.
+            href: "/teacher/counseling", // 교사 상담. 직원이 이 Screen을 쓰지 않는다.
+            label: // 배지.
+                metrics.pendingChurnCare > 0 // COUNSELING 배정 건.
+                    ? `상담 관리 (${metrics.pendingChurnCare})` // 할 일 숫자.
+                    : "상담 관리", // 건수 0이면 라벨만.
+        },
     ]; // 교사 라우트 전용. 직원이 쓰지 않는다.
 
     return ( // 교사 오늘 수업 홈. 직원 dashboard가 쓰지 않는다.

@@ -47,7 +47,7 @@ export default function DirectorDashboardScreen({ // 이 파일의 화면. 원�
         { // 객체/블록 시작.
             label: "이탈 위험", // label 필드.
             value: String(metrics.openChurn), // value 필드.
-            detail: "감지·상담 중", // detail 필드.
+            detail: "감지·상담·검토", // PENDING_REVIEW 포함. 열린 이탈 카드.
             tone: metrics.openChurn > 0 ? "danger" : "success", // tone 필드.
             href: "/director/churn", // href 필드.
         }, // 객체/호출 끝.
@@ -94,7 +94,7 @@ export default function DirectorDashboardScreen({ // 이 파일의 화면. 원�
         }, // 객체/호출 끝.
         { // 객체/블록 시작.
             label: "이탈 위험", // label 필드.
-            detail: "상담·조치 필요", // detail 필드.
+            detail: "배정·검토 필요", // 담당 배정과 PENDING_REVIEW.
             href: "/director/churn", // href 필드.
             count: metrics.openChurn, // count 필드.
             tone: metrics.openChurn > 0 ? "danger" : "success", // tone 필드.

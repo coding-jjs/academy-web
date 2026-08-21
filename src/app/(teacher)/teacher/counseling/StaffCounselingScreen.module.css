@@ -34,6 +34,10 @@
     gap: 8px;
     margin-bottom: 16px;
   }
+
+  .careTop {
+    margin-bottom: 16px;
+  }
   
   .filterBtn,
   .filterActive {
@@ -221,6 +225,44 @@
   
   .inquiryActions select {
     max-width: 140px;
+  }
+
+  .memoStack {
+    display: grid;
+    gap: 18px;
+  }
+
+  .careList {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .careItem {
+    padding: 16px 0;
+    border-top: 1px solid #ededf0;
+  }
+
+  .careItem:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .careItem .form {
+    margin-top: 12px;
+  }
+
+  .careReason,
+  .careMemo {
+    margin: 0 0 8px;
+    color: #515154;
+    font-size: 13px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+  }
+
+  .careMemo {
+    color: #6e6e73;
   }
   
   @keyframes screen-enter {

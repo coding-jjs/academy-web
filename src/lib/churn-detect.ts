@@ -14,12 +14,13 @@
  * 의도적으로 하지 않는 일:
  * - 신호가 사라진 케이스를 RESOLVED로 닫지 않는다. 원장이 상담/종결한다.
  * - PAUSED/WITHDRAWN 원생은 스캔하지 않는다 — 이미 떠난 학생을 큐에 넣지 않기 위함.
- * - 열린 케이스(DETECTED/COUNSELING)가 있으면 새로 만들지 않고 summary만 갱신한다.
+ * - 열린 케이스(DETECTED/COUNSELING/PENDING_REVIEW)가 있으면 새로 만들지 않고 summary만 갱신한다.
  *
  * 관련: `features/churn/*`, `student-lifecycle.ts` (퇴원 시 케이스 닫기), `date-kst.ts`.
  */
 
 import { CHURN_SIGNAL_LABELS } from "@/features/churn/presentation"; // 화면 한글. 케이스가 닫힐 때 쓰는 문구가 아님.
+import { OPEN_CHURN_STATUSES } from "@/features/churn/types"; // DETECTED·COUNSELING·PENDING_REVIEW. 새 카드를 만들지 않는다.
 import { prisma } from "@/lib/db"; // 원장 스캔 쓰기. PAUSED/WITHDRAWN은 where에서 뺀다.
 import { getKstDayRange } from "@/lib/date-kst"; // 오늘은 진행 중이라 창에서 뺀다. 서버 자정이 아님.
 import type { Prisma } from "@/generate/prisma/client"; // details JSON. 신호 이력.
@@ -263,10 +264,10 @@ export async function detectChurnCases( // 재원 ENROLLED만 스캔. 열린 케
         signalCount += signals.length; // 로그 createMany 건수.
         const summary = buildSummary(signals); // 카드 한 줄.
 
-        const openCase = await prisma.churnCase.findFirst({ // DETECTED/COUNSELING이 있으면 새 카드를 만들지 않는다.
+        const openCase = await prisma.churnCase.findFirst({ // 열린 카드가 있으면 새 카드를 만들지 않는다.
             where: { // 이 원생의 열린 카드.
                 studentId: student.id, // 이 원생.
-                status: { in: ["DETECTED", "COUNSELING"] }, // IMPROVED/RESOLVED/WITHDRAWN은 열린 카드가 아님.
+                status: { in: [...OPEN_CHURN_STATUSES] }, // IMPROVED/WITHDRAWN은 열린 카드가 아님. 검토 대기 포함.
             },
             orderBy: { detectedAt: "desc" }, // 가장 최근 열린 카드.
             select: { id: true }, // summary만 갱신.

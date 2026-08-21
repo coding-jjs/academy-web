@@ -49,7 +49,7 @@ export const roleNavigation: Record<RolePrefix, NavItem[]> = { // 권한 키로 
         { href: "/employee/dashboard", label: "업무 홈", icon: "▦" }, // 직원 홈. /staff가 아님.
         { href: "/employee/billing", label: "청구·수납", icon: "▰" }, // grant billing. 교사와 달리 프리셋 true.
         { href: "/employee/students", label: "학생", icon: "◉" }, // StaffStudentsScreen 재사용.
-        { href: "/employee/counseling", label: "상담 문의", icon: "◎" }, // 문의 큐는 직원만 includeInquiries.
+        { href: "/employee/counseling", label: "상담", icon: "◎" }, // 이탈 케어+문의. includeInquiries는 직원만 true.
         { href: "/employee/messages", label: "쪽지", icon: "□" }, // PENDING_APPROVAL. 수신 행은 아직 없음.
     ], // employee 메뉴 끝.
     parent: [ // 학부모. 권한 키 없음. 활성 자녀 링크만 data.ts가 건다.

@@ -115,6 +115,7 @@ enum MessageAudience {
 enum ChurnCaseStatus {
   DETECTED
   COUNSELING
+  PENDING_REVIEW
   IMPROVED
   WITHDRAWN
 
@@ -546,16 +547,19 @@ model CounselingMemo {
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId    String   @map("student_id") @db.Uuid
   authorUserId String   @map("author_user_id") @db.Uuid
+  churnCaseId  String?  @map("churn_case_id") @db.Uuid
   content      String
   counseledAt  DateTime @map("counseled_at") @db.Timestamptz(6)
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  student Student @relation(fields: [studentId], references: [id])
-  author  User    @relation(fields: [authorUserId], references: [id])
+  student   Student    @relation(fields: [studentId], references: [id])
+  author    User       @relation(fields: [authorUserId], references: [id])
+  churnCase ChurnCase? @relation(fields: [churnCaseId], references: [id], onDelete: SetNull)
 
   @@index([studentId, counseledAt(sort: Desc)])
   @@index([authorUserId])
+  @@index([churnCaseId])
   @@map("counseling_memos")
 }
 
@@ -589,7 +593,7 @@ model AiReport {
   @@map("ai_reports")
 }
 
-/// 이탈 위험 건. DETECTED/COUNSELING이 열린 케이스다.
+/// 이탈 위험 건. DETECTED/COUNSELING/PENDING_REVIEW가 열린 케이스다.
 model ChurnCase {
   id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId      String          @map("student_id") @db.Uuid
@@ -601,9 +605,10 @@ model ChurnCase {
   createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  student  Student          @relation(fields: [studentId], references: [id])
-  assignee User?            @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
-  signals  ChurnSignalLog[]
+  student          Student           @relation(fields: [studentId], references: [id])
+  assignee         User?             @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
+  signals          ChurnSignalLog[]
+  counselingMemos  CounselingMemo[]
 
   @@index([status, detectedAt(sort: Desc)])
   @@index([studentId, status])

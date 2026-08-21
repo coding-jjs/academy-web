@@ -45,8 +45,8 @@ export async function getStaffDashboardData({ // 출결 저장이 아니다.
     metrics: StaffDashboardMetrics; // 카드.
     sessions: StaffDashboardSession[]; // 오늘 칸.
 }> { // 조회.
-    const [sessionRecords, pendingReports, studentCount, openInquiries] = // 병렬.
-        await Promise.all([ // 오늘 스코프 세션 + 대기 리포트 + 담당 재원 수 + (사무면) 열린 문의.
+    const [sessionRecords, pendingReports, studentCount, openInquiries, pendingChurnCare] = // 병렬. 케어 건수는 상담 바로가기 배지.
+        await Promise.all([ // 오늘 스코프 세션 + 대기 리포트 + 담당 재원 수 + (사무면) 열린 문의 + 배정 케어.
             prisma.classSession.findMany({ // 오늘 수업.
                 where: { // 취소 세션 제외.
                     startsAt: { gte: startOfDay, lt: endOfDay }, // 오늘 구간.
@@ -92,6 +92,12 @@ export async function getStaffDashboardData({ // 출결 저장이 아니다.
                       where: { status: { in: ["NEW", "IN_PROGRESS"] } }, // 완료 제외.
                   })
                 : Promise.resolve(0), // 교사 홈에서는 0. 사무 직원만 NEW·IN_PROGRESS.
+            prisma.churnCase.count({ // 내게 배정된 상담 중 건. 상담 바로가기 숫자.
+                where: { // 담당자=나.
+                    assignedUserId: staffUserId, // 원장이 배정한 교사·직원.
+                    status: "COUNSELING", // 검토 대기는 원장 큐. 여기서는 상담 중만.
+                },
+            }),
         ]);
 
     const sessions = sessionRecords.map((classSession) => { // 오늘 수업 한 칸. 출결 미체크 재원 수를 세어 홈 할 일에 쓴다.
@@ -129,6 +135,7 @@ export async function getStaffDashboardData({ // 출결 저장이 아니다.
             pendingReports, // 작성중·대기·반려.
             myStudentCount: studentCount, // 담당 재원.
             openInquiries, // 교사면 0.
+            pendingChurnCare, // 배정된 COUNSELING. 상담 링크 배지.
         },
     };
 }

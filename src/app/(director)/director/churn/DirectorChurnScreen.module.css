@@ -55,7 +55,7 @@
 
 .metrics article:nth-child(1)::before { background: #ff453a; }
 .metrics article:nth-child(2)::before { background: #ff9f0a; }
-.metrics article:nth-child(3)::before { background: #34c759; }
+.metrics article:nth-child(3)::before { background: #0071e3; }
 
 .metrics article > span {
     color: #86868b;
@@ -105,7 +105,7 @@
 
 .tableWrap table {
     width: 100%;
-    min-width: 700px;
+    min-width: 880px;
     border-collapse: collapse;
     font-size: 13px;
 }
@@ -151,8 +151,39 @@
 }
 
 .tableWrap td:last-child {
-    width: 112px;
+    width: 180px;
     text-align: right;
+}
+
+.memoPreview {
+    display: -webkit-box;
+    overflow: hidden;
+    color: #515154;
+    font-size: 12px;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.actionStack {
+    display: grid;
+    gap: 8px;
+    justify-items: end;
+}
+
+.teacherSelect {
+    width: 100%;
+    margin: 0;
+}
+
+.teacherSelect select {
+    min-height: 34px;
+    padding: 0 8px;
+    font-size: 12px;
+}
+
+.actionMuted {
+    color: #a1a1a6;
 }
 
 .tableActionBtn {

@@ -1,5 +1,5 @@
 /**
- * 이탈 신호·상태 라벨과 다음 액션 버튼 문구를 UI용으로 둔다.
+ * 이탈 신호·상태 라벨을 UI용으로 둔다.
  *
  * 호출: `ChurnCaseTable`, `lib/churn-detect`(신호 한글 요약).
  * 상태 전이는 `actions.ts`에 있고, 여기는 표시만 담당한다.
@@ -7,12 +7,13 @@
  * 의도적으로 하지 않는 일:
  * - DETECTED→COUNSELING 등 DB 업데이트.
  * - 신호 4종의 계산식 → `@/lib/churn-detect`.
+ * - 다음 버튼 문구. 원장 테이블이 상태별로 버튼을 직접 그린다.
  *
  * 관련: `types.ts`.
  */
 
 import type { // 코드값만. 감지 식은 lib/churn-detect.
-    ChurnCaseStatus, // DETECTED→COUNSELING→IMPROVED.
+    ChurnCaseStatus, // PENDING_REVIEW 포함.
     ChurnSignalType, // 신호 4종.
 } from "@/features/churn/types"; // ENROLLED 스캔 대상과 같은 코드.
 
@@ -26,23 +27,12 @@ export const CHURN_SIGNAL_LABELS: Record<ChurnSignalType, string> = { // 계산�
 
 /** 케이스 상태 칩. */
 export const CHURN_STATUS_METADATA: Record< // 화면 칩. DB 전이는 actions.
-    ChurnCaseStatus, // WITHDRAWN 포함.
+    ChurnCaseStatus, // WITHDRAWN·PENDING_REVIEW 포함.
     { label: string; tone: "neutral" | "success" | "warning" | "danger" } // StatusChip.
-> = { // 원장 테이블.
-    DETECTED: { label: "위험 감지", tone: "danger" }, // 다음 버튼: 상담 시작.
-    COUNSELING: { label: "상담 중", tone: "warning" }, // 다음 버튼: 개선 처리.
-    IMPROVED: { label: "개선", tone: "success" }, // 다음 버튼: 학부모 쪽지.
-    WITHDRAWN: { label: "퇴원", tone: "neutral" }, // advance 경로에 없음. 쪽지만.
+> = { // 원장 테이블·교사 케어 패널.
+    DETECTED: { label: "위험 감지", tone: "danger" }, // 아직 미배정.
+    COUNSELING: { label: "상담 중", tone: "warning" }, // 담당자 상담.
+    PENDING_REVIEW: { label: "검토 대기", tone: "warning" }, // 원장 확정 대기.
+    IMPROVED: { label: "개선", tone: "success" }, // 원장이 확정.
+    WITHDRAWN: { label: "퇴원", tone: "neutral" }, // lifecycle이 닫음.
 };
-
-/**
- * 다음 버튼 문구.
- * DETECTED→상담 시작, COUNSELING→개선 처리, IMPROVED/WITHDRAWN→쪽지.
- * 케이스 없으면 "—".
- */
-export function getChurnActionLabel(status: ChurnCaseStatus | null) { // 버튼 카피만. 전이는 actions.
-    if (status === "DETECTED") return "상담 시작"; // advanceChurnCase → COUNSELING.
-    if (status === "COUNSELING") return "개선 처리"; // advanceChurnCase → IMPROVED. WITHDRAWN은 이 경로 없음.
-    if (status === "IMPROVED" || status === "WITHDRAWN") return "쪽지"; // sendChurnParentNote. Message SENT.
-    return "—"; // 케이스 없는 재원생.
-}

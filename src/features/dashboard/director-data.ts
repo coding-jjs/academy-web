@@ -13,6 +13,7 @@ import "server-only"; // 카드 숫자만. 공개 홈이 아니다.
  * 관련: `types.ts`의 `DirectorDashboardMetrics`.
  */
 
+import { OPEN_CHURN_STATUSES } from "@/features/churn/types"; // DETECTED·COUNSELING·PENDING_REVIEW.
 import { prisma } from "@/lib/db"; // server-only Prisma.
 import type { DirectorDashboardMetrics } from "@/features/dashboard/types"; // 카드 DTO.
 
@@ -28,7 +29,7 @@ export async function getDirectorDashboardMetrics({ // 마케팅 홈이 아니�
 }): Promise<DirectorDashboardMetrics> { // 카드 숫자.
     const [ // 병렬 집계.
         pendingReports, // PENDING_APPROVAL.
-        openChurn, // DETECTED·COUNSELING.
+        openChurn, // DETECTED·COUNSELING·PENDING_REVIEW.
         overdueInvoices, // OVERDUE.
         newInquiries, // NEW.
         enrolledStudents, // ENROLLED.
@@ -39,7 +40,7 @@ export async function getDirectorDashboardMetrics({ // 마케팅 홈이 아니�
     ] = await Promise.all([ // 오늘 구간으로 카드용 숫자를 센다. 공개 마케팅 홈이 아니다.
         prisma.aiReport.count({ where: { status: "PENDING_APPROVAL" } }), // 승인 큐. 승인 액션 아님.
         prisma.churnCase.count({ // 열린 이탈.
-            where: { status: { in: ["DETECTED", "COUNSELING"] } }, // 개선·퇴원은 열린 이탈이 아니다.
+            where: { status: { in: [...OPEN_CHURN_STATUSES] } }, // 개선·퇴원은 열린 이탈이 아니다. 검토 대기 포함.
         }),
         prisma.invoice.count({ where: { status: "OVERDUE" } }), // 카드용 건수. 발행·상담 액션은 이 파일이 아니다.
         prisma.inquiry.count({ where: { status: "NEW" } }), // 신규 문의.

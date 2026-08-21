@@ -27,9 +27,9 @@ const links = [ // 운영 입구만. 출석/성적/리포트 URL이 없다.
         detail: "학생 정보와 학부모 연락을 확인합니다.", // 안내.
     }, // 객체/호출 끝.
     { // 상담. includeInquiries true.
-        href: "/employee/counseling", // 게스트 문의 포함. 교사 counseling은 문의 없음.
-        title: "상담 문의", // 카드 제목.
-        detail: "게스트 상담 문의와 메모를 처리합니다.", // /guest/inquiry 건.
+        href: "/employee/counseling", // 이탈 케어+게스트 문의. 교사 counseling은 문의 없음.
+        title: "상담", // 카드 제목. 팀원 PR에서 문의 전용 카피를 케어 포함으로 바꿈.
+        detail: "이탈 케어와 상담 문의, 메모를 처리합니다.", // 배정 케어 + /guest/inquiry.
     }, // 객체/호출 끝.
     { // 쪽지. features MessagesScreen.
         href: "/employee/messages", // sendMessage 권한 page.

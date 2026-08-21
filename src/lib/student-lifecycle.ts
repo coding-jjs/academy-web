@@ -20,6 +20,7 @@
  */
 
 import type { Prisma, StudentStatus } from "@/generate/prisma/client"; // ENROLLED/PAUSED/WITHDRAWN. UserStatus와 별개.
+import { OPEN_CHURN_STATUSES } from "@/features/churn/types"; // DETECTED·COUNSELING·PENDING_REVIEW. 퇴원 시 같이 닫는다.
 import { // 이름만 가져온다. 역할 가드는 proxy·requireRole.
     writeAuditLog, // ENROLLED↔PAUSED↔WITHDRAWN. 수강은 CANCELLED+endedAt.
     type AuditRequestMetadata, // ENROLLED↔PAUSED↔WITHDRAWN. 수강은 CANCELLED+endedAt.
@@ -74,7 +75,7 @@ export async function transitionStudentStatus( // ENROLLED↔PAUSED↔WITHDRAWN.
         await tx.churnCase.updateMany({ // 미해결 케이스를 WITHDRAWN으로 닫아 큐에 남지 않게 한다.
             where: { // 이 원생의 열린 카드만.
                 studentId: student.id, // 이 원생만.
-                status: { in: ["DETECTED", "COUNSELING"] }, // IMPROVED는 이미 끝난 카드. 다시 열지 않는다.
+                status: { in: [...OPEN_CHURN_STATUSES] }, // IMPROVED는 이미 끝난 카드. 검토 대기도 닫는다.
             },
             data: { // 큐에서 빼되 행은 남긴다.
                 status: "WITHDRAWN", // 상담/종결이 아니라 퇴원 종결.

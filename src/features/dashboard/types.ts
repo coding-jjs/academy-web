@@ -16,7 +16,7 @@ import type { AttendanceStatus } from "@/features/attendance/types"; // 오늘 �
 /** 원장 홈 카드용 집계. 오늘 출석률은 세션 출결 분모가 0이면 null. */
 export type DirectorDashboardMetrics = { // 카드 숫자만. 승인·감지 실행은 없다.
     pendingReports: number; // PENDING_APPROVAL.
-    openChurn: number; // DETECTED·COUNSELING만. IMPROVED·WITHDRAWN 제외.
+    openChurn: number; // DETECTED·COUNSELING·PENDING_REVIEW. IMPROVED·WITHDRAWN 제외.
     overdueInvoices: number; // OVERDUE 건수.
     newInquiries: number; // Inquiry status=NEW.
     enrolledStudents: number; // Student ENROLLED.
@@ -46,6 +46,7 @@ export type StaffDashboardMetrics = { // 교사 홈 openInquiries=0.
     pendingReports: number; // DRAFTING·PENDING·REJECTED. SENT는 제외.
     myStudentCount: number; // 담당 재원.
     openInquiries: number; // 교사 홈은 0.
+    pendingChurnCare: number; // 내게 배정된 COUNSELING 건수. 상담 바로가기에 쓴다.
 };
 
 /** 홈 공지 3건용 짧은 행. */
