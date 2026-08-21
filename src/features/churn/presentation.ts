@@ -16,13 +16,7 @@ export const CHURN_STATUS_METADATA: Record<
 > = {
     DETECTED: { label: "위험 감지", tone: "danger" },
     COUNSELING: { label: "상담 중", tone: "warning" },
+    PENDING_REVIEW: { label: "검토 대기", tone: "warning" },
     IMPROVED: { label: "개선", tone: "success" },
     WITHDRAWN: { label: "퇴원", tone: "neutral" },
 };
-
-export function getChurnActionLabel(status: ChurnCaseStatus | null) {
-    if (status === "DETECTED") return "상담 시작";
-    if (status === "COUNSELING") return "개선 처리";
-    if (status === "IMPROVED" || status === "WITHDRAWN") return "쪽지";
-    return "—";
-}

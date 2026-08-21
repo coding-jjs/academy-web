@@ -30,6 +30,7 @@ export type StaffDashboardMetrics = {
     pendingReports: number;
     myStudentCount: number;
     openInquiries: number;
+    pendingChurnCare: number;
 };
 
 export type DashboardNewsItem = {

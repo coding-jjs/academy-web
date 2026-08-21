@@ -36,7 +36,7 @@ export default function DirectorDashboardScreen({
         {
             label: "이탈 위험",
             value: String(metrics.openChurn),
-            detail: "감지·상담 중",
+            detail: "감지·상담·검토",
             tone: metrics.openChurn > 0 ? "danger" : "success",
             href: "/director/churn",
         },
@@ -83,7 +83,7 @@ export default function DirectorDashboardScreen({
         },
         {
             label: "이탈 위험",
-            detail: "상담·조치 필요",
+            detail: "배정·검토 필요",
             href: "/director/churn",
             count: metrics.openChurn,
             tone: metrics.openChurn > 0 ? "danger" : "success",

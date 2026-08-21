@@ -17,8 +17,8 @@ const links = [
     },
     {
         href: "/employee/counseling",
-        title: "상담 문의",
-        detail: "게스트 상담 문의와 메모를 처리합니다.",
+        title: "상담",
+        detail: "이탈 케어와 상담 문의, 메모를 처리합니다.",
     },
     {
         href: "/employee/messages",

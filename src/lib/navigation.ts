@@ -27,7 +27,7 @@ export const roleNavigation: Record<RolePrefix, NavItem[]> = {
         { href: "/employee/dashboard", label: "업무 홈", icon: "▦" },
         { href: "/employee/billing", label: "청구·수납", icon: "▰" },
         { href: "/employee/students", label: "학생", icon: "◉" },
-        { href: "/employee/counseling", label: "상담 문의", icon: "◎" },
+        { href: "/employee/counseling", label: "상담", icon: "◎" },
         { href: "/employee/messages", label: "쪽지", icon: "□" },
     ],
     parent: [

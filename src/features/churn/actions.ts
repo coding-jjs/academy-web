@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { detectChurnCases } from "@/lib/churn-detect";
 import { prisma } from "@/lib/db";
-import { expandParentRecipients } from "@/features/messages/recipients";
 
 export type ChurnActionResult =
     | { ok: true; message: string }
@@ -18,7 +17,150 @@ async function requireDirector() {
     return session;
 }
 
-export async function advanceChurnCase(input: {
+function revalidateChurnPaths() {
+    revalidatePath("/director/churn");
+    revalidatePath("/director/dashboard");
+    revalidatePath("/teacher/counseling");
+    revalidatePath("/teacher/dashboard");
+    revalidatePath("/employee/counseling");
+    revalidatePath("/employee/dashboard");
+}
+
+export async function assignChurnCounseling(input: {
+    churnCaseId: string;
+    teacherUserId: string;
+}): Promise<ChurnActionResult> {
+    const session = await requireDirector();
+    if (!session) {
+        return { ok: false, message: "원장 권한이 필요합니다." };
+    }
+
+    const churnCaseId = String(input.churnCaseId ?? "").trim();
+    const teacherUserId = String(input.teacherUserId ?? "").trim();
+    if (!churnCaseId) {
+        return { ok: false, message: "이탈 케이스 ID가 없습니다." };
+    }
+    if (!teacherUserId) {
+        return { ok: false, message: "담당자를 선택해 주세요." };
+    }
+
+    const row = await prisma.churnCase.findUnique({
+        where: { id: churnCaseId },
+        select: { id: true, status: true, studentId: true },
+    });
+
+    if (!row) {
+        return { ok: false, message: "이탈 케이스를 찾을 수 없습니다." };
+    }
+    if (
+        row.status !== "DETECTED" &&
+        row.status !== "COUNSELING" &&
+        row.status !== "PENDING_REVIEW"
+    ) {
+        return {
+            ok: false,
+            message: "열린 케이스만 담당자에게 배정할 수 있습니다.",
+        };
+    }
+
+    const assignee = await prisma.user.findFirst({
+        where: {
+            id: teacherUserId,
+            role: { in: ["TEACHER", "STAFF"] },
+            status: "ACTIVE",
+        },
+        select: { id: true, name: true, role: true },
+    });
+
+    if (!assignee) {
+        return { ok: false, message: "담당할 선생님·직원을 찾을 수 없습니다." };
+    }
+
+    const teachesStudent = await prisma.classEnrollment.findFirst({
+        where: {
+            studentId: row.studentId,
+            status: "ACTIVE",
+            endedAt: null,
+            class: { teacherUserId: assignee.id },
+        },
+        select: { id: true },
+    });
+
+    if (!teachesStudent) {
+        return {
+            ok: false,
+            message: "이 학생의 담당 반 선생님·직원만 배정할 수 있습니다.",
+        };
+    }
+
+    await prisma.churnCase.update({
+        where: { id: row.id },
+        data: {
+            status: "COUNSELING",
+            assignedUserId: assignee.id,
+            resolvedAt: null,
+        },
+    });
+
+    revalidateChurnPaths();
+    const roleLabel = assignee.role === "STAFF" ? "직원" : "선생님";
+    return {
+        ok: true,
+        message: `${assignee.name} ${roleLabel}에게 상담을 배정했습니다.`,
+    };
+}
+
+export async function confirmChurnImproved(input: {
+    churnCaseId: string;
+}): Promise<ChurnActionResult> {
+    const session = await requireDirector();
+    if (!session) {
+        return { ok: false, message: "원장 권한이 필요합니다." };
+    }
+
+    const churnCaseId = String(input.churnCaseId ?? "").trim();
+    if (!churnCaseId) {
+        return { ok: false, message: "이탈 케이스 ID가 없습니다." };
+    }
+
+    const row = await prisma.churnCase.findUnique({
+        where: { id: churnCaseId },
+        select: {
+            id: true,
+            status: true,
+            _count: { select: { counselingMemos: true } },
+        },
+    });
+
+    if (!row) {
+        return { ok: false, message: "이탈 케이스를 찾을 수 없습니다." };
+    }
+    if (row.status !== "PENDING_REVIEW") {
+        return {
+            ok: false,
+            message: "선생님이 검토를 요청한 케이스만 개선으로 확정할 수 있습니다.",
+        };
+    }
+    if (row._count.counselingMemos === 0) {
+        return {
+            ok: false,
+            message: "상담 기록이 없어 개선으로 확정할 수 없습니다.",
+        };
+    }
+
+    await prisma.churnCase.update({
+        where: { id: row.id },
+        data: {
+            status: "IMPROVED",
+            resolvedAt: new Date(),
+        },
+    });
+
+    revalidateChurnPaths();
+    return { ok: true, message: "개선으로 확정했습니다." };
+}
+
+export async function returnChurnToCounseling(input: {
     churnCaseId: string;
 }): Promise<ChurnActionResult> {
     const session = await requireDirector();
@@ -39,136 +181,23 @@ export async function advanceChurnCase(input: {
     if (!row) {
         return { ok: false, message: "이탈 케이스를 찾을 수 없습니다." };
     }
-
-    if (row.status === "DETECTED") {
-        await prisma.churnCase.update({
-            where: { id: row.id },
-            data: {
-                status: "COUNSELING",
-                assignedUserId: session.user.id,
-                resolvedAt: null,
-            },
-        });
-        revalidatePath("/director/churn");
-        return { ok: true, message: "상담을 시작했습니다." };
-    }
-
-    if (row.status === "COUNSELING") {
-        await prisma.churnCase.update({
-            where: { id: row.id },
-            data: {
-                status: "IMPROVED",
-                resolvedAt: new Date(),
-            },
-        });
-        revalidatePath("/director/churn");
-        return { ok: true, message: "개선으로 처리했습니다." };
-    }
-
-    return {
-        ok: false,
-        message: "이 상태에서는 다음 단계로 진행할 수 없습니다.",
-    };
-}
-
-export async function sendChurnParentNote(input: {
-    churnCaseId: string;
-}): Promise<ChurnActionResult> {
-    const session = await requireDirector();
-    if (!session) {
-        return { ok: false, message: "원장 권한이 필요합니다." };
-    }
-
-    const churnCaseId = String(input.churnCaseId ?? "").trim();
-    if (!churnCaseId) {
-        return { ok: false, message: "이탈 케이스 ID가 없습니다." };
-    }
-
-    const row = await prisma.churnCase.findUnique({
-        where: { id: churnCaseId },
-        select: {
-            id: true,
-            status: true,
-            summary: true,
-            student: {
-                select: {
-                    id: true,
-                    name: true,
-                    parentLinks: {
-                        where: { endedAt: null },
-                        select: { parentUserId: true },
-                    },
-                },
-            },
-        },
-    });
-
-    if (!row) {
-        return { ok: false, message: "이탈 케이스를 찾을 수 없습니다." };
-    }
-
-    if (row.status !== "IMPROVED" && row.status !== "WITHDRAWN") {
+    if (row.status !== "PENDING_REVIEW") {
         return {
             ok: false,
-            message: "개선·퇴원 상태에서만 쪽지를 보낼 수 있습니다.",
+            message: "검토 대기 케이스만 다시 상담으로 보낼 수 있습니다.",
         };
     }
 
-    const parentIds = [
-        ...new Set(row.student.parentLinks.map((l) => l.parentUserId)),
-    ];
-    if (parentIds.length === 0) {
-        return {
-            ok: false,
-            message: "연결된 학부모가 없어 쪽지를 보낼 수 없습니다.",
-        };
-    }
-
-    const recipientIds = await expandParentRecipients(
-        parentIds,
-        session.user.id,
-    );
-    if (recipientIds.length === 0) {
-        return {
-            ok: false,
-            message: "연결된 학부모가 없어 쪽지를 보낼 수 없습니다.",
-        };
-    }
-
-    const title = `[이탈 케어] ${row.student.name} 학생 안내`;
-    const content = [
-        `${row.student.name} 학생 이탈 케어 관련 안내입니다.`,
-        row.summary?.trim()
-            ? `요약: ${row.summary.trim()}`
-            : "최근 출결·학습 상태를 함께 살펴봐 주시면 감사하겠습니다.",
-        "궁금한 점이 있으면 학원으로 문의해 주세요.",
-    ].join("\n\n");
-
-    const now = new Date();
-    await prisma.message.create({
+    await prisma.churnCase.update({
+        where: { id: row.id },
         data: {
-            title,
-            content,
-            deepLink: "/parent/inbox",
-            status: "SENT",
-            audience: "PARENT",
-            sentAt: now,
-            sender: { connect: { id: session.user.id } },
-            author: { connect: { id: session.user.id } },
-            recipients: {
-                create: recipientIds.map((recipientUserId) => ({
-                    recipient: { connect: { id: recipientUserId } },
-                })),
-            },
+            status: "COUNSELING",
+            resolvedAt: null,
         },
     });
 
-    revalidatePath("/director/churn");
-    revalidatePath("/parent/inbox");
-    revalidatePath("/student/inbox");
-    revalidatePath("/director/messages");
-
-    return { ok: true, message: "학부모에게 쪽지를 보냈습니다." };
+    revalidateChurnPaths();
+    return { ok: true, message: "선생님에게 재상담을 요청했습니다." };
 }
 
 export async function saveChurnThreshold(input: {
@@ -245,8 +274,7 @@ export async function runChurnDetection(): Promise<ChurnActionResult> {
 
     try {
         const result = await detectChurnCases();
-        revalidatePath("/director/churn");
-        revalidatePath("/director/dashboard");
+        revalidateChurnPaths();
 
         return {
             ok: true,

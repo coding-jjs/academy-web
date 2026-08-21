@@ -23,7 +23,13 @@ export default function StaffDashboardScreen({
         { href: "/teacher/attendance", label: "출석 체크" },
         { href: "/teacher/reports", label: "AI 리포트" },
         { href: "/teacher/students", label: "담당 학생" },
-        { href: "/teacher/counseling", label: "상담 관리" },
+        {
+            href: "/teacher/counseling",
+            label:
+                metrics.pendingChurnCare > 0
+                    ? `상담 관리 (${metrics.pendingChurnCare})`
+                    : "상담 관리",
+        },
     ];
 
     return (

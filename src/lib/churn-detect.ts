@@ -1,4 +1,5 @@
 import { CHURN_SIGNAL_LABELS } from "@/features/churn/presentation";
+import { OPEN_CHURN_STATUSES } from "@/features/churn/types";
 import { prisma } from "@/lib/db";
 import { getKstDayRange } from "@/lib/date-kst";
 import type { Prisma } from "@/generate/prisma/client";
@@ -228,7 +229,7 @@ export async function detectChurnCases(
         const openCase = await prisma.churnCase.findFirst({
             where: {
                 studentId: student.id,
-                status: { in: ["DETECTED", "COUNSELING"] },
+                status: { in: [...OPEN_CHURN_STATUSES] },
             },
             orderBy: { detectedAt: "desc" },
             select: { id: true },

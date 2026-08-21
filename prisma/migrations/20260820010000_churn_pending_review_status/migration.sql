@@ -1,0 +1,1 @@
+ALTER TYPE "churn_case_status" ADD VALUE IF NOT EXISTS 'PENDING_REVIEW';
