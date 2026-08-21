@@ -9,7 +9,7 @@
 ![Prisma](https://img.shields.io/badge/Prisma-PostgreSQL-2D3748?style=flat-square&logo=prisma)
 ![Gemini](https://img.shields.io/badge/Gemini-AI_Report-8E75B2?style=flat-square&logo=googlegemini)
 
-[기능](#주요-기능) · [구조](#프로젝트-구조) · [Google 로그인](#google-로그인-설정) · [데이터베이스](#데이터베이스) · [원장 설정](#최초-원장-설정) · [실행](#실행-방법)
+[기능](#주요-기능) · [실행](#실행-방법) · [구조](#프로젝트-구조) · [Google 로그인](#google-로그인-설정) · [데이터베이스](#데이터베이스) · [원장 설정](#최초-원장-설정)
 
 </div>
 
@@ -31,6 +31,20 @@
 > [!NOTE]
 > 학부모 결제 PG 연동은 아직 준비 중입니다.
 
+## 실행 방법
+
+필요: Node.js, PostgreSQL, Google OAuth 클라이언트.
+
+1. `.env.example` → `.env.local`
+2. `npm install` → `npx prisma migrate dev`
+3. `npm run dev` → http://localhost:3000
+
+원장 계정은 서버가 뜬 뒤 `npm run bootstrap:director -- you@gmail.com` 한 번입니다.
+
+```bash
+npm run validate   # lint, typecheck, prisma validate, production build
+```
+
 ## 프로젝트 구조
 
 `app`은 라우팅, `features/{domain}`은 데이터와 변경입니다. Server Action은 진입점마다 인증·권한을 다시 확인합니다.
@@ -51,13 +65,17 @@ src/proxy.ts            역할별 URL 가드 (Next.js 16)
 ```
 
 ```mermaid
-flowchart LR
-  Google[Google 로그인] --> Guest[GUEST]
-  Guest -->|bootstrap 1회| Director[원장]
-  Director --> Teacher[교사]
-  Director --> Staff[직원]
-  Director --> Parent[학부모]
-  Director --> Student[학생]
+flowchart TB
+  subgraph app [src/app]
+    routes[역할별 라우트]
+  end
+  subgraph features [src/features]
+    data[data.ts 읽기]
+    actions[actions.ts 쓰기]
+  end
+  routes --> data
+  routes --> actions
+  actions --> db[(PostgreSQL)]
 ```
 
 ## Google 로그인 설정
@@ -116,20 +134,3 @@ npm run bootstrap:director -- director@example.com
 ```
 
 이미 원장이 있으면 거부합니다. 이후 교사·직원·학부모·학생 역할은 `/director/users`에서 부여합니다.
-
-## 실행 방법
-
-필요: Node.js, PostgreSQL, Google OAuth 클라이언트.
-
-```bash
-cp .env.example .env.local   # DATABASE_URL, DIRECT_URL, AUTH_* 등 채우기
-npm install
-npx prisma migrate dev
-npm run dev
-```
-
-http://localhost:3000 에서 확인합니다.
-
-```bash
-npm run validate   # lint, typecheck, prisma validate, production build
-```
