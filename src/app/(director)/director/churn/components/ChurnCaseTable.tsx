@@ -1,4 +1,11 @@
-"use client";
+"use client"; // 원장 이탈 명단. 배정·확정·재상담 버튼을 행마다 둔다.
+
+/**
+ * 재원생 이탈 테이블. 케이스 없는 행도 "신호 없음"으로 남긴다.
+ *
+ * 호출: `DirectorChurnScreen`.
+ * 배정은 담당 반 후보만. 확정/재상담은 PENDING_REVIEW만.
+ */
 
 import { useMemo, useState } from "react";
 import StatusChip from "@/components/ui/StatusChip";

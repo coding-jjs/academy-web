@@ -1,4 +1,21 @@
-"use server";
+"use server"; // Server Action. 브라우저가 Prisma를 직접 치지 않는다.
+
+/**
+ * 원장 이탈 케어: 담당 배정, 개선 확정, 재상담, 임계값 저장, 감지 실행.
+ *
+ * 호출: `(director)/director/churn/DirectorChurnScreen`.
+ * 감지 로직(신호 4종, ENROLLED 스캔)은 `@/lib/churn-detect`에 두고,
+ * 이 파일은 권한 확인 후 화면이 호출하는 명령만 노출한다.
+ *
+ * 워크플로: DETECTED → (배정) COUNSELING → (담당자 검토요청) PENDING_REVIEW
+ * → 원장 confirmChurnImproved / returnChurnToCounseling.
+ *
+ * 의도적으로 하지 않는 일:
+ * - 교사가 IMPROVED로 바로 확정하지 않는다. 원장만 confirm.
+ * - WITHDRAWN 전이는 이 파일에 없다. `student-lifecycle`이 퇴원 시 닫는다.
+ *
+ * 관련: `data.ts`, `teacher-actions.ts`.
+ */
 
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
@@ -9,6 +26,7 @@ export type ChurnActionResult =
     | { ok: true; message: string }
     | { ok: false; message: string };
 
+/** 원장만. 교사·직원은 이탈 큐를 배정·확정하지 못한다. */
 async function requireDirector() {
     const session = await auth();
     if (!session?.user?.id || session.user.role !== "DIRECTOR") {
@@ -17,6 +35,7 @@ async function requireDirector() {
     return session;
 }
 
+/** 원장·교사·직원 이탈 화면을 같이 갱신한다. */
 function revalidateChurnPaths() {
     revalidatePath("/director/churn");
     revalidatePath("/director/dashboard");
@@ -26,6 +45,7 @@ function revalidateChurnPaths() {
     revalidatePath("/employee/dashboard");
 }
 
+/** 열린 케이스를 담당 반 교사·직원에게 맡기고 COUNSELING으로 둔다. */
 export async function assignChurnCounseling(input: {
     churnCaseId: string;
     teacherUserId: string;
@@ -110,6 +130,7 @@ export async function assignChurnCounseling(input: {
     };
 }
 
+/** PENDING_REVIEW만 IMPROVED로 확정. 상담 메모가 있어야 한다. */
 export async function confirmChurnImproved(input: {
     churnCaseId: string;
 }): Promise<ChurnActionResult> {
@@ -160,6 +181,7 @@ export async function confirmChurnImproved(input: {
     return { ok: true, message: "개선으로 확정했습니다." };
 }
 
+/** 검토 대기를 COUNSELING으로 되돌려 담당자에게 재상담을 맡긴다. */
 export async function returnChurnToCounseling(input: {
     churnCaseId: string;
 }): Promise<ChurnActionResult> {
@@ -200,6 +222,7 @@ export async function returnChurnToCounseling(input: {
     return { ok: true, message: "선생님에게 재상담을 요청했습니다." };
 }
 
+/** id=1 임계값 upsert. 감지기 다음 스캔에 반영된다. */
 export async function saveChurnThreshold(input: {
     attendanceDropPercentPoint: number;
     scoreDropPoints: number;
@@ -266,6 +289,7 @@ export async function saveChurnThreshold(input: {
     return { ok: true, message: "임계값을 저장했습니다." };
 }
 
+/** ENROLLED 전원을 스캔해 신호를 쌓는다. 열린 카드는 summary만. */
 export async function runChurnDetection(): Promise<ChurnActionResult> {
     const session = await requireDirector();
     if (!session) {

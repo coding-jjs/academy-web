@@ -1,4 +1,18 @@
-import "server-only";
+import "server-only"; // 조회만. 감지는 lib/churn-detect.
+
+/**
+ * 재원 학생별 최신 이탈 케이스와 임계값 설정을 원장 화면에 넘긴다.
+ *
+ * 호출: `(director)/director/churn/page.tsx`.
+ * `status: ENROLLED`만 스캔한다. 케이스 없는 학생도 목록에 남겨 신호 없음까지 한 화면에서 본다.
+ * 담당자 후보·추천은 `assignees.ts`가 반 수강에서 만든다.
+ *
+ * 의도적으로 하지 않는 일:
+ * - 신호 4종 계산 → `runChurnDetection` → `@/lib/churn-detect`.
+ * - 배정·검토 확정 → `actions.ts`.
+ *
+ * 관련: `types.ts`, `presentation.ts`, `assignees.ts`.
+ */
 
 import { prisma } from "@/lib/db";
 import {
@@ -12,6 +26,7 @@ import type {
     DirectorChurnCase,
 } from "@/features/churn/types";
 
+/** summary가 있으면 그걸, 없으면 최근 신호 라벨·값으로 이어 붙인다. */
 function describeChurnSignals(
     signals: { type: ChurnSignalType; value: { toString(): string } | null }[],
     summary: string | null,
@@ -27,6 +42,7 @@ function describeChurnSignals(
         .join(" · ");
 }
 
+/** ENROLLED 전원 행 + id=1 임계. 케이스 없어도 신호 없음 행을 남긴다. */
 export async function getDirectorChurnData(): Promise<{
     cases: DirectorChurnCase[];
     threshold: ChurnThreshold;

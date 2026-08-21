@@ -1,4 +1,14 @@
-"use client";
+"use client"; // 교사·직원 상담 Screen. 직원이 재사용한다.
+
+/**
+ * 상담 관리 UI (클라이언트).
+ *
+ * `/teacher/counseling`과 `/employee/counseling`이 같이 쓴다.
+ * 교사: 문의 탭 비움, 본인 메모. 직원: 게스트 문의 포함.
+ * 배정된 이탈 케어는 `ChurnCarePanel`로 상단에 올린다.
+ *
+ * Server Action 제출은 패널 자식이 한다. 이 파일은 탭만.
+ */
 
 import { useState } from "react";
 import type {

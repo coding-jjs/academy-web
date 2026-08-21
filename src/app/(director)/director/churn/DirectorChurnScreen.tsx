@@ -1,4 +1,16 @@
-"use client";
+"use client"; // 클라이언트 컴포넌트. 서버 data 로더가 아니다.
+
+/**
+ * 원장 이탈 징후 화면 (클라이언트).
+ *
+ * `/director/churn`. 임계값 `saveChurnThreshold`, 스캔 `runChurnDetection`,
+ * 배정 `assignChurnCounseling`, 확정 `confirmChurnImproved`,
+ * 재상담 `returnChurnToCounseling`.
+ *
+ * props: cases, threshold — churn data.
+ * 미납 일수는 임계값에 있지만 청구 정산 UI는 아직 없다.
+ * 학부모 쪽지는 이 화면에서 보내지 않는다.
+ */
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";

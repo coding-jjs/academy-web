@@ -1,3 +1,5 @@
+/* 파일 역할: 다이얼로그. */
+
 .overlayWide {
     width: min(640px, calc(100vw - 32px));
     max-height: calc(100dvh - 32px);

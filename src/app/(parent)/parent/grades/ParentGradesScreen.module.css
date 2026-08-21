@@ -1,3 +1,5 @@
+/* 파일 역할: ParentGrades 화면 레이아웃·간격. 도메인 로직은 같은 이름의 tsx에 있다. */
+
 .page {
     animation: screen-enter 360ms cubic-bezier(.22, 1, .36, 1) both;
   }
