@@ -8,16 +8,16 @@
  * 교사/직원 Screen 파일을 import하지 않는다. 승인 큐와 작성기는 features가 담당.
  */
 
-import { requireRole } from "@/lib/auth-guard"; // layout에 더해 page에서도 원장만.
-import { getDirectorMessagesData } from "@/features/messages/data"; // 승인 큐·작성기 데이터.
-import MessagesScreen from "@/features/messages/MessagesScreen"; // features Screen. 교사 Screen 파일을 쓰지 않는다.
+import { requireRole } from "@/lib/auth-guard";
+import { getDirectorMessagesData } from "@/features/messages/data";
+import MessagesScreen from "@/features/messages/MessagesScreen";
 
-export const dynamic = "force-dynamic"; // 승인 큐가 캐시에 안 남게.
+export const dynamic = "force-dynamic";
 
 /** 원장 쪽지 데이터와 작성 권한을 MessagesScreen에 넘긴다. */
-export default async function DirectorMessagesPage() { // proxy→layout→page. 승인 큐는 features.
-    await requireRole("DIRECTOR"); // 원장만.
-    const messagesData = await getDirectorMessagesData(); // 승인 큐·작성기 데이터.
+export default async function DirectorMessagesPage() {
+    await requireRole("DIRECTOR");
+    const messagesData = await getDirectorMessagesData();
 
-    return <MessagesScreen mode="director" canCompose {...messagesData} />; // features MessagesScreen. 교사 Screen 파일을 쓰지 않는다.
-} // 블록 끝.
+    return <MessagesScreen mode="director" canCompose {...messagesData} />;
+}

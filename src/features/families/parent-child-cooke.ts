@@ -17,7 +17,7 @@
  */
 
 /** 학부모 화면이 공유하는 선택 자녀 쿠키 이름. */
-export const PARENT_CHILD_COOKIE = "parent_child_id"; // dashboard/출결/시간표가 같은 키를 쓴다.
+export const PARENT_CHILD_COOKIE = "parent_child_id";
 
 /**
  * Next cookies() 스토어에서 선택 자녀 id를 읽는다.
@@ -25,10 +25,10 @@ export const PARENT_CHILD_COOKIE = "parent_child_id"; // dashboard/출결/시간
  * @param cookieStore `cookies()`와 같이 `.get(name)`만 있는 객체.
  * @returns 쿠키 값 또는 undefined. 디코드하지 않는다(쓰기가 encodeURIComponent).
  */
-export function readParentChildCookie(cookieStore: { // 권한 검증 없음. resolveChild가 링크 목록과 대조한다.
-    get: (name: string) => { value: string } | undefined; // Next cookies().get과 같은 모양.
-}): string | undefined { // 위조 값은 이번 요청에서 resolveChild가 무시한다.
-    return cookieStore.get(PARENT_CHILD_COOKIE)?.value; // 권한 검증 없음. 위조 값은 resolveChild가 링크 목록과 대조한다.
+export function readParentChildCookie(cookieStore: {
+    get: (name: string) => { value: string } | undefined;
+}): string | undefined {
+    return cookieStore.get(PARENT_CHILD_COOKIE)?.value;
 }
 
 /**
@@ -37,6 +37,6 @@ export function readParentChildCookie(cookieStore: { // 권한 검증 없음. re
  * @param childId 링크된 자녀 Student.id. 호출 측이 목록에 있는 id만 넘긴다.
  * @sideEffects `document.cookie` 기록. 서버 액션이 아니다.
  */
-export function writeParentChildCookie(childId: string) { // httpOnly 서버 쿠키가 아니다. 학부모 화면 전환용.
-    document.cookie = `${PARENT_CHILD_COOKIE}=${encodeURIComponent(childId)}; Path=/; Max-Age=31536000; SameSite=Lax`; // httpOnly 서버 쿠키가 아니다. 학부모 화면 전환용.
+export function writeParentChildCookie(childId: string) {
+    document.cookie = `${PARENT_CHILD_COOKIE}=${encodeURIComponent(childId)}; Path=/; Max-Age=31536000; SameSite=Lax`;
 }

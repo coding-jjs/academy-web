@@ -1,4 +1,4 @@
-"use server"; // Server Action. 브라우저가 Prisma를 직접 치지 않는다.
+"use server";
 
 /**
  * 원장 이탈 케어: 담당 배정, 개선 확정, 재상담, 임계값 저장, 감지 실행.

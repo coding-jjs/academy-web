@@ -13,10 +13,10 @@
  * 관련: `src/proxy.ts` (요청 가드), Docker 배포 산출물.
  */
 
-import type { NextConfig } from "next"; // Next 설정 타입. rewrite로 역할 URL을 바꾸지 않는다.
+import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = { // next build/dev가 읽는다. 앱 런타임은 import하지 않는다.
-    output: "standalone", // 컨테이너는 .next/standalone만 복사. 역할 URL rewrite는 proxy.ts.
+const nextConfig: NextConfig = {
+    output: "standalone",
 };
 
-export default nextConfig; // next build/dev가 읽는다. 앱 런타임은 import하지 않는다.
+export default nextConfig;

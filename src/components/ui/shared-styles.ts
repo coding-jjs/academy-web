@@ -12,23 +12,23 @@
  * 관련: 같은 폴더의 `*.module.css`.
  */
 
-export { default as screenStyles } from "./screen.module.css"; // 화면 뼈대. 셸 CSS는 여기 없다.
-export { default as pageHeadingStyles } from "./pageHeading.module.css"; // 페이지 제목. Screen 헤더.
-export { default as buttonStyles } from "./button.module.css"; // 저장·승인 버튼. actions.ts 제출.
-export { default as fieldStyles } from "./field.module.css"; // 폼 필드. Server Action FormData.
-export { default as surfaceStyles } from "./surface.module.css"; // 카드 표면.
-export { default as typographyStyles } from "./typography.module.css"; // 본문 타이포.
-export { default as emptyStateStyles } from "./emptyState.module.css"; // 스코프·검색 0건 안내.
-export { default as panelStyles } from "./panel.module.css"; // 목록/상세 패널.
-export { default as dialogStyles } from "./dialog.module.css"; // 작성·확인 다이얼로그.
-export { default as skeletonStyles } from "./skeleton.module.css"; // loading.tsx 자리.
-export { default as a11yStyles } from "./a11y.module.css"; // 스크린리더 전용.
-export { default as spinnerStyles } from "./spinner.module.css"; // pending 표시.
+export { default as screenStyles } from "./screen.module.css";
+export { default as pageHeadingStyles } from "./pageHeading.module.css";
+export { default as buttonStyles } from "./button.module.css";
+export { default as fieldStyles } from "./field.module.css";
+export { default as surfaceStyles } from "./surface.module.css";
+export { default as typographyStyles } from "./typography.module.css";
+export { default as emptyStateStyles } from "./emptyState.module.css";
+export { default as panelStyles } from "./panel.module.css";
+export { default as dialogStyles } from "./dialog.module.css";
+export { default as skeletonStyles } from "./skeleton.module.css";
+export { default as a11yStyles } from "./a11y.module.css";
+export { default as spinnerStyles } from "./spinner.module.css";
 
 /**
  * falsy 클래스를 빼고 이어 붙인다. `className={cx(buttonStyles.primary, pending && styles.wait)}`.
  * 빈 문자열/false가 CSS 모듈에 `"false"`로 들어가지 않게 한다.
  */
-export function cx(...classes: Array<string | false | null | undefined>) { // Tailwind cn이 아니다. CSS 모듈 토큰만.
-    return classes.filter(Boolean).join(" "); // false가 CSS 모듈에 "false"로 들어가지 않게. Tailwind cn이 아니다.
+export function cx(...classes: Array<string | false | null | undefined>) {
+    return classes.filter(Boolean).join(" ");
 }

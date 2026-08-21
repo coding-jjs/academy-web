@@ -1,4 +1,4 @@
-import "server-only"; // 클라이언트 번들에 Prisma가 들어가면 DATABASE_URL이 새므로 맨 위.
+import "server-only";
 
 /**
  * 서버 전용 PrismaClient.
@@ -18,24 +18,24 @@ import "server-only"; // 클라이언트 번들에 Prisma가 들어가면 DATABA
  * 관련: `prisma/schema.prisma`, `prisma.config.ts`.
  */
 
-import { PrismaClient } from "@/generate/prisma/client"; // generate 산출물. 앱 런타임만. CLI는 prisma.config.
-import { PrismaPg } from "@prisma/adapter-pg"; // Prisma 7 pg adapter. 엔진 바이너리가 아니다.
+import { PrismaClient } from "@/generate/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const connectionString = process.env.DATABASE_URL; // 런타임 풀링 URL. migrate용 DIRECT_URL이 아니다.
+const connectionString = process.env.DATABASE_URL;
 
-if (!connectionString) { // 풀링 URL이 없으면 기동 실패. 요청마다 부분 실패하지 않게.
-    throw new Error("DATABASE_URL이 설정되지 않았습니다."); // 기동 실패. jwt·data.ts가 같은 클라이언트를 쓴다.
+if (!connectionString) {
+    throw new Error("DATABASE_URL이 설정되지 않았습니다.");
 }
 
-const globalForPrisma = globalThis as unknown as { // hot reload마다 커넥션이 늘지 않게 붙일 자리.
-    prisma: PrismaClient | undefined; // 개발 전용 슬롯. 프로덕션은 모듈 스코프 한 개.
+const globalForPrisma = globalThis as unknown as {
+    prisma: PrismaClient | undefined;
 };
 
 /** 앱 전역 Prisma. 서버 모듈만 import한다. */
-export const prisma = // 런타임 DATABASE_URL. migrate는 DIRECT_URL.
-    globalForPrisma.prisma ?? // 런타임 DATABASE_URL. migrate는 DIRECT_URL.
-    new PrismaClient({ // data.ts 읽기·actions.ts 쓰기·jwt 재검사가 같은 클라이언트.
-        adapter: new PrismaPg(connectionString), // Prisma 7 pg adapter. 엔진 바이너리가 아니다.
+export const prisma =
+    globalForPrisma.prisma ??
+    new PrismaClient({
+        adapter: new PrismaPg(connectionString),
     });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma; // 개발 hot reload마다 커넥션이 늘지 않게. 프로덕션은 모듈 스코프 한 개면 충분.
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

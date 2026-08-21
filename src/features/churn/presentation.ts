@@ -12,27 +12,27 @@
  * 관련: `types.ts`.
  */
 
-import type { // 코드값만. 감지 식은 lib/churn-detect.
-    ChurnCaseStatus, // PENDING_REVIEW 포함.
-    ChurnSignalType, // 신호 4종.
-} from "@/features/churn/types"; // ENROLLED 스캔 대상과 같은 코드.
+import type {
+    ChurnCaseStatus,
+    ChurnSignalType,
+} from "@/features/churn/types";
 
 /** 신호 4종 한글. 감지 요약 문장과 테이블 reason에 같이 쓴다. */
-export const CHURN_SIGNAL_LABELS: Record<ChurnSignalType, string> = { // 계산식이 아니라 라벨.
-    ATTENDANCE_DROP: "출석 하락", // 출석 %p 하락.
-    SCORE_DROP: "성적 하락", // 점수 하락.
-    CONSECUTIVE_ABSENCE: "연속 결석", // 연속 결석 횟수.
-    UNPAID_DAYS: "미납", // 미납 일수.
+export const CHURN_SIGNAL_LABELS: Record<ChurnSignalType, string> = {
+    ATTENDANCE_DROP: "출석 하락",
+    SCORE_DROP: "성적 하락",
+    CONSECUTIVE_ABSENCE: "연속 결석",
+    UNPAID_DAYS: "미납",
 };
 
 /** 케이스 상태 칩. */
-export const CHURN_STATUS_METADATA: Record< // 화면 칩. DB 전이는 actions.
-    ChurnCaseStatus, // WITHDRAWN·PENDING_REVIEW 포함.
-    { label: string; tone: "neutral" | "success" | "warning" | "danger" } // StatusChip.
-> = { // 원장 테이블·교사 케어 패널.
-    DETECTED: { label: "위험 감지", tone: "danger" }, // 아직 미배정.
-    COUNSELING: { label: "상담 중", tone: "warning" }, // 담당자 상담.
-    PENDING_REVIEW: { label: "검토 대기", tone: "warning" }, // 원장 확정 대기.
-    IMPROVED: { label: "개선", tone: "success" }, // 원장이 확정.
-    WITHDRAWN: { label: "퇴원", tone: "neutral" }, // lifecycle이 닫음.
+export const CHURN_STATUS_METADATA: Record<
+    ChurnCaseStatus,
+    { label: string; tone: "neutral" | "success" | "warning" | "danger" }
+> = {
+    DETECTED: { label: "위험 감지", tone: "danger" },
+    COUNSELING: { label: "상담 중", tone: "warning" },
+    PENDING_REVIEW: { label: "검토 대기", tone: "warning" },
+    IMPROVED: { label: "개선", tone: "success" },
+    WITHDRAWN: { label: "퇴원", tone: "neutral" },
 };

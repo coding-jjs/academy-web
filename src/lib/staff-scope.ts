@@ -15,39 +15,39 @@
  * 관련: `permission-guard.ts`, Prisma `Class.teacherUserId` / `ClassEnrollment`.
  */
 
-import { userHasPermission } from "@/lib/permission-guard"; // viewAllStudents grant. JWT 권한을 믿지 않는다.
+import { userHasPermission } from "@/lib/permission-guard";
 
 /** 한 요청에서 재사용할 스코프. viewAll이면 where가 `{}`. */
-export type StaffScope = { // data.ts where에 spread. 학부모/학생 스코프는 여기 없다.
-    userId: string; // 담임 Class.teacherUserId와 비교.
-    viewAllStudents: boolean; // grant. 꺼지면 담당 반만.
+export type StaffScope = {
+    userId: string;
+    viewAllStudents: boolean;
 };
 
 /**
  * 로그인 교사/직원의 학생·반 조회 범위.
  * viewAllStudents grant가 켜져 있으면 전 원생, 아니면 본인이 담임인 반만.
  */
-export async function getStaffScope(userId: string): Promise<StaffScope> { // 한 요청에서 재사용. 원장은 보통 안 탄다.
-    const viewAllStudents = await userHasPermission( // viewAll 아니면 담임 반만. CANCELLED 수강 제외.
-        userId, // requireRole이 넘긴 DB id.
-        "viewAllStudents", // 켜져 있으면 전 원생, 아니면 담임 반만. 원장은 이 헬퍼를 보통 안 탄다.
+export async function getStaffScope(userId: string): Promise<StaffScope> {
+    const viewAllStudents = await userHasPermission(
+        userId,
+        "viewAllStudents",
     );
-    return { userId, viewAllStudents }; // where 조각의 입력. 학부모/학생 필터는 레이아웃이 직접.
+    return { userId, viewAllStudents };
 }
 
 /**
  * `Student.findMany` where에 spread.
  * 담당 반 필터는 ACTIVE + endedAt null만 — 끝난 수강으로 타반 학생을 끌어오지 않는다.
  */
-export function studentScopeWhere(scope: StaffScope) { // 타반 명단이 새지 않게. CANCELLED 수강은 현재 명단이 아님.
-    if (scope.viewAllStudents) return {}; // 전 원생 조화면 where를 비워 타반 필터를 붙이지 않는다.
+export function studentScopeWhere(scope: StaffScope) {
+    if (scope.viewAllStudents) return {};
 
-    return { // ACTIVE + 미종료 수강만. 끝난 수강으로 타반 학생을 끌어오지 않는다.
-        enrollments: { // ClassEnrollment. 퇴원 확정은 CANCELLED+endedAt.
-            some: { // 한 반이라도 담임이면 명단에 남긴다.
-                status: "ACTIVE" as const, // CANCELLED는 퇴원 확정·수강 해제. 현재 명단에 안 남긴다.
-                endedAt: null, // endedAt이 있으면 이력. 현재 탭이 아님.
-                class: { teacherUserId: scope.userId }, // 본인이 담임인 반만.
+    return {
+        enrollments: {
+            some: {
+                status: "ACTIVE" as const,
+                endedAt: null,
+                class: { teacherUserId: scope.userId },
             },
         },
     };
@@ -57,18 +57,18 @@ export function studentScopeWhere(scope: StaffScope) { // 타반 명단이 새�
  * 한 학생의 반 목록을 좁힐 때 (`ClassEnrollment` where).
  * viewAll이어도 ACTIVE·미종료만 보여 퇴원 확정 반이 현재 탭에 안 남게 한다.
  */
-export function enrollmentScopeWhere(scope: StaffScope) { // 현재 수강 탭. CANCELLED+endedAt은 이력.
-    if (scope.viewAllStudents) { // viewAll이어도 끝난 수강은 현재 탭에 안 남긴다.
-        return { // viewAll이어도 ACTIVE·미종료만. 퇴원 확정 반이 현재 탭에 안 남게.
-            status: "ACTIVE" as const, // CANCELLED는 퇴원 확정.
-            endedAt: null, // endedAt이 있으면 이력.
+export function enrollmentScopeWhere(scope: StaffScope) {
+    if (scope.viewAllStudents) {
+        return {
+            status: "ACTIVE" as const,
+            endedAt: null,
         };
     }
 
-    return { // 본인이 담임인 반의 현재 수강만.
-        status: "ACTIVE" as const, // CANCELLED는 현재 탭이 아님.
-        endedAt: null, // 미종료만.
-        class: { teacherUserId: scope.userId }, // 담임 반만. 타반 성적이 새지 않게.
+    return {
+        status: "ACTIVE" as const,
+        endedAt: null,
+        class: { teacherUserId: scope.userId },
     };
 }
 
@@ -76,26 +76,26 @@ export function enrollmentScopeWhere(scope: StaffScope) { // 현재 수강 탭. 
  * `Class.findMany` where에 spread.
  * 직원이 담임이 아닌 반도 viewAll이면 보인다. 꺼져 있으면 teacherUserId = 본인만.
  */
-export function classScopeWhere(scope: StaffScope) { // 반 목록. 학부모/학생은 이 헬퍼를 안 탄다.
-    if (scope.viewAllStudents) return {}; // 직원이 담임이 아닌 반도 viewAll이면 보인다.
-    return { teacherUserId: scope.userId }; // 꺼져 있으면 본인 담임 반만.
+export function classScopeWhere(scope: StaffScope) {
+    if (scope.viewAllStudents) return {};
+    return { teacherUserId: scope.userId };
 }
 
 /**
  * `User`(role=STUDENT) 목록용 — 리포트 페이지처럼 User 기준으로 학생을 고를 때.
  * Student가 아니라 `studentProfile.enrollments`로 스코프한다.
  */
-export function studentUserScopeWhere(scope: StaffScope) { // User 기준. Student.findMany가 아님.
-    if (scope.viewAllStudents) return {}; // User 기준 목록도 viewAll이면 필터 없음.
+export function studentUserScopeWhere(scope: StaffScope) {
+    if (scope.viewAllStudents) return {};
 
-    return { // Student가 아니라 studentProfile.enrollments로 담당 반을 좁힌다.
-        studentProfile: { // User → Student 1:1. 없는 프로필은 목록에서 빠진다.
-            is: { // 현재 수강만.
-                enrollments: { // ACTIVE + 미종료. CANCELLED는 현재 명단이 아님.
-                    some: { // 한 반이라도 담임이면.
-                        status: "ACTIVE" as const, // 퇴원 확정 수강은 제외.
-                        endedAt: null, // 이력 수강 제외.
-                        class: { teacherUserId: scope.userId }, // 담임 반만.
+    return {
+        studentProfile: {
+            is: {
+                enrollments: {
+                    some: {
+                        status: "ACTIVE" as const,
+                        endedAt: null,
+                        class: { teacherUserId: scope.userId },
                     },
                 },
             },
@@ -107,7 +107,7 @@ export function studentUserScopeWhere(scope: StaffScope) { // User 기준. Stude
  * `ClassSession.findMany` — 회차 목록을 반의 담임으로 좁힌다.
  * 출석 화면이 다른 교사 회차를 기본 목록에 올리지 않게 한다.
  */
-export function classSessionScopeWhere(scope: StaffScope) { // 출석 화면 기본 목록. 타반 회차를 숨긴다.
-    if (scope.viewAllStudents) return {}; // viewAll이면 다른 교사 회차도 목록에 올린다.
-    return { class: { teacherUserId: scope.userId } }; // 출석 화면이 타반 회차를 기본 목록에 올리지 않게.
+export function classSessionScopeWhere(scope: StaffScope) {
+    if (scope.viewAllStudents) return {};
+    return { class: { teacherUserId: scope.userId } };
 }

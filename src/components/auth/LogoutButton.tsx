@@ -1,4 +1,4 @@
-"use client"; // useFormStatus. 셸은 서버, 버튼만 클라이언트.
+"use client";
 
 /**
  * 로그아웃 폼 버튼.
@@ -18,23 +18,23 @@
  * 관련: `app/(auth)/logout/action.ts`.
  */
 
-import { useFormStatus } from "react-dom"; // pending. 이중 제출을 막는다.
-import { logoutAction } from "@/app/(auth)/logout/action"; // Server Action. 클라이언트 signOut이 아님.
+import { useFormStatus } from "react-dom";
+import { logoutAction } from "@/app/(auth)/logout/action";
 
-export default function LogoutButton({ className }: { className?: string }) { // 셸 CSS만 받는다. callbackUrl은 여기 없음.
-    return ( // 클라이언트 signOut이 아니라 form POST. JS 실패 시에도 끊긴다.
-        <form action={logoutAction}> {/* 클라이언트 signOut이 아니라 Server Action. JS 실패 시에도 POST로 끊긴다. */}
-            <SubmitButton className={className} /> {/* pending 문구. 확인 모달은 없다. */}
-        </form> {/* Server Action 로그아웃. 확인 모달 없음. */}
+export default function LogoutButton({ className }: { className?: string }) {
+    return (
+        <form action={logoutAction}>
+            <SubmitButton className={className} />
+        </form>
     );
 }
 
-function SubmitButton({ className }: { className?: string }) { // useFormStatus는 form 자식에서만.
-    const { pending } = useFormStatus(); // 이중 제출을 막고 학원 PC에서 끊기는 중임을 보여 준다.
+function SubmitButton({ className }: { className?: string }) {
+    const { pending } = useFormStatus();
 
-    return ( // 확인 모달 없음. 학원 PC 공유를 빨리 끊는 쪽이 우선.
-        <button type="submit" className={className} disabled={pending}> {/* pending이면 잠근다. 확인 모달은 없다. */}
-            {pending ? "로그아웃 중…" : "로그아웃"} {/* action이 /login으로 보낸다. callbackUrl은 여기 없음. */}
-        </button> {/* Server Action 로그아웃. 확인 모달 없음. */}
+    return (
+        <button type="submit" className={className} disabled={pending}>
+            {pending ? "로그아웃 중…" : "로그아웃"}
+        </button>
     );
 }

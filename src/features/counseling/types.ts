@@ -12,40 +12,40 @@
  */
 
 /** 입학 문의 처리 단계. 직원 화면 큐는 NEW/IN_PROGRESS만 불러온다. */
-export type InquiryStatus = "NEW" | "IN_PROGRESS" | "DONE" | "SPAM"; // 직원 큐는 NEW/IN_PROGRESS. DONE/SPAM은 뺀다.
+export type InquiryStatus = "NEW" | "IN_PROGRESS" | "DONE" | "SPAM";
 
 /** 상담 메모를 남길 학생 선택 항목. */
-export type CounselingStudentOption = { // 메모 대상. 게스트 문의 보호자가 아니다.
-    id: string; // 원생 카드. 직원 메모는 ENROLLED만.
-    name: string; // 상담 대상 이름.
-    schoolName: string | null; // 온보딩 학교.
-    grade: string | null; // 온보딩 학년.
-    className: string | null; // take:1 표시용 현재 반.
-    teacherName: string | null; // 그 반 담임.
+export type CounselingStudentOption = {
+    id: string;
+    name: string;
+    schoolName: string | null;
+    grade: string | null;
+    className: string | null;
+    teacherName: string | null;
 };
 
 /** 직원·원장 목록에 쓰는 상담 메모 행. */
-export type StaffCounselingMemo = { // 목록 행. 수정·삭제는 없다.
-    id: string; // 메모 행. 수정·삭제는 없다.
-    content: string; // 상담 본문 2~2000자.
-    counseledAt: string; // ISO 상담 일시. 화면은 KST datetime.
-    createdAt: string; // ISO 작성 시각.
-    studentId: string; // 원장 화면이 상세에서 이 id로 다시 건다.
-    studentName: string; // 목록에 찍는 원생 이름.
-    studentGrade: string | null; // 학년 표시.
-    authorName: string; // 작성자 User 이름. 교사 onlyOwnMemos는 본인만.
+export type StaffCounselingMemo = {
+    id: string;
+    content: string;
+    counseledAt: string;
+    createdAt: string;
+    studentId: string;
+    studentName: string;
+    studentGrade: string | null;
+    authorName: string;
 };
 
 /** 직원 상담 화면의 미완료 입학 문의. 제출자 userId는 없다(게스트 문의). */
-export type StaffInquiryItem = { // 게스트 문의. createInquiry는 userId를 안 붙인다.
-    id: string; // updateInquiryStatus의 inquiryId. 교사 화면은 목록이 비어 있다.
-    guardianName: string; // 게스트 폼 보호자 이름. 제출자 userId는 없다.
-    phone: string; // 연락처.
-    studentGrade: string | null; // 선택 학년.
-    interestedSubject: string | null; // 선택 과목.
-    preferredTime: string | null; // 선택 희망 시간.
-    message: string | null; // 선택 본문.
-    status: InquiryStatus; // 직원 큐는 NEW/IN_PROGRESS만. DONE/SPAM은 빼 둔다.
-    createdAt: string; // ISO 접수 시각.
-    assigneeName: string | null; // 상태를 바꾼 사무. 별도 배정 UI는 없다.
+export type StaffInquiryItem = {
+    id: string;
+    guardianName: string;
+    phone: string;
+    studentGrade: string | null;
+    interestedSubject: string | null;
+    preferredTime: string | null;
+    message: string | null;
+    status: InquiryStatus;
+    createdAt: string;
+    assigneeName: string | null;
 };

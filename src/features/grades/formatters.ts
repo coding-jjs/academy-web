@@ -11,20 +11,20 @@
  * 관련: `@/lib/date-kst`.
  */
 
-import { formatKstYearMonthDay } from "@/lib/date-kst"; // KST 연·월·일. UTC 자정으로 자르지 않는다.
+import { formatKstYearMonthDay } from "@/lib/date-kst";
 
 /** ISO 평가일을 KST 연·월·일로 표시. */
-export function formatGradeDate(isoDate: string) { // 입력 maxAssessedDate(오늘 KST)와 맞춘다.
-    return formatKstYearMonthDay(isoDate); // ISO → KST 연·월·일. 퍼센트 계산은 viewer-data.
+export function formatGradeDate(isoDate: string) {
+    return formatKstYearMonthDay(isoDate);
 }
 
 /**
  * 직전 점수 대비 변화. 비교 대상이 없으면 "비교 없음".
  * 음수는 이미 부호가 있어 `이전 대비 ${delta}`로만 붙인다.
  */
-export function formatGradeDelta(delta: number | null) { // 뷰어 하이라이트. 입력 화면 카드가 아니다.
-    if (delta == null) return "비교 없음"; // 직전 점수가 없는 과목. 입력 화면 하이라이트가 아니다.
-    if (delta > 0) return `이전 대비 +${delta}`; // 상승. viewer-data가 소수 1자리로 반올림한다.
-    if (delta < 0) return `이전 대비 ${delta}`; // 하락. 부호가 있어 +를 붙이지 않는다.
-    return "이전과 동일"; // 직전과 같은 점수.
+export function formatGradeDelta(delta: number | null) {
+    if (delta == null) return "비교 없음";
+    if (delta > 0) return `이전 대비 +${delta}`;
+    if (delta < 0) return `이전 대비 ${delta}`;
+    return "이전과 동일";
 }

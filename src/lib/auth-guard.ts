@@ -12,10 +12,10 @@
  * 권한 키(billing 등)는 여기서 보지 않는다 → `userHasPermission`.
  */
 
-import { redirect } from "next/navigation"; // 실패 시 /login 또는 /post-login. 거절 페이지만 보여 주지 않는다.
-import type { AppRole } from "@/types/roles"; // 레이아웃이 허용하는 역할. 권한 키는 여기 없다.
-import { getUsableAccount } from "@/lib/account-access"; // BLOCKED/WITHDRAWN이면 null. JWT 8시간을 믿지 않는다.
-import { auth } from "@/lib/auth"; // JWT 세션. proxy 1차 가드 후에도 DB와 맞춘다.
+import { redirect } from "next/navigation";
+import type { AppRole } from "@/types/roles";
+import { getUsableAccount } from "@/lib/account-access";
+import { auth } from "@/lib/auth";
 
 /**
  * 현재 세션이 `roles` 중 하나인지 확인하고, DB 기준으로 보강한 세션을 돌려준다.
@@ -24,29 +24,29 @@ import { auth } from "@/lib/auth"; // JWT 세션. proxy 1차 가드 후에도 DB
  * @returns session.user.id/role/onboardingCompleted를 DB 값으로 덮은 세션.
  *          JWT에 남은 옛 역할이 화면에 쓰이지 않게 하기 위함.
  */
-export async function requireRole(...roles: AppRole[]) { // layout → page → data/actions. 권한 키는 userHasPermission.
-    const session = await auth(); // JWT. proxy 1차 가드 후에도 페이지에서 DB와 맞춰 본다.
+export async function requireRole(...roles: AppRole[]) {
+    const session = await auth();
 
-    if (!session?.user?.id) { // 비로그인은 업무 URL을 보여 주지 않는다.
-        redirect("/login"); // 로그인 후 callback으로 돌아올 수 있게 /login만.
+    if (!session?.user?.id) {
+        redirect("/login");
     }
 
-    const account = await getUsableAccount(session.user.id); // BLOCKED/퇴원 확정이면 null. JWT 8시간을 믿지 않는다.
-    if (!account) { // 쿠키가 남아 있어도 업무 화면을 열지 않는다.
-        redirect("/login"); // 사용 불가 계정도 로그인 화면. 본인 홈이 아님.
+    const account = await getUsableAccount(session.user.id);
+    if (!account) {
+        redirect("/login");
     }
 
-    if (!roles.includes(account.role)) { // 학부모가 /director 를 친 경우처럼 URL 그룹이 다름.
-        redirect("/post-login"); // 역할 홈으로 보낸다. 거절 페이지만 보여 주지 않는다.
+    if (!roles.includes(account.role)) {
+        redirect("/post-login");
     }
 
-    return { // JWT에 남은 옛 role을 DB 값으로 덮어 Screen·셸에 쓰이게 한다.
-        ...session, // 나머지 세션 필드 유지. 권한 키 맵은 싣지 않는다.
-        user: { // 권한 키 맵은 세션에 싣지 않는다. userHasPermission이 요청마다 grant를 본다.
-            ...session.user, // name/email/image는 JWT. id/role/onboarding은 DB.
-            id: account.id, // getUsableAccount가 읽은 User.id.
-            role: account.role, // 원장이 방금 바꾼 역할이 다음 요청에 반영되게.
-            onboardingCompleted: account.onboardingCompleted, // 온보딩 미완료 GUEST는 signup 분기에 쓰인다.
+    return {
+        ...session,
+        user: {
+            ...session.user,
+            id: account.id,
+            role: account.role,
+            onboardingCompleted: account.onboardingCompleted,
         },
     };
 }

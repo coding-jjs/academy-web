@@ -11,16 +11,16 @@
  * 쪽지는 features `MessagesScreen`을 공유하고, 청구는 준비 중 카피다.
  */
 
-import type { ReactNode } from "react"; // children 타입. 세션은 requireRole이 돌려준다.
-import AdminShell from "@/components/layout/AdminShell"; // employee 내비. 출석/성적/리포트 메뉴 없음.
-import { requireRole } from "@/lib/auth-guard"; // proxy 1차 후 DB 계정 재검사. DB enum은 STAFF.
+import type { ReactNode } from "react";
+import AdminShell from "@/components/layout/AdminShell";
+import { requireRole } from "@/lib/auth-guard";
 
 /** 직원만 통과시키고 employee 내비의 AdminShell을 붙인다. */
-export default async function EmployeeLayout({ // `/employee/*` 껍데기. StaffDashboardScreen을 쓰지 않는다.
-    children, // 직원 page. 상담은 includeInquiries true.
-}: { // layout props.
-    children: ReactNode; // AdminShell 안에 넣는다.
-}) { // EmployeeLayout props 끝.
-    await requireRole("STAFF"); // 직원만. 대시보드는 StaffDashboardScreen을 쓰지 않는다.
-    return <AdminShell role="employee">{children}</AdminShell>; // employee 내비(청구 있음, 출석/성적/리포트 없음).
-} // 블록 끝.
+export default async function EmployeeLayout({
+    children,
+}: {
+    children: ReactNode;
+}) {
+    await requireRole("STAFF");
+    return <AdminShell role="employee">{children}</AdminShell>;
+}

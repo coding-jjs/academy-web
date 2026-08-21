@@ -7,16 +7,16 @@
  * 공개 `/notices`와 별개다. 학생 대상 게시만 넘긴다.
  */
 
-import { requireRole } from "@/lib/auth-guard"; // 학생만.
-import NewsScreen from "@/features/news/NewsScreen"; // features Screen. 원장 작성 UI는 /notices.
-import { getPublishedNews } from "@/features/news/data"; // STUDENT 대상 게시만. 공개 /notices와 별개.
+import { requireRole } from "@/lib/auth-guard";
+import NewsScreen from "@/features/news/NewsScreen";
+import { getPublishedNews } from "@/features/news/data";
 
-export const dynamic = "force-dynamic"; // 게시가 캐시에 안 남게.
+export const dynamic = "force-dynamic";
 
 /** STUDENT 대상 게시만 뉴스 Screen에 넘긴다. */
-export default async function StudentNewsPage() { // proxy→layout→page. 공개 /notices와 별개.
-    await requireRole("STUDENT"); // 학생만.
-    const items = await getPublishedNews("STUDENT"); // STUDENT 대상 게시만. 공개 /notices와 별개.
+export default async function StudentNewsPage() {
+    await requireRole("STUDENT");
+    const items = await getPublishedNews("STUDENT");
 
-    return <NewsScreen items={items} audience="student" />; // features NewsScreen. 원장 작성 UI는 /notices.
-} // 블록 끝.
+    return <NewsScreen items={items} audience="student" />;
+}

@@ -8,6 +8,6 @@
  * 시크릿(AUTH_SECRET, Google client secret)은 env에만 두고 이 파일에 하드코딩하지 않는다.
  */
 
-import { handlers } from "@/lib/auth"; // Auth.js GET/POST. 시크릿은 env. 이 파일에 하드코딩하지 않는다.
+import { handlers } from "@/lib/auth";
 
-export const { GET, POST } = handlers; // Auth.js 핸들러만 재export. 시크릿·콜백 로직은 @/lib/auth.
+export const { GET, POST } = handlers;

@@ -1,4 +1,4 @@
-"use client"; // 교사·직원 상담 Screen. 직원이 재사용한다.
+"use client";
 
 /**
  * 상담 관리 UI (클라이언트).

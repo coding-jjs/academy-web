@@ -17,23 +17,23 @@
  * 관련: `auth.config.ts`, `types/roles.ts`, `account-access.ts`.
  */
 
-import type { DefaultSession } from "next-auth"; // Session.user를 보강. 권한 키 맵은 세션에 없다.
-import type { AppRole } from "./roles"; // JWT·세션 role. DIRECTOR…GUEST.
+import type { DefaultSession } from "next-auth";
+import type { AppRole } from "./roles";
 
-declare module "next-auth" { // auth() / useSession 반환 타입. jwt 콜백이 DB에서 채운다.
-    interface Session { // layout/page가 User 테이블을 매번 치지 않게.
-        user: { // layout/page가 User 테이블을 매번 치지 않게 jwt가 채운 최소 신원.
-            id: string; // User.id. requireRole이 DB 값으로 다시 덮는다.
-            role: AppRole; // DIRECTOR…GUEST. 권한 키 맵은 세션에 없다.
-            onboardingCompleted: boolean; // 온보딩 시각이 찍혔는지. signup 분기용.
-        } & DefaultSession["user"]; // name/email/image는 DefaultSession. 권한 키는 없음.
+declare module "next-auth" {
+    interface Session {
+        user: {
+            id: string;
+            role: AppRole;
+            onboardingCompleted: boolean;
+        } & DefaultSession["user"];
     }
 }
 
-declare module "@auth/core/jwt" { // jwt 콜백 토큰. updateAge:0 이라 매 요청 DB를 다시 본다.
-    interface JWT { // optional. clearAccessToken이 신원만 지울 때 undefined.
-        userId?: string; // 사용 불가면 clearAccessToken이 undefined. 쿠키는 maxAge까지 남는다.
-        role?: AppRole; // updateAge:0 이라 매 요청 jwt 콜백이 DB에서 다시 넣는다.
-        onboardingCompleted?: boolean; // 없으면 session 콜백이 false. GUEST 온보딩 전.
+declare module "@auth/core/jwt" {
+    interface JWT {
+        userId?: string;
+        role?: AppRole;
+        onboardingCompleted?: boolean;
     }
 }

@@ -12,24 +12,24 @@
  */
 
 /** 학부모에게 보여 주는 발송 완료 리포트 한 건. */
-export type ParentReportItem = { // SENT만. 초안·반려는 parent-data where에서 뺀다.
-    id: string; // AiReport PK.
-    content: string; // 원장 승인 때 Message와 같은 본문.
-    keywords: string[]; // 관찰 포인트. 반려 사유는 없다.
-    teacherName: string; // 작성 교사 이름.
-    periodStart: string; // ISO.
-    periodEnd: string; // ISO.
-    sentAt: string | null; // approveAndSendReport가 찍은 시각.
-    parentReadAt: string | null; // 읽음은 이 타입이 아니라 인박스/화면 액션.
+export type ParentReportItem = {
+    id: string;
+    content: string;
+    keywords: string[];
+    teacherName: string;
+    periodStart: string;
+    periodEnd: string;
+    sentAt: string | null;
+    parentReadAt: string | null;
 };
 
 /** 연결된 자녀 한 명과 그 자녀의 SENT 리포트 목록. */
-export type ParentReportChild = { // 종료되지 않은 링크만 parent-data가 채운다.
-    id: string; // Student PK.
-    name: string; // User.name.
-    schoolName: string | null; // 온보딩 학교.
-    grade: string | null; // 1~12 문자열.
-    className: string | null; // 활성 수강 1건.
-    teacherName: string | null; // 반 담당.
-    reports: ParentReportItem[]; // SENT만. 초안은 없음.
+export type ParentReportChild = {
+    id: string;
+    name: string;
+    schoolName: string | null;
+    grade: string | null;
+    className: string | null;
+    teacherName: string | null;
+    reports: ParentReportItem[];
 };

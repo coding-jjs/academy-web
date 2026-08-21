@@ -7,6 +7,6 @@
  */
 
 /** 전환 애니메이션 래퍼. 역할 가드를 하지 않는다. */
-export default function Template({ children }: { children: React.ReactNode }) { // 라우트마다 다시 마운트. 가드는 layout.
-    return <div className="route-transition-shell">{children}</div>; // 페이드만. 권한·데이터는 layout/page 몫.
-} // 블록 끝.
+export default function Template({ children }: { children: React.ReactNode }) {
+    return <div className="route-transition-shell">{children}</div>;
+}

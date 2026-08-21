@@ -1,4 +1,4 @@
-import "server-only"; // 조회만. 감지는 lib/churn-detect.
+import "server-only";
 
 /**
  * 재원 학생별 최신 이탈 케이스와 임계값 설정을 원장 화면에 넘긴다.

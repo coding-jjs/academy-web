@@ -14,19 +14,19 @@
  * 관련: `package.json` lint/validate 스크립트.
  */
 
-import { defineConfig, globalIgnores } from "eslint/config"; // flat config. prettier는 여기 없다.
-import nextVitals from "eslint-config-next/core-web-vitals"; // Next 화면·레이아웃 a11y/웹바이탈. 역할 가드 규칙은 여기 없다.
-import nextTs from "eslint-config-next/typescript"; // TS. src/generate는 별도 ignore하지 않는다.
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
 
-const eslintConfig = defineConfig([ // npm run lint / validate. 런타임 import 없음.
-  ...nextVitals, // Next 화면·레이아웃 a11y/웹바이탈. 역할 가드 규칙은 여기 없다.
-  ...nextTs, // TS. src/generate는 별도 ignore하지 않는다.
-  globalIgnores([ // 생성 파일은 프로젝트 규칙을 어겨도 고칠 수 없다. next-env.d.ts는 빌드가 덮는다.
-    ".next/**", // Next 빌드 산출물. 매 빌드 덮는다.
-    "out/**", // export 산출물.
-    "build/**", // 기타 빌드 폴더.
-    "next-env.d.ts", // Next가 매 빌드 덮는다. 프로젝트 규칙으로 고치지 않는다.
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
   ]),
 ]);
 
-export default eslintConfig; // npm run lint / validate. 런타임 import 없음.
+export default eslintConfig;

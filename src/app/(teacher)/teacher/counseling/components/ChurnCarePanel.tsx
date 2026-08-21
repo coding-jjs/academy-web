@@ -53,7 +53,7 @@ export default function ChurnCarePanel({
                         </p>
                         {task.latestMemo ? (
                             <p className={styles.careMemo}>
-                                최근 기록 ({task.latestMemo.authorName}):{" "}
+                                최근 기록 ({task.latestMemo.authorName}):
                                 {task.latestMemo.content}
                             </p>
                         ) : null}
