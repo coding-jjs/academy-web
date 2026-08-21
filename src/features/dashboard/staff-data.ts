@@ -28,7 +28,13 @@ export async function getStaffDashboardData({
     metrics: StaffDashboardMetrics;
     sessions: StaffDashboardSession[];
 }> {
-    const [sessionRecords, pendingReports, studentCount, openInquiries] =
+    const [
+        sessionRecords,
+        pendingReports,
+        studentCount,
+        openInquiries,
+        pendingChurnCare,
+    ] =
         await Promise.all([
             prisma.classSession.findMany({
                 where: {
@@ -75,6 +81,12 @@ export async function getStaffDashboardData({
                       where: { status: { in: ["NEW", "IN_PROGRESS"] } },
                   })
                 : Promise.resolve(0),
+            prisma.churnCase.count({
+                where: {
+                    assignedUserId: staffUserId,
+                    status: "COUNSELING",
+                },
+            }),
         ]);
 
     const sessions = sessionRecords.map((classSession) => {
@@ -112,6 +124,7 @@ export async function getStaffDashboardData({
             pendingReports,
             myStudentCount: studentCount,
             openInquiries,
+            pendingChurnCare,
         },
     };
 }

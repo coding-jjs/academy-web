@@ -7,7 +7,9 @@ import type {
     StaffInquiryItem,
 } from "@/features/counseling/types";
 import CounselingMemoPanel from "./components/CounselingMemoPanel";
+import ChurnCarePanel from "./components/ChurnCarePanel";
 import InquiryManagementPanel from "./components/InquiryManagementPanel";
+import type { TeacherChurnCareTask } from "@/features/churn/types";
 import styles from "./StaffCounselingScreen.module.css";
 
 export default function StaffCounselingScreen({
@@ -15,11 +17,13 @@ export default function StaffCounselingScreen({
     students,
     memos,
     inquiries,
+    churnTasks = [],
 }: {
     role: "TEACHER" | "STAFF";
     students: CounselingStudentOption[];
     memos: StaffCounselingMemo[];
     inquiries: StaffInquiryItem[];
+    churnTasks?: TeacherChurnCareTask[];
 }) {
     const [activeTab, setActiveTab] = useState<"memos" | "inquiries">(
         role === "STAFF" && inquiries.length > 0 ? "inquiries" : "memos",
@@ -30,9 +34,14 @@ export default function StaffCounselingScreen({
                 <div>
                     <span>COUNSELING</span>
                     <h1>상담 관리</h1>
-                    <p>학부모 상담 요청과 진행 기록을 관리합니다.</p>
+                    <p>이탈 케어와 상담 기록을 관리합니다.</p>
                 </div>
             </header>
+            {churnTasks.length > 0 ? (
+                <div className={styles.careTop}>
+                    <ChurnCarePanel tasks={churnTasks} />
+                </div>
+            ) : null}
             <div className={styles.filters}>
                 <button
                     type="button"

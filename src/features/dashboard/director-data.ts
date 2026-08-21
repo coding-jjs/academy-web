@@ -1,5 +1,6 @@
 import "server-only";
 
+import { OPEN_CHURN_STATUSES } from "@/features/churn/types";
 import { prisma } from "@/lib/db";
 import type { DirectorDashboardMetrics } from "@/features/dashboard/types";
 
@@ -23,7 +24,7 @@ export async function getDirectorDashboardMetrics({
     ] = await Promise.all([
         prisma.aiReport.count({ where: { status: "PENDING_APPROVAL" } }),
         prisma.churnCase.count({
-            where: { status: { in: ["DETECTED", "COUNSELING"] } },
+            where: { status: { in: [...OPEN_CHURN_STATUSES] } },
         }),
         prisma.invoice.count({ where: { status: "OVERDUE" } }),
         prisma.inquiry.count({ where: { status: "NEW" } }),

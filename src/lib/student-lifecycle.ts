@@ -3,6 +3,7 @@ import {
     writeAuditLog,
     type AuditRequestMetadata,
 } from "@/lib/audit";
+import { OPEN_CHURN_STATUSES } from "@/features/churn/types";
 import { isPastWithdrawalGrace } from "@/lib/date-kst";
 import { prisma } from "@/lib/db";
 
@@ -46,7 +47,7 @@ export async function transitionStudentStatus(
         await tx.churnCase.updateMany({
             where: {
                 studentId: student.id,
-                status: { in: ["DETECTED", "COUNSELING"] },
+                status: { in: [...OPEN_CHURN_STATUSES] },
             },
             data: {
                 status: "WITHDRAWN",

@@ -145,11 +145,6 @@ export default function ParentReportsScreen({
                             )}
 
                             <article className={styles.panel}>
-                                <h3>선생님 코멘트</h3>
-                                <p>{activeReport.content}</p>
-                            </article>
-
-                            <article className={styles.panel}>
                                 <div className={styles.panelHead}>
                                     <h3>지난 보고서</h3>
                                     <StatusChip>
