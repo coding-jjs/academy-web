@@ -7,16 +7,16 @@
  * 교사 URL에는 반 CRUD가 없다. 세션 생성은 이 Screen의 Server Action 몫이다.
  */
 
-import { requireRole } from "@/lib/auth-guard"; // layout에 더해 page에서도 원장만.
-import { getClassesManagementData } from "@/features/classes/data"; // 반·회차 관리 DTO.
-import ClassesManagementScreen from "@/features/classes/ClassesManagementScreen"; // features Screen. 교사 URL에는 반 CRUD가 없다.
+import { requireRole } from "@/lib/auth-guard";
+import { getClassesManagementData } from "@/features/classes/data";
+import ClassesManagementScreen from "@/features/classes/ClassesManagementScreen";
 
-export const dynamic = "force-dynamic"; // 반·회차가 캐시에 안 남게.
+export const dynamic = "force-dynamic";
 
 /** 반·회차 관리 데이터를 Screen에 넘긴다. */
-export default async function DirectorClassesPage() { // proxy→layout→page. 교사 반 CRUD 없음.
-    await requireRole("DIRECTOR"); // 원장만.
-    const classesData = await getClassesManagementData(); // 반·회차 관리 DTO.
+export default async function DirectorClassesPage() {
+    await requireRole("DIRECTOR");
+    const classesData = await getClassesManagementData();
 
-    return <ClassesManagementScreen {...classesData} />; // features Screen. 교사 URL에는 반 CRUD가 없다.
-} // 블록 끝.
+    return <ClassesManagementScreen {...classesData} />;
+}

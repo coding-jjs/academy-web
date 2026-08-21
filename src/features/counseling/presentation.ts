@@ -11,30 +11,30 @@
  * 관련: `types.ts`, `@/lib/date-kst`.
  */
 
-import type { InquiryStatus } from "@/features/counseling/types"; // 칩 라벨용. 전환 허용 값은 actions.ts.
-import { formatKstDateTime } from "@/lib/date-kst"; // 상담은 시각까지. 평가일처럼 날짜만 자르지 않는다.
+import type { InquiryStatus } from "@/features/counseling/types";
+import { formatKstDateTime } from "@/lib/date-kst";
 
 /** 문의 처리 단계 → 화면 문구·칩 색. */
-export const INQUIRY_STATUS_METADATA: Record< // 게스트 문의 칩. 원생 카드는 만들지 않는다.
-    InquiryStatus, // NEW/IN_PROGRESS만 직원 큐. DONE/SPAM은 뺀다.
-    { label: string; tone: "neutral" | "success" | "warning" | "danger" } // 화면 칩. 서버 enum이 아니다.
-> = { // 상태 코드를 화면이 직접 해석하지 않게.
-    NEW: { label: "신규", tone: "warning" }, // 게스트 createInquiry 직후. 제출자 userId는 없다.
-    IN_PROGRESS: { label: "진행중", tone: "neutral" }, // 직원 큐에 남는 상태. 교사는 이 목록을 안 본다.
-    DONE: { label: "완료", tone: "success" }, // staff-data where에서 빼 진행 중만 보여 준다.
-    SPAM: { label: "스팸", tone: "danger" }, // 큐에서 뺀다. 원생 카드는 만들지 않는다.
+export const INQUIRY_STATUS_METADATA: Record<
+    InquiryStatus,
+    { label: string; tone: "neutral" | "success" | "warning" | "danger" }
+> = {
+    NEW: { label: "신규", tone: "warning" },
+    IN_PROGRESS: { label: "진행중", tone: "neutral" },
+    DONE: { label: "완료", tone: "success" },
+    SPAM: { label: "스팸", tone: "danger" },
 };
 
 /** ISO 상담 일시를 KST 날짜+시각으로 표시. */
-export function formatCounselingDateTime(isoDate: string) { // 평가일처럼 날짜만 자르지 않는다.
-    return formatKstDateTime(isoDate); // ISO → KST 날짜+시각. datetime-local 기본값과는 별개.
+export function formatCounselingDateTime(isoDate: string) {
+    return formatKstDateTime(isoDate);
 }
 
 /**
  * datetime-local 입력 기본값. 서버 TZ가 아니라 브라우저 로컬을 쓴다.
  * UTC ISO를 넣으면 한국에서 몇 시간 어긋난 기본값이 된다.
  */
-export function getCurrentLocalDateTimeInput(date = new Date()) { // 브라우저 로컬. 서버 TZ가 아니다.
-    const pad = (value: number) => String(value).padStart(2, "0"); // datetime-local용 2자리.
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`; // 브라우저 로컬. UTC ISO를 넣으면 한국에서 몇 시간 어긋난다.
+export function getCurrentLocalDateTimeInput(date = new Date()) {
+    const pad = (value: number) => String(value).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }

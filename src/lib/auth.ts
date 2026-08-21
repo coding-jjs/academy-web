@@ -19,8 +19,8 @@
  * 관련: `auth.config.ts`, `oauth-intent.ts`, `account-access.ts`, `types/next-auth.d.ts`.
  */
 
-import NextAuth from "next-auth"; // Auth.js 팩토리. 제공자 배열은 auth.config.
-import authConfig from "./auth.config"; // JWT 8h·updateAge 0·Google/dev Credentials.
+import NextAuth from "next-auth";
+import authConfig from "./auth.config";
 
 /** Auth.js 핸들러·세션 헬퍼. 설정은 authConfig, 앱은 이 네 이름만 import한다. */
-export const { handlers, auth, signIn, signOut } = NextAuth(authConfig); // JWT 8h. 역할 URL 가드는 proxy·requireRole.
+export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);

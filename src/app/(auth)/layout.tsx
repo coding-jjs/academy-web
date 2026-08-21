@@ -8,9 +8,9 @@
  * `/post-login`도 이 레이아웃을 타지만 본문은 바로 redirect한다.
  */
 
-import type { ReactNode } from "react"; // children 타입만. 세션 타입은 아니다.
+import type { ReactNode } from "react";
 
 /** 인증 라우트는 셸 없이 children만 통과시킨다. */
-export default function AuthLayout({ children }: { children: ReactNode }) { // 셸·가드 없음. 미로그인·GUEST 진입.
-    return children; // 셸·가드 없이 children만. 미로그인·GUEST가 들어와야 한다.
-} // 블록 끝.
+export default function AuthLayout({ children }: { children: ReactNode }) {
+    return children;
+}

@@ -8,14 +8,14 @@
  * 부트스트랩 원장 API와 별개다.
  */
 
-import { getPendingRoleUsersData } from "@/features/users/director-data"; // 대기 GUEST와 미연결 원생 옵션.
-import DirectorUsersScreen from "./DirectorUsersScreen"; // 부여 UI. 부트스트랩 API가 아니다.
+import { getPendingRoleUsersData } from "@/features/users/director-data";
+import DirectorUsersScreen from "./DirectorUsersScreen";
 
-export const dynamic = "force-dynamic"; // 대기 GUEST가 캐시에 안 남게.
+export const dynamic = "force-dynamic";
 
 /** 대기 GUEST와 미연결 원생 옵션을 Screen에 넘긴다. */
-export default async function DirectorUsersPage() { // layout 가드만. 부여는 assignUserRole.
-    const usersData = await getPendingRoleUsersData(); // 대기 GUEST와 미연결 원생 옵션.
+export default async function DirectorUsersPage() {
+    const usersData = await getPendingRoleUsersData();
 
-    return <DirectorUsersScreen {...usersData} />; // Screen에 props만. 부여는 assignUserRole.
-} // 블록 끝.
+    return <DirectorUsersScreen {...usersData} />;
+}

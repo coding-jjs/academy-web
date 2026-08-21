@@ -1,4 +1,4 @@
-import "server-only"; // 조회만. 쓰기는 notices/actions.ts. 브라우저가 Prisma를 치지 않는다.
+import "server-only";
 
 /**
  * 게시된 공개 공지 조회. kind=NOTICE·published·audience=ALL만 돌려 /notices와 홈에 쓴다.
@@ -13,59 +13,59 @@ import "server-only"; // 조회만. 쓰기는 notices/actions.ts. 브라우저�
  * 관련: `types.ts`, `actions.ts`.
  */
 
-import { prisma } from "@/lib/db"; // server-only Prisma. 공개 목록만 읽는다.
-import { // 공개 카드 DTO. 피드 NewsItem과 나눈다.
-    NOTICE_AUDIENCE_LABELS, // DB enum → 한글. 모르는 코드는 "전체".
-    formatNoticeListDate, // MM.DD(KST).
-    type Notice, // 공개 /notices 카드. 역할 피드가 아니다.
-} from "@/features/notices/types"; // 공개 DTO. news/types.ts가 아니다.
+import { prisma } from "@/lib/db";
+import {
+    NOTICE_AUDIENCE_LABELS,
+    formatNoticeListDate,
+    type Notice,
+} from "@/features/notices/types";
 
-function mapNotice(row: { // Prisma 행 → 공개 카드. MIME/5MB는 업로드 쪽.
-    id: string; // NewsItem id. kind=NOTICE 행만.
-    audience: string; // DB 코드. 화면에는 한글 라벨만.
-    title: string; // 80자. 카드 한 줄.
-    content: string | null; // 공개 목록은 공백이면 "내용이 없습니다."
-    createdAt: Date; // formatNoticeListDate가 KST MM.DD.
-    imageUrl: string | null; // 버킷 notices 공개 URL.
-}): Notice { // 공개 카드. 피드 NewsItem이 아니다.
-    return { // 화면이 DB enum·Date를 모르게.
-        id: row.id, // NewsItem id. kind=NOTICE 행만.
-        audience: NOTICE_AUDIENCE_LABELS[row.audience] ?? "전체", // 모르는 코드는 "전체". 화면이 DB enum을 모르게.
-        title: row.title, // 카드 한 줄.
-        date: formatNoticeListDate(row.createdAt), // MM.DD(KST).
-        body: row.content?.trim() || "내용이 없습니다.", // 공개 목록 카드용. 작성 액션 map은 빈 문자열.
-        imageUrl: row.imageUrl, // 버킷 notices 공개 URL. MIME/5MB는 업로드 쪽.
+function mapNotice(row: {
+    id: string;
+    audience: string;
+    title: string;
+    content: string | null;
+    createdAt: Date;
+    imageUrl: string | null;
+}): Notice {
+    return {
+        id: row.id,
+        audience: NOTICE_AUDIENCE_LABELS[row.audience] ?? "전체",
+        title: row.title,
+        date: formatNoticeListDate(row.createdAt),
+        body: row.content?.trim() || "내용이 없습니다.",
+        imageUrl: row.imageUrl,
     };
 }
 
 /**
  * 공개 /notices용 공지 목록. 기본 200건.
  */
-export async function getPublishedNotices(limit = 200): Promise<Notice[]> { // 로그인 없이. 피드 getPublishedNews와 쿼리를 나눈다.
-    const rows = await prisma.newsItem.findMany({ // kind=NOTICE·published·audience=ALL만.
-        where: { // 학부모 전용·BANNER·미게시는 뺀다.
-            kind: "NOTICE", // 피드 BANNER·학부모 전용은 뺀다.
-            published: true, // 미게시는 공개 목록에 안 넣는다.
-            audience: "ALL", // 로그인 없이 공개 목록.
+export async function getPublishedNotices(limit = 200): Promise<Notice[]> {
+    const rows = await prisma.newsItem.findMany({
+        where: {
+            kind: "NOTICE",
+            published: true,
+            audience: "ALL",
         },
-        orderBy: [{ createdAt: "desc" }], // 최신 먼저.
-        take: limit, // 홈은 3, 목록은 200.
-        select: { // 공개 카드 필드만. 카테고리·게시 기간은 피드 쪽.
-            id: true, // NewsItem id.
-            audience: true, // 한글 라벨로 내린다.
-            title: true, // 카드 제목.
-            content: true, // body. 공백이면 "내용이 없습니다."
-            createdAt: true, // MM.DD(KST).
-            imageUrl: true, // 버킷 notices 공개 URL.
+        orderBy: [{ createdAt: "desc" }],
+        take: limit,
+        select: {
+            id: true,
+            audience: true,
+            title: true,
+            content: true,
+            createdAt: true,
+            imageUrl: true,
         },
     });
 
-    return rows.map(mapNotice); // 공개 카드 DTO. 피드 ISO와 형식이 다르다.
+    return rows.map(mapNotice);
 }
 
 /**
  * 홈 미리보기. 같은 쿼리를 limit만 줄여 목록 첫 화면과 내용이 갈라지지 않게 한다.
  */
-export async function getHomeNotices(limit = 3): Promise<Notice[]> { // 같은 where. 홈 바 클릭은 /notices.
-    return getPublishedNotices(limit); // 같은 where. 홈 바 클릭은 /notices.
+export async function getHomeNotices(limit = 3): Promise<Notice[]> {
+    return getPublishedNotices(limit);
 }

@@ -21,12 +21,12 @@
  * @param requested 쿠키 또는 searchParam. 없거나 목록 밖이면 무시.
  * @returns 허용된 id, 없으면 `childIds[0]`, 자녀가 없으면 `""`.
  */
-export function resolveChild( // DB를 치지 않는다. 위조 쿠키는 첫 자녀로 떨어뜨린다.
-    childIds: string[], // 활성 링크 studentId. endedAt null만 호출 측이 넣는다.
-    requested: string | null | undefined, // 쿠키/쿼리. 목록 밖이면 채택하지 않는다.
-): string { // 빈 문자열이면 Screen이 "연결된 자녀 없음"을 그린다.
-    if (requested && childIds.includes(requested)) { // 활성 링크 안의 id만. 위조 쿠키·쿼리는 채택하지 않는다.
-        return requested; // 활성 링크 안의 id만. 위조 쿠키·쿼리는 채택하지 않는다.
+export function resolveChild(
+    childIds: string[],
+    requested: string | null | undefined,
+): string {
+    if (requested && childIds.includes(requested)) {
+        return requested;
     }
-    return childIds[0] ?? ""; // 없거나 목록 밖이면 첫 자녀. 링크가 없으면 빈 문자열로 "자녀 없음".
+    return childIds[0] ?? "";
 }

@@ -12,8 +12,8 @@
  */
 
 /** 로그인한 방문자의 헤더 요약. 대시보드는 역할 홈으로만 링크한다. */
-export type HomeViewer = { // 비로그인이면 page가 null. 출결 집계 타입이 아니다.
-    name: string; // 세션 표시 이름.
-    roleLabel: string; // 한글 역할. JWT role 코드가 아니다.
-    dashboardHref: string; // 이 `/`는 마케팅 홈. 역할 대시보드는 이 경로로만 이동.
+export type HomeViewer = {
+    name: string;
+    roleLabel: string;
+    dashboardHref: string;
 };

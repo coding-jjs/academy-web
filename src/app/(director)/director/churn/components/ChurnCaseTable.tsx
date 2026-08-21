@@ -1,4 +1,4 @@
-"use client"; // 원장 이탈 명단. 배정·확정·재상담 버튼을 행마다 둔다.
+"use client";
 
 /**
  * 재원생 이탈 테이블. 케이스 없는 행도 "신호 없음"으로 남긴다.
@@ -42,9 +42,9 @@ export default function ChurnCaseTable({
             <div className={styles.thresholdBar}>
                 <StatusChip tone="neutral">기본값</StatusChip>
                 <span>
-                    출석 {threshold.attendanceDropPercentPoint}%p · 성적{" "}
-                    {threshold.scoreDropPoints}점 · 결석{" "}
-                    {threshold.consecutiveAbsences}회 · 미납{" "}
+                    출석 {threshold.attendanceDropPercentPoint}%p · 성적
+                    {threshold.scoreDropPoints}점 · 결석
+                    {threshold.consecutiveAbsences}회 · 미납
                     {threshold.unpaidDays}일
                 </span>
             </div>

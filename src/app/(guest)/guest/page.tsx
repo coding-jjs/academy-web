@@ -10,9 +10,9 @@
  * - 원장 역할 부여를 기다리지 말고 홈·문의만 쓰게 한다.
  */
 
-import { redirect } from "next/navigation"; // UI를 그리지 않는다. 공개 홈으로만.
+import { redirect } from "next/navigation";
 
 /** 게스트 루트는 공개 홈으로만 보낸다. */
-export default function GuestPage() { // 게스트 루트. 게스트 대시보드는 없다.
-    redirect("/"); // 게스트 홈은 공개 /. 문의는 /guest/inquiry.
-} // 블록 끝.
+export default function GuestPage() {
+    redirect("/");
+}

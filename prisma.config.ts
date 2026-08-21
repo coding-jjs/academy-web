@@ -15,19 +15,19 @@
  * 관련: `prisma/schema.prisma`, `lib/db.ts`.
  */
 
-import { config } from "dotenv"; // CLI가 셸 env만 보면 DIRECT_URL이 빠진다.
-import { defineConfig, env } from "prisma/config"; // Prisma 7 CLI. 런타임 PrismaClient는 lib/db.ts.
+import { config } from "dotenv";
+import { defineConfig, env } from "prisma/config";
 
-config({ path: ".env.local" }); // Next와 같은 .env.local. CLI가 셸 env만 보면 DIRECT_URL이 빠진다.
+config({ path: ".env.local" });
 
-export default defineConfig({ // migrate/generate/validate. 앱 런타임은 DATABASE_URL.
-    schema: "prisma/schema.prisma", // 앱 런타임 스키마. generate 산출물은 src/generate.
+export default defineConfig({
+    schema: "prisma/schema.prisma",
 
-    migrations: { // 시드 SQL은 여기 두지 않는다. scripts/*.mjs가 DIRECT_URL로 붙는다.
-        path: "prisma/migrations", // migrate 이력. 시드 SQL은 여기 두지 않는다.
+    migrations: {
+        path: "prisma/migrations",
     },
 
-    datasource: { // 풀링 DATABASE_URL이 아님. advisory lock은 PgBouncer에서 실패한다.
-        url: env("DIRECT_URL"), // 풀링 DATABASE_URL이 아님. advisory lock은 PgBouncer에서 실패한다.
+    datasource: {
+        url: env("DIRECT_URL"),
     },
 });
