@@ -19,7 +19,7 @@ import type {
 } from "@/features/timetable/types";
 import { WEEK_DAY_LABELS } from "@/features/timetable/presentation";
 import styles from "./ParentTimetableScreen.module.css";
-import { writeParentChildCookie } from "@/features/families/parent-child-cooke";
+import { writeParentChildCookie } from "@/features/families/parent-child-cookie";
 
 /** 요일별 세션과 오늘 하이라이트를 그린다. */
 export default function ParentTimetableScreen({

@@ -12,7 +12,7 @@ import { getParentAttendanceChildren } from "@/features/attendance/parent-data";
 import { resolveChild } from "@/features/families/resolve-child";
 import { requireRole } from "@/lib/auth-guard";
 import { cookies } from "next/headers";
-import { readParentChildCookie } from "@/features/families/parent-child-cooke";
+import { readParentChildCookie } from "@/features/families/parent-child-cookie";
 import ParentAttendanceScreen from "./ParentAttendanceScreen";
 
 /** 자녀 세션과 결석 신청 가능 목록을 Screen에 넘긴다. */

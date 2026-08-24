@@ -17,7 +17,7 @@ import {
     requestAbsence,
     type AbsenceState,
 } from "@/features/attendance/parent-actions";
-import { writeParentChildCookie } from "@/features/families/parent-child-cooke";
+import { writeParentChildCookie } from "@/features/families/parent-child-cookie";
 import styles from "./ParentAttendanceScreen.module.css";
 
 const statusMeta = ATTENDANCE_STATUS_METADATA;

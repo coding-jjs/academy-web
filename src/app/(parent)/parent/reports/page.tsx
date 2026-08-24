@@ -12,7 +12,7 @@ import { requireRole } from "@/lib/auth-guard";
 import ParentReportsScreen from "@/app/(parent)/parent/reports/ParentReportsScreen";
 import { getParentReportChildren } from "@/features/reports/parent-data";
 import { resolveChild } from "@/features/families/resolve-child";
-import { readParentChildCookie } from "@/features/families/parent-child-cooke";
+import { readParentChildCookie } from "@/features/families/parent-child-cookie";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";

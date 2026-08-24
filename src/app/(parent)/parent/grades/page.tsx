@@ -12,7 +12,7 @@ import { requireRole } from "@/lib/auth-guard";
 import { resolveChild } from "@/features/families/resolve-child";
 import ParentGradesScreen from "@/app/(parent)/parent/grades/ParentGradesScreen";
 import { getParentGradesChildren } from "@/features/grades/viewer-data";
-import { readParentChildCookie } from "@/features/families/parent-child-cooke";
+import { readParentChildCookie } from "@/features/families/parent-child-cookie";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
