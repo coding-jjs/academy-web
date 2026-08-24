@@ -134,6 +134,18 @@ export async function getStudentGradesData(
             enrollments: {
                 where: { status: "ACTIVE", endedAt: null },
                 take: 1,
+                select: {
+                    class: {
+                        select: {
+                            name: true,
+                            teacher: { select: { name: true } },
+                        },
+                    },
+                },
+            },
+            gradeRecords: {
+                orderBy: { assessedAt: "desc" },
+                take: 20,
                 select: gradeRecordSelection,
             },
             wrongNotes: {
@@ -166,17 +178,15 @@ export async function getStudentGradesData(
     };
 }
 
-function mapGradeRecord(
-    gradeRecord: {
-        id: string;
-        title: string;
-        subject: string;
-        score: unknown;
-        maxScore: unknown;
-        assessedAt: Date;
-        class: { name: string } | null;
-    },
-): StudentGradeRecord {
+function mapGradeRecord(gradeRecord: {
+    id: string;
+    title: string;
+    subject: string;
+    score: unknown;
+    maxScore: unknown;
+    assessedAt: Date;
+    class: { name: string } | null;
+}): StudentGradeRecord {
     const score = Number(gradeRecord.score);
     const maxScore = Number(gradeRecord.maxScore);
     return {
