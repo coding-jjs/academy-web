@@ -20,7 +20,7 @@ import type {
     ParentDashboardChild,
 } from "@/features/dashboard/types";
 import styles from "./ParentDashboardScreen.module.css";
-import { writeParentChildCookie } from "@/features/families/parent-child-cooke";
+import { writeParentChildCookie } from "@/features/families/parent-child-cookie";
 
 const statusMeta = ATTENDANCE_STATUS_METADATA;
 

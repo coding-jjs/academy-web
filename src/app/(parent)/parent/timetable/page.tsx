@@ -12,7 +12,7 @@ import { requireRole } from "@/lib/auth-guard";
 import { getParentTimetableData } from "@/features/timetable/data";
 import { resolveChild } from "@/features/families/resolve-child";
 import ParentTimetableScreen from "./ParentTimetableScreen";
-import { readParentChildCookie } from "@/features/families/parent-child-cooke";
+import { readParentChildCookie } from "@/features/families/parent-child-cookie";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";

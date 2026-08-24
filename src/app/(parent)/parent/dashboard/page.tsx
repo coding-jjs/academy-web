@@ -13,7 +13,7 @@ import { getParentDashboardData } from "@/features/dashboard/parent-data";
 import ParentDashboardScreen from "./ParentDashboardScreen";
 import { resolveChild } from "@/features/families/resolve-child";
 import { cookies } from "next/headers";
-import { readParentChildCookie } from "@/features/families/parent-child-cooke";
+import { readParentChildCookie } from "@/features/families/parent-child-cookie";
 
 export const dynamic = "force-dynamic";
 

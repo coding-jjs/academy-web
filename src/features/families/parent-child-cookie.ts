@@ -13,7 +13,7 @@
  * - 타인 원생 id를 걸러 내지 않는다. 위조된 쿠키는 resolveChild가 첫 자녀로 떨어뜨린다.
  *
  * 관련: `features/families/resolve-child.ts`.
- * 파일명 cooke는 cookie 오타이나 기존 import 경로를 유지한다.
+ * 파일명 cookie는 cookie 오타이나 기존 import 경로를 유지한다.
  */
 
 /** 학부모 화면이 공유하는 선택 자녀 쿠키 이름. */

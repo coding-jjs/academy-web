@@ -11,7 +11,7 @@
  * - DB를 치지 않는다. 이미 가져온 링크 id 배열만 본다.
  * - 쿠키를 고치지 않는다. 잘못된 값은 이번 요청에서만 무시한다.
  *
- * 관련: `features/families/parent-child-cooke.ts`, `features/families/actions.ts`.
+ * 관련: `features/families/parent-child-cookie.ts`, `features/families/actions.ts`.
  */
 
 /**

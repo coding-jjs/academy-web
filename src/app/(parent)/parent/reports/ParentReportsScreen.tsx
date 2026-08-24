@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import StatusChip from "@/components/ui/StatusChip";
 import type { ParentReportChild } from "@/features/reports/parent-types";
 import styles from "./ParentReportsScreen.module.css";
-import { writeParentChildCookie } from "@/features/families/parent-child-cooke";
+import { writeParentChildCookie } from "@/features/families/parent-child-cookie";
 
 /** 자녀 탭과 선택한 리포트 본문·이력을 그린다. */
 export default function ParentReportsScreen({

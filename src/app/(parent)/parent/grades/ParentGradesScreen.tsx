@@ -17,7 +17,7 @@ import {
 } from "@/features/grades/formatters";
 import { WRONG_NOTE_STATUS_METADATA } from "@/features/grades/presentation";
 import styles from "./ParentGradesScreen.module.css";
-import { writeParentChildCookie } from "@/features/families/parent-child-cooke";
+import { writeParentChildCookie } from "@/features/families/parent-child-cookie";
 
 const wrongStatusMeta = WRONG_NOTE_STATUS_METADATA;
 const formatDate = formatGradeDate;
