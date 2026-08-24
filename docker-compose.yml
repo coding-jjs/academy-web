@@ -1,0 +1,77 @@
+name: academy-web
+
+x-logging: &default-logging
+    driver: json-file
+    options:
+        max-size: "10m"
+        max-file: "3"
+
+services:
+    migrate:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: migrator
+        env_file:
+            - path: .env
+              required: false
+        restart: "no"
+        logging: *default-logging
+
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: runner
+            args:
+                NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
+                NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-}
+        env_file:
+            - path: .env
+              required: false
+        expose:
+            - "3000"
+        restart: unless-stopped
+        logging: *default-logging
+
+    caddy:
+        image: caddy:2.10-alpine
+        ports:
+            - "80:80"
+            - "443:443"
+            - "443:443/udp"
+        environment:
+            APP_DOMAIN: ${APP_DOMAIN:-}
+            CADDY_EMAIL: ${CADDY_EMAIL:-}
+        volumes:
+            - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+            - caddy_data:/data
+            - caddy_config:/config
+        depends_on:
+            app:
+                condition: service_healthy
+        restart: unless-stopped
+        logging: *default-logging
+
+    # 관리형 DB를 쓰기 전 시험용. 운영은 Lightsail Database + DATABASE_URL을 권장.
+    postgres:
+        image: postgres:16-alpine
+        profiles: ["bundled-db"]
+        environment:
+            POSTGRES_DB: academy
+            POSTGRES_USER: academy
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U academy -d academy"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+        restart: unless-stopped
+        logging: *default-logging
+
+volumes:
+    caddy_data:
+    caddy_config:
+    postgres_data:

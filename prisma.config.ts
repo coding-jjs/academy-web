@@ -6,7 +6,8 @@
  * 앱 런타임은 이 파일을 쓰지 않는다 → `lib/db.ts`의 `DATABASE_URL` + pg adapter.
  *
  * DIRECT_URL을 쓰는 이유: migrate의 advisory lock은 PgBouncer 트랜잭션 풀에서 실패한다.
- * dotenv는 `.env.local`만 읽는다 — Next와 같은 파일을 보게 하기 위함.
+ * dotenv는 `.env.local` 다음 `.env`를 읽는다. 이미 있는 값은 덮지 않으므로
+ * 로컬은 `.env.local`, Lightsail Compose는 프로세스 env / `.env`를 쓴다.
  *
  * 의도적으로 하지 않는 일:
  * - 시드 스크립트를 여기 붙이지 않는다 → `scripts/*.mjs`가 DIRECT_URL로 직접 붙는다.
@@ -19,6 +20,7 @@ import { config } from "dotenv";
 import { defineConfig, env } from "prisma/config";
 
 config({ path: ".env.local" });
+config({ path: ".env" });
 
 export default defineConfig({
     schema: "prisma/schema.prisma",
