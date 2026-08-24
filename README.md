@@ -9,7 +9,7 @@
 ![Prisma](https://img.shields.io/badge/Prisma-PostgreSQL-2D3748?style=flat-square&logo=prisma)
 ![Gemini](https://img.shields.io/badge/Gemini-AI_Report-8E75B2?style=flat-square&logo=googlegemini)
 
-[기능](#주요-기능) · [실행](#실행-방법) · [구조](#프로젝트-구조) · [Google 로그인](#google-로그인-설정) · [데이터베이스](#데이터베이스) · [원장 설정](#최초-원장-설정)
+[기능](#주요-기능) · [실행](#실행-방법) · [구조](#프로젝트-구조) · [Google 로그인](#google-로그인-설정) · [데이터베이스](#데이터베이스) · [원장 설정](#최초-원장-설정) · [배포](#배포-aws-lightsail)
 
 </div>
 
@@ -134,3 +134,15 @@ npm run bootstrap:director -- director@example.com
 ```
 
 이미 원장이 있으면 거부합니다. 이후 교사·직원·학부모·학생 역할은 `/director/users`에서 부여합니다.
+
+## 배포 (AWS Lightsail)
+
+운영은 Ubuntu 인스턴스에서 Docker Compose로 Next.js `standalone`과 Caddy(HTTPS)를 띄우고, PostgreSQL은 Lightsail Database를 쓰는 구성을 초안으로 두었습니다.
+
+- 절차·방화벽·OAuth·원장 부트스트랩: [`deploy/README.md`](deploy/README.md)
+- 서버용 env 템플릿: [`deploy/lightsail.env.example`](deploy/lightsail.env.example)
+
+```bash
+cp deploy/lightsail.env.example .env
+./deploy/up.sh
+```
