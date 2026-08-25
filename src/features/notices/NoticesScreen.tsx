@@ -14,6 +14,7 @@
  */
 
 import Link from "next/link";
+import BrandMark from "@/components/BrandMark";
 import {
     useCallback,
     useEffect,
@@ -47,8 +48,7 @@ import {
 } from "@/components/ui/shared-styles";
 import styles from "./NoticesScreen.module.css";
 
-const URL_REGEX =
-    /((?:https?:\/\/|www\.)[^\s<]+[^\s<.,;:!?)\]\}])/gi;
+const URL_REGEX = /((?:https?:\/\/|www\.)[^\s<]+[^\s<.,;:!?)\]\}])/gi;
 
 function isSafeExternalUrl(url: string) {
     try {
@@ -354,33 +354,38 @@ export default function NoticesScreen({
 
     return (
         <main className={cx(styles.page, screenStyles.animatedPage)}>
-            <header
-                className={styles.topBar}
-            >
-                <Link href="/" className={styles.brand} aria-label="A학원 홈">
-                    <span className={styles.brandMark}>A</span>
-                    <strong>A학원</strong>
+            <header className={styles.topBar}>
+                <Link
+                    href="/"
+                    className={styles.brand}
+                    aria-label="뚜비학원 홈"
+                >
+                    <BrandMark className={styles.brandMark} />
+                    <strong>뚜비학원</strong>
                 </Link>
                 <Link href="/" className={styles.backLink}>
                     메인으로
                 </Link>
             </header>
-            <section
-                className={styles.content}
-            >
+            <section className={styles.content}>
                 <header className={cx(pageHeadingStyles.root, styles.heading)}>
                     <div>
-                        <span className={pageHeadingStyles.eyebrow}>NOTICE</span>
+                        <span className={pageHeadingStyles.eyebrow}>
+                            NOTICE
+                        </span>
                         <h1>공지사항</h1>
                         <p>학원의 주요 안내와 일정을 확인합니다.</p>
                     </div>
                     <div className={styles.headingActions}>
-                        <label className={cx(fieldStyles.root, styles.searchField)}>
-                            <span className={a11yStyles.srOnly}>
-                                제목 검색
-                            </span>
+                        <label
+                            className={cx(fieldStyles.root, styles.searchField)}
+                        >
+                            <span className={a11yStyles.srOnly}>제목 검색</span>
                             <input
-                                className={cx(fieldStyles.control, styles.searchInput)}
+                                className={cx(
+                                    fieldStyles.control,
+                                    styles.searchInput,
+                                )}
                                 type="search"
                                 value={searchQuery}
                                 onChange={(event) =>
@@ -393,7 +398,10 @@ export default function NoticesScreen({
                         {canWrite ? (
                             <button
                                 type="button"
-                                className={cx(buttonStyles.primary, styles.writeBtn)}
+                                className={cx(
+                                    buttonStyles.primary,
+                                    styles.writeBtn,
+                                )}
                                 onClick={openCompose}
                             >
                                 작성
@@ -402,7 +410,13 @@ export default function NoticesScreen({
                     </div>
                 </header>
                 {notices.length === 0 ? (
-                    <div className={cx(surfaceStyles.root, emptyStateStyles.root, styles.empty)}>
+                    <div
+                        className={cx(
+                            surfaceStyles.root,
+                            emptyStateStyles.root,
+                            styles.empty,
+                        )}
+                    >
                         <h2>등록된 공지가 없습니다</h2>
                         <p>
                             {canWrite
@@ -411,7 +425,13 @@ export default function NoticesScreen({
                         </p>
                     </div>
                 ) : filteredNotices.length === 0 ? (
-                    <div className={cx(surfaceStyles.root, emptyStateStyles.root, styles.empty)}>
+                    <div
+                        className={cx(
+                            surfaceStyles.root,
+                            emptyStateStyles.root,
+                            styles.empty,
+                        )}
+                    >
                         <h2>검색 결과가 없습니다</h2>
                         <p>다른 제목으로 다시 검색해 주세요.</p>
                     </div>
@@ -422,14 +442,21 @@ export default function NoticesScreen({
                                 <li key={notice.id}>
                                     <button
                                         type="button"
-                                        className={cx(surfaceStyles.root, styles.card)}
+                                        className={cx(
+                                            surfaceStyles.root,
+                                            styles.card,
+                                        )}
                                         onClick={() => openNotice(notice)}
                                     >
                                         <div className={styles.cardTop}>
                                             <span className={styles.audience}>
                                                 {notice.audience}
                                             </span>
-                                            <time className={typographyStyles.muted}>
+                                            <time
+                                                className={
+                                                    typographyStyles.muted
+                                                }
+                                            >
                                                 {notice.date}
                                             </time>
                                         </div>
@@ -498,7 +525,10 @@ export default function NoticesScreen({
                         </header>
                         {isEditing ? (
                             <form
-                                className={cx(fieldStyles.form, styles.composeForm)}
+                                className={cx(
+                                    fieldStyles.form,
+                                    styles.composeForm,
+                                )}
                                 onSubmit={handleUpdateSubmit}
                             >
                                 <label className={fieldStyles.root}>
@@ -526,7 +556,12 @@ export default function NoticesScreen({
                                         disabled={isSubmitting}
                                     />
                                 </label>
-                                <label className={cx(fieldStyles.root, styles.fileField)}>
+                                <label
+                                    className={cx(
+                                        fieldStyles.root,
+                                        styles.fileField,
+                                    )}
+                                >
                                     이미지 (선택)
                                     <input
                                         type="file"
@@ -647,7 +682,10 @@ export default function NoticesScreen({
                                 </div>
                                 {detailError ? (
                                     <p
-                                        className={cx(typographyStyles.error, styles.detailError)}
+                                        className={cx(
+                                            typographyStyles.error,
+                                            styles.detailError,
+                                        )}
                                         role="alert"
                                     >
                                         {detailError}
@@ -658,7 +696,10 @@ export default function NoticesScreen({
                                     <footer className={styles.detailActions}>
                                         <button
                                             type="button"
-                                            className={cx(buttonStyles.danger, styles.deleteBtn)}
+                                            className={cx(
+                                                buttonStyles.danger,
+                                                styles.deleteBtn,
+                                            )}
                                             onClick={handleDelete}
                                             disabled={isSubmitting}
                                         >
@@ -734,7 +775,12 @@ export default function NoticesScreen({
                                     disabled={isSubmitting}
                                 />
                             </label>
-                            <label className={cx(fieldStyles.root, styles.fileField)}>
+                            <label
+                                className={cx(
+                                    fieldStyles.root,
+                                    styles.fileField,
+                                )}
+                            >
                                 이미지 (선택)
                                 <input
                                     type="file"
@@ -769,7 +815,10 @@ export default function NoticesScreen({
                             ) : null}
 
                             {composeError ? (
-                                <p className={typographyStyles.error} role="alert">
+                                <p
+                                    className={typographyStyles.error}
+                                    role="alert"
+                                >
                                     {composeError}
                                 </p>
                             ) : null}

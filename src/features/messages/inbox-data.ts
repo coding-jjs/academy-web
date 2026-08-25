@@ -98,7 +98,7 @@ function mapInboxMessage(
         deepLink: row.message.deepLink,
         createdAt: row.message.createdAt.toISOString(),
         readAt: row.readAt?.toISOString() ?? null,
-        senderName: row.message.sender?.name ?? "A학원",
+        senderName: row.message.sender?.name ?? "뚜비학원",
         senderRole: row.message.sender?.role ?? null,
     };
 }

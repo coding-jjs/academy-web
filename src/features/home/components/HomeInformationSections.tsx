@@ -12,6 +12,7 @@
  */
 
 import Link from "next/link";
+import BrandMark from "@/components/BrandMark";
 import { ACADEMY_PROGRAMS, LEARNING_STEPS } from "@/features/home/content";
 import {
     buttonStyles,
@@ -28,19 +29,33 @@ export default function HomeInformationSections() {
         <>
             <section className={styles.quickLinks} aria-label="빠른 메뉴">
                 <div className={cx(surfaceStyles.root, styles.quickLinksIntro)}>
-                    <span className={pageHeadingStyles.eyebrowBlock}>FOR FAMILY</span>
+                    <span className={pageHeadingStyles.eyebrowBlock}>
+                        FOR FAMILY
+                    </span>
                     <h2>오늘의 배움을 바로 확인하세요</h2>
                 </div>
-                <Link href="/login" className={cx(surfaceStyles.root, styles.quickLinkCard)}>
-                    <small className={typographyStyles.muted}>학부모</small>자녀의 출결과 학습 기록
+                <Link
+                    href="/login"
+                    className={cx(surfaceStyles.root, styles.quickLinkCard)}
+                >
+                    <small className={typographyStyles.muted}>학부모</small>
+                    자녀의 출결과 학습 기록
                     <span aria-hidden="true">↗</span>
                 </Link>
-                <Link href="/login" className={cx(surfaceStyles.root, styles.quickLinkCard)}>
-                    <small className={typographyStyles.muted}>학생</small>나의 시간표와 성적
+                <Link
+                    href="/login"
+                    className={cx(surfaceStyles.root, styles.quickLinkCard)}
+                >
+                    <small className={typographyStyles.muted}>학생</small>나의
+                    시간표와 성적
                     <span aria-hidden="true">↗</span>
                 </Link>
-                <Link href="/guest/inquiry" className={cx(surfaceStyles.root, styles.quickLinkCard)}>
-                    <small className={typographyStyles.muted}>게스트</small>입학 및 수업 상담
+                <Link
+                    href="/guest/inquiry"
+                    className={cx(surfaceStyles.root, styles.quickLinkCard)}
+                >
+                    <small className={typographyStyles.muted}>게스트</small>입학
+                    및 수업 상담
                     <span aria-hidden="true">↗</span>
                 </Link>
             </section>
@@ -52,7 +67,12 @@ export default function HomeInformationSections() {
                         <br />
                         스스로 설명하는 수업
                     </h2>
-                    <span className={cx(typographyStyles.hint, styles.sectionLead)}>
+                    <span
+                        className={cx(
+                            typographyStyles.hint,
+                            styles.sectionLead,
+                        )}
+                    >
                         학생마다 다른 출발점과 속도를 존중합니다.
                     </span>
                 </div>
@@ -60,13 +80,22 @@ export default function HomeInformationSections() {
                     {ACADEMY_PROGRAMS.map((program) => (
                         <article
                             key={program.number}
-                            className={cx(surfaceStyles.root, styles.programCard)}
+                            className={cx(
+                                surfaceStyles.root,
+                                styles.programCard,
+                            )}
                         >
-                            <span className={pageHeadingStyles.eyebrow}>{program.number}</span>
+                            <span className={pageHeadingStyles.eyebrow}>
+                                {program.number}
+                            </span>
                             <div>
-                                <small className={typographyStyles.muted}>{program.subtitle}</small>
+                                <small className={typographyStyles.muted}>
+                                    {program.subtitle}
+                                </small>
                                 <h3>{program.title}</h3>
-                                <p className={typographyStyles.hint}>{program.detail}</p>
+                                <p className={typographyStyles.hint}>
+                                    {program.detail}
+                                </p>
                             </div>
                         </article>
                     ))}
@@ -74,12 +103,21 @@ export default function HomeInformationSections() {
             </section>
             <section className={styles.process} id="process">
                 <div className={styles.processIntro}>
-                    <p className={pageHeadingStyles.eyebrowBlock}>LEARNING JOURNEY</p>
-                    <h2>성장은 보이지 않는 순간에도 이어집니다</h2>
-                    <span className={cx(typographyStyles.hint, styles.processLead)}>
-                        감이 아닌 기록으로 학생을 이해하고, 필요한 순간에
-                        함께합니다.
-                    </span>
+                    <p className={pageHeadingStyles.eyebrowBlock}>
+                        LEARNING JOURNEY
+                    </p>
+                    <div className={styles.processCopy}>
+                        <h2>성장은 보이지 않는 순간에도 이어집니다</h2>
+                        <span
+                            className={cx(
+                                typographyStyles.hint,
+                                styles.processLead,
+                            )}
+                        >
+                            감이 아닌 기록으로 학생을 이해하고, 필요한 순간에
+                            함께합니다.
+                        </span>
+                    </div>
                 </div>
                 <ol className={styles.stepList}>
                     {LEARNING_STEPS.map(([title, detail], index) => (
@@ -91,18 +129,29 @@ export default function HomeInformationSections() {
                     ))}
                 </ol>
             </section>
-            <section id="location" className={cx(surfaceStyles.root, styles.location)} aria-labelledby="location-heading">
+            <section
+                id="location"
+                className={cx(surfaceStyles.root, styles.location)}
+                aria-labelledby="location-heading"
+            >
                 <div className={styles.locationGrid}>
                     <div className={styles.locationInfo}>
                         <p className={pageHeadingStyles.eyebrowBlock}>VISIT</p>
                         <h2 id="location-heading">오시는 길</h2>
-                        <p className={cx(typographyStyles.hint, styles.locationLead)}>
+                        <p
+                            className={cx(
+                                typographyStyles.hint,
+                                styles.locationLead,
+                            )}
+                        >
                             기록과 상담이 이어지는 배움의 공간으로 초대합니다.
                         </p>
                         <dl className={styles.locationMeta}>
                             <div>
                                 <dt className={typographyStyles.muted}>주소</dt>
-                                <dd>대구광역시 수성구 알파시티1로 170 · A학원</dd>
+                                <dd>
+                                    대구광역시 수성구 알파시티1로 170 · 뚜비학원
+                                </dd>
                             </div>
                             <div>
                                 <dt className={typographyStyles.muted}>연락</dt>
@@ -110,7 +159,9 @@ export default function HomeInformationSections() {
                             </div>
                             <div>
                                 <dt className={typographyStyles.muted}>안내</dt>
-                                <dd>수성알파시티 인근 · 방문 전 상담 예약 권장</dd>
+                                <dd>
+                                    수성알파시티 인근 · 방문 전 상담 예약 권장
+                                </dd>
                             </div>
                         </dl>
                         <div className={styles.locationActions}>
@@ -139,7 +190,7 @@ export default function HomeInformationSections() {
                     <div className={styles.map}>
                         <iframe
                             src="https://www.google.com/maps/embed?pb=!1m5!3m3!1m2!1s0x356609911e108f93%3A0xd41b28115963e05a!2z64yA6rWs65SU7KeA7YS47ZiB7Iug7KeE7Z2l7JuQ!5e0!3m2!1sko!2skr!4v1786500523158!5m2!1sko!2skr"
-                            title="A학원 오시는 길"
+                            title="뚜비학원 오시는 길"
                             allowFullScreen
                             loading="lazy"
                             referrerPolicy="strict-origin-when-cross-origin"
@@ -148,7 +199,12 @@ export default function HomeInformationSections() {
                 </div>
             </section>
             <section className={styles.finalCta}>
-                <p className={cx(pageHeadingStyles.eyebrowBlock, styles.finalCtaEyebrow)}>
+                <p
+                    className={cx(
+                        pageHeadingStyles.eyebrowBlock,
+                        styles.finalCtaEyebrow,
+                    )}
+                >
                     START TOGETHER
                 </p>
                 <h2>
@@ -165,12 +221,16 @@ export default function HomeInformationSections() {
             </section>
             <footer className={styles.footer}>
                 <div className={styles.footerBrand}>
-                    <span className={styles.brandMark}>A</span>
-                    <strong>A학원</strong>
+                    <BrandMark className={styles.brandMark} />
+                    <strong>뚜비학원</strong>
                 </div>
                 <div>
-                    <p className={typographyStyles.muted}>학생의 배움과 성장을 함께 기록합니다.</p>
-                    <p className={typographyStyles.muted}>© 2026 A Academy. All rights reserved.</p>
+                    <p className={typographyStyles.muted}>
+                        학생의 배움과 성장을 함께 기록합니다.
+                    </p>
+                    <p className={typographyStyles.muted}>
+                        © 2026 A Academy. All rights reserved.
+                    </p>
                 </div>
                 <nav aria-label="하단 메뉴">
                     <Link href="/guest/inquiry">상담 문의</Link>

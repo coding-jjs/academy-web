@@ -18,17 +18,19 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HOME_BANNERS } from "@/features/home/content";
 import type { Notice } from "@/features/notices/types";
-import { buttonStyles, cx, pageHeadingStyles, surfaceStyles, typographyStyles } from "@/components/ui/shared-styles";
+import {
+    buttonStyles,
+    cx,
+    pageHeadingStyles,
+    surfaceStyles,
+    typographyStyles,
+} from "@/components/ui/shared-styles";
 import styles from "../HomeScreen.module.css";
 
 /**
  * 공지 4초·배너 6초 순환. 호버/포커스면 멈춘다.
  */
-export default function HomeShowcase({
-    notices,
-}: {
-    notices: Notice[];
-}) {
+export default function HomeShowcase({ notices }: { notices: Notice[] }) {
     const [noticeIndex, setNoticeIndex] = useState(0);
     const [bannerIndex, setBannerIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
@@ -71,7 +73,12 @@ export default function HomeShowcase({
                 {...pauseEvents}
             >
                 <div className={styles.noticeInner}>
-                    <strong className={cx(pageHeadingStyles.sectionLabel, styles.noticeLabel)}>
+                    <strong
+                        className={cx(
+                            pageHeadingStyles.sectionLabel,
+                            styles.noticeLabel,
+                        )}
+                    >
                         NOTICE
                     </strong>
                     <Link
@@ -83,13 +90,17 @@ export default function HomeShowcase({
                             <>
                                 <span>{activeNotice.audience}</span>
                                 <p>{activeNotice.title}</p>
-                                <time className={typographyStyles.muted}>{activeNotice.date}</time>
+                                <time className={typographyStyles.muted}>
+                                    {activeNotice.date}
+                                </time>
                             </>
                         ) : (
                             <>
                                 <span>전체</span>
                                 <p>등록된 공지가 없습니다</p>
-                                <time className={typographyStyles.muted}>—</time>
+                                <time className={typographyStyles.muted}>
+                                    —
+                                </time>
                             </>
                         )}
                     </Link>
@@ -121,20 +132,31 @@ export default function HomeShowcase({
             </section>
             <section className={styles.hero} id="about" {...pauseEvents}>
                 <div className={cx(surfaceStyles.root, styles.heroCopy)}>
-                    <p className={pageHeadingStyles.eyebrowBlock}>LEARN · RECORD · GROW</p>
+                    <p className={pageHeadingStyles.eyebrowBlock}>
+                        LEARN · RECORD · GROW
+                    </p>
                     <h1>
                         <span className={styles.heroLine}>
                             배움의 오늘을
-                            <span className={styles.mobileLine}>기록하고,</span>
+                            <span className={styles.mobileLine}>
+                                {" "}
+                                기록하고,
+                            </span>
                         </span>
                         <span className={styles.heroLine}>
                             내일의 성장을
-                            <span className={styles.mobileLine}>만듭니다</span>
+                            <span className={styles.mobileLine}> 만듭니다</span>
                         </span>
                     </h1>
-                    <p className={cx(typographyStyles.hint, styles.heroDescription)}>
-                        A학원은 수업만 제공하지 않습니다. 학생의 과정과 변화를
-                        세심하게 기록하고, 가정과 함께 다음 걸음을 설계합니다.
+                    <p
+                        className={cx(
+                            typographyStyles.hint,
+                            styles.heroDescription,
+                        )}
+                    >
+                        뚜비학원은 수업만 제공하지 않습니다. 학생의 과정과
+                        변화를 세심하게 기록하고, 가정과 함께 다음 걸음을
+                        설계합니다.
                     </p>
                     <div className={styles.heroActions}>
                         <Link
@@ -147,7 +169,12 @@ export default function HomeShowcase({
                             학부모 · 학생 로그인
                         </Link>
                     </div>
-                    <div className={cx(typographyStyles.muted, styles.heroSummary)}>
+                    <div
+                        className={cx(
+                            typographyStyles.muted,
+                            styles.heroSummary,
+                        )}
+                    >
                         <span>수업</span>
                         <i aria-hidden="true" />
                         <span>기록</span>
@@ -157,7 +184,13 @@ export default function HomeShowcase({
                         <span>성장</span>
                     </div>
                 </div>
-                <div className={cx(surfaceStyles.root, styles.visual, styles[activeBanner.tone])}>
+                <div
+                    className={cx(
+                        surfaceStyles.root,
+                        styles.visual,
+                        styles[activeBanner.tone],
+                    )}
+                >
                     {HOME_BANNERS.map((banner, index) => (
                         <Image
                             key={banner.src}
@@ -200,9 +233,7 @@ export default function HomeShowcase({
                         <button
                             type="button"
                             className={styles.pauseButton}
-                            onClick={() =>
-                                setIsPaused((current) => !current)
-                            }
+                            onClick={() => setIsPaused((current) => !current)}
                             aria-label={
                                 isPaused ? "자동 전환 시작" : "자동 전환 멈춤"
                             }

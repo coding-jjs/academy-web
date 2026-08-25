@@ -17,6 +17,7 @@
 
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import BrandMark from "@/components/BrandMark";
 import { auth } from "@/lib/auth";
 import { signUpWithGoogle } from "@/features/auth/actions";
 import SignupFlow from "./SignupFlow";
@@ -38,9 +39,13 @@ export default async function SignupPage() {
     return (
         <main className={styles.page}>
             <header className={styles.header}>
-                <Link href="/" className={styles.brand} aria-label="A학원 홈">
-                    <span className={styles.brandMark}>A</span>
-                    <strong>A학원</strong>
+                <Link
+                    href="/"
+                    className={styles.brand}
+                    aria-label="뚜비학원 홈"
+                >
+                    <BrandMark className={styles.brandMark} />
+                    <strong>뚜비학원</strong>
                 </Link>
                 <Link href="/login" className={styles.loginLink}>
                     이미 계정이 있으신가요? <strong>로그인</strong>

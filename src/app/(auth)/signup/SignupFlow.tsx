@@ -67,8 +67,10 @@ export default function SignupFlow({
             {step === "google" ? (
                 <section className={cx(surfaceStyles.root, styles.card)}>
                     <div className={styles.authIntro}>
-                        <span className={pageHeadingStyles.eyebrow}>JOIN A ACADEMY</span>
-                        <h1>A학원과 함께 시작해요</h1>
+                        <span className={pageHeadingStyles.eyebrow}>
+                            JOIN A ACADEMY
+                        </span>
+                        <h1>뚜비학원과 함께 시작해요</h1>
                         <p>
                             Google 로그인 버튼을 누른 뒤
                             <br />
@@ -92,8 +94,8 @@ export default function SignupFlow({
                         </div>
                     </div>
                     <p className={cx(typographyStyles.hint, styles.terms)}>
-                        계속하면 A학원의 서비스 이용약관 및 개인정보 처리방침에
-                        동의하는 것으로 간주합니다.
+                        계속하면 뚜비학원의 서비스 이용약관 및 개인정보
+                        처리방침에 동의하는 것으로 간주합니다.
                     </p>
                 </section>
             ) : (

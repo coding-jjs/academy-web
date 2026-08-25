@@ -16,8 +16,8 @@ import { getPublishedNotices } from "@/features/notices/data";
 import { auth } from "@/lib/auth";
 
 export const metadata: Metadata = {
-    title: "공지사항 · A학원",
-    description: "A학원의 주요 안내와 학사 일정을 확인합니다.",
+    title: "공지사항 · 뚜비학원",
+    description: "뚜비학원의 주요 안내와 학사 일정을 확인합니다.",
 };
 
 /**

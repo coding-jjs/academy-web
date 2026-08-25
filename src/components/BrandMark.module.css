@@ -1,0 +1,17 @@
+.mark {
+    display: grid;
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%);
+}
+
+.mark img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

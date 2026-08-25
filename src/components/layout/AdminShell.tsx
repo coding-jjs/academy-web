@@ -18,6 +18,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import BrandMark from "@/components/BrandMark";
 import { roleNavigation } from "@/lib/navigation";
 import { adminRoleLabels } from "@/lib/role-routes";
 import type { RolePrefix } from "@/types/roles";
@@ -47,9 +48,9 @@ export default async function AdminShell({
         <div className={styles.adminPage}>
             <header className={styles.adminHeader}>
                 <Link href="/" className={styles.brand}>
-                    <span>A</span>
+                    <BrandMark />
                     <div>
-                        <strong>A학원</strong>
+                        <strong>뚜비학원</strong>
                         <small>{roleLabel} 페이지</small>
                     </div>
                 </Link>
