@@ -27,15 +27,8 @@
 }
 
 .brandMark {
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  color: #000;
-  background: #fff;
-  font-size: 14px;
-  font-weight: 600;
+    width: 28px;
+    height: 28px;
 }
 
 .brand strong {

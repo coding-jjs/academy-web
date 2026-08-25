@@ -11,6 +11,7 @@
  */
 
 import Link from "next/link";
+import BrandMark from "@/components/BrandMark";
 import {
     buttonStyles,
     cx,
@@ -19,14 +20,8 @@ import {
     surfaceStyles,
     typographyStyles,
 } from "@/components/ui/shared-styles";
-import {
-    DEV_LOGIN_ROLES,
-    isDevLoginEnabled,
-} from "@/lib/dev-login";
-import {
-    signInAsTestUser,
-    signInWithGoogle,
-} from "@/features/auth/actions";
+import { DEV_LOGIN_ROLES, isDevLoginEnabled } from "@/lib/dev-login";
+import { signInAsTestUser, signInWithGoogle } from "@/features/auth/actions";
 import { getDevelopmentTestUsers } from "@/features/auth/data";
 import { roleLabels } from "@/lib/role-routes";
 import styles from "./page.module.css";
@@ -50,16 +45,22 @@ export default async function LoginPage({
     return (
         <main className={styles.page}>
             <header className={styles.header}>
-                <Link href="/" className={styles.brand} aria-label="A학원 홈">
-                    <span className={styles.brandMark}>A</span>
-                    <strong>A학원</strong>
+                <Link
+                    href="/"
+                    className={styles.brand}
+                    aria-label="뚜비학원 홈"
+                >
+                    <BrandMark className={styles.brandMark} />
+                    <strong>뚜비학원</strong>
                 </Link>
             </header>
             <section className={styles.loginArea}>
                 <div className={cx(surfaceStyles.root, styles.loginCard)}>
                     <div className={styles.intro}>
-                        <span className={pageHeadingStyles.eyebrow}>A ACADEMY</span>
-                        <h1>A학원에 로그인</h1>
+                        <span className={pageHeadingStyles.eyebrow}>
+                            A ACADEMY
+                        </span>
+                        <h1>뚜비학원에 로그인</h1>
                         <p>
                             출결, 수업 일정, 학습 리포트를
                             <br />
@@ -67,7 +68,10 @@ export default async function LoginPage({
                         </p>
                     </div>
                     {params.error && (
-                        <p className={cx(typographyStyles.error, styles.error)} role="alert">
+                        <p
+                            className={cx(typographyStyles.error, styles.error)}
+                            role="alert"
+                        >
                             {getLoginErrorMessage(params.error)}
                         </p>
                     )}
@@ -94,31 +98,59 @@ export default async function LoginPage({
                                 </p>
                                 {testUsers.length > 0 ? (
                                     <form action={signInAsTestUser}>
-                                        <label className={cx(fieldStyles.root, styles.devField)}>
+                                        <label
+                                            className={cx(
+                                                fieldStyles.root,
+                                                styles.devField,
+                                            )}
+                                        >
                                             <span>테스트 계정</span>
-                                            <select className={fieldStyles.select} name="email" required defaultValue="">
+                                            <select
+                                                className={fieldStyles.select}
+                                                name="email"
+                                                required
+                                                defaultValue=""
+                                            >
                                                 <option value="" disabled>
                                                     역할과 계정을 선택하세요
                                                 </option>
                                                 {DEV_LOGIN_ROLES.map((role) => {
-                                                    const users = testUsers.filter(
-                                                        (user) => user.role === role,
-                                                    );
-                                                    if (users.length === 0) return null;
+                                                    const users =
+                                                        testUsers.filter(
+                                                            (user) =>
+                                                                user.role ===
+                                                                role,
+                                                        );
+                                                    if (users.length === 0)
+                                                        return null;
 
                                                     return (
                                                         <optgroup
                                                             key={role}
-                                                            label={roleLabels[role]}
+                                                            label={
+                                                                roleLabels[role]
+                                                            }
                                                         >
-                                                            {users.map((user) => (
-                                                                <option
-                                                                    key={user.email}
-                                                                    value={user.email}
-                                                                >
-                                                                    {user.name} · {user.email}
-                                                                </option>
-                                                            ))}
+                                                            {users.map(
+                                                                (user) => (
+                                                                    <option
+                                                                        key={
+                                                                            user.email
+                                                                        }
+                                                                        value={
+                                                                            user.email
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            user.name
+                                                                        }{" "}
+                                                                        ·{" "}
+                                                                        {
+                                                                            user.email
+                                                                        }
+                                                                    </option>
+                                                                ),
+                                                            )}
                                                         </optgroup>
                                                     );
                                                 })}
@@ -126,15 +158,18 @@ export default async function LoginPage({
                                         </label>
                                         <button
                                             type="submit"
-                                            className={cx(buttonStyles.primaryLg, styles.devLoginButton)}
+                                            className={cx(
+                                                buttonStyles.primaryLg,
+                                                styles.devLoginButton,
+                                            )}
                                         >
                                             선택한 계정으로 로그인
                                         </button>
                                     </form>
                                 ) : (
                                     <p className={styles.devEmpty}>
-                                        활성 테스트 계정이 없습니다. 테스트 시드를 먼저
-                                        생성해 주세요.
+                                        활성 테스트 계정이 없습니다. 테스트
+                                        시드를 먼저 생성해 주세요.
                                     </p>
                                 )}
                             </div>
@@ -142,8 +177,8 @@ export default async function LoginPage({
                     )}
 
                     <p className={cx(typographyStyles.hint, styles.notice)}>
-                        로그인하면 A학원의 서비스 이용약관과 개인정보 처리방침에
-                        동의하게 됩니다.
+                        로그인하면 뚜비학원의 서비스 이용약관과 개인정보
+                        처리방침에 동의하게 됩니다.
                     </p>
                     <p className={styles.signupPrompt}>
                         처음 방문하셨나요?

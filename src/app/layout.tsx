@@ -13,8 +13,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-    title: "A학원 · 학원 운영 플랫폼",
-    description: "원장, 선생님, 학부모, 학생을 연결하는 A학원 운영 플랫폼",
+    title: "뚜비학원 · 학원 운영 플랫폼",
+    description: "원장, 선생님, 학부모, 학생을 연결하는 뚜비학원 운영 플랫폼",
 };
 
 /** 역할 내비 없이 html/body만 감싼다. */

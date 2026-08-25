@@ -19,9 +19,9 @@ import { auth } from "@/lib/auth";
 import { getRoleHomePath, roleLabels } from "@/lib/role-routes";
 
 export const metadata: Metadata = {
-    title: "A학원 · 배움의 흐름을 함께",
+    title: "뚜비학원 · 배움의 흐름을 함께",
     description:
-        "수업, 기록, 상담을 연결해 학생의 성장을 함께 만드는 A학원입니다.",
+        "수업, 기록, 상담을 연결해 학생의 성장을 함께 만드는 뚜비학원입니다.",
 };
 
 /**

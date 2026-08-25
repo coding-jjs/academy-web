@@ -18,6 +18,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import BrandMark from "@/components/BrandMark";
 import { roleNavigation } from "@/lib/navigation";
 import type { RolePrefix } from "@/types/roles";
 import LogoutButton from "@/components/auth/LogoutButton";
@@ -46,9 +47,9 @@ export default function MemberShell({
             <div className={styles.adminPage}>
                 <header className={styles.adminHeader}>
                     <Link href="/" className={styles.brand}>
-                        <span>A</span>
+                        <BrandMark />
                         <div>
-                            <strong>A학원</strong>
+                            <strong>뚜비학원</strong>
                             <small>{roleLabel} 페이지</small>
                         </div>
                     </Link>
@@ -62,16 +63,9 @@ export default function MemberShell({
                 <div className={styles.adminBody}>
                     <aside className={styles.sidebar}>
                         <nav aria-label={`${roleLabel} 메뉴`}>
-                            {roleNavigation[role].map(
-                                (
-                                    item,
-                                ) => (
-                                    <NavLink
-                                        item={item}
-                                        key={item.href}
-                                    />
-                                ),
-                            )}
+                            {roleNavigation[role].map((item) => (
+                                <NavLink item={item} key={item.href} />
+                            ))}
                         </nav>
                     </aside>
                     <main className={styles.adminContent}>{children}</main>
@@ -85,24 +79,16 @@ export default function MemberShell({
         <div className={styles.memberPage}>
             <header className={styles.memberHeader}>
                 <Link href="/" className={styles.brand}>
-                    <span>A</span>
+                    <BrandMark />
                     <div>
-                        <strong>A학원</strong>
+                        <strong>뚜비학원</strong>
                         <small>{memberLabel(role)}</small>
                     </div>
                 </Link>
                 <nav className={styles.desktopNav} aria-label="상단 메뉴">
-                    {roleNavigation[role].map(
-                        (
-                            item,
-                        ) => (
-                            <NavLink
-                                item={item}
-                                compact
-                                key={item.href}
-                            />
-                        ),
-                    )}
+                    {roleNavigation[role].map((item) => (
+                        <NavLink item={item} compact key={item.href} />
+                    ))}
                 </nav>
                 <div className={styles.memberTools}>
                     <span className={styles.userName}>
@@ -113,17 +99,9 @@ export default function MemberShell({
             </header>
             <main className={styles.memberContent}>{children}</main>
             <nav className={styles.mobileNav} aria-label="하단 메뉴">
-                {roleNavigation[role].map(
-                    (
-                        item,
-                    ) => (
-                        <NavLink
-                            item={item}
-                            compact
-                            key={item.href}
-                        />
-                    ),
-                )}
+                {roleNavigation[role].map((item) => (
+                    <NavLink item={item} compact key={item.href} />
+                ))}
             </nav>
         </div>
     );

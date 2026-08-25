@@ -13,6 +13,7 @@
  */
 
 import Link from "next/link";
+import BrandMark from "@/components/BrandMark";
 import LogoutButton from "@/components/auth/LogoutButton";
 import {
     buttonStyles,
@@ -29,10 +30,10 @@ import styles from "../HomeScreen.module.css";
 export default function HomeHeader({ viewer }: { viewer: HomeViewer | null }) {
     return (
         <header className={styles.header}>
-            <Link href="/" className={styles.brand} aria-label="A학원 홈">
-                <span className={styles.brandMark}>A</span>
+            <Link href="/" className={styles.brand} aria-label="뚜비학원 홈">
+                <BrandMark className={styles.brandMark} />
                 <span>
-                    <strong>A학원</strong>
+                    <strong>뚜비학원</strong>
                     <small>ACADEMY</small>
                 </span>
             </Link>
