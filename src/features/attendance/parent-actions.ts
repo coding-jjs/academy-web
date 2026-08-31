@@ -16,9 +16,8 @@
  * 관련: `features/attendance/parent-data.ts`, `features/families/actions.ts`.
  */
 
-import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { submitParentAbsence } from "./parent-absence";
 
 /**
  * 결석 신청 폼의 useActionState 상태.
@@ -37,8 +36,9 @@ export type AbsenceState = {
  * @param _prev useActionState 직전 상태.
  * @param formData `studentId`, `sessionId`, `reason`(2~300자).
  * @auth PARENT. 활성 ParentStudentLink 필수.
- * @sideEffects absenceRequest upsert, `/parent/attendance` revalidate.
+ * @sideEffects AbsenceRequest upsert.
  */
+
 export async function requestAbsence(
     _prev: AbsenceState,
     formData: FormData,
@@ -47,79 +47,14 @@ export async function requestAbsence(
     if (!session?.user?.id || session.user.role !== "PARENT") {
         return { status: "error", message: "학부모 로그인이 필요합니다." };
     }
-
-    const studentId = String(formData.get("studentId") ?? "").trim();
-    const sessionId = String(formData.get("sessionId") ?? "").trim();
-    const reason = String(formData.get("reason") ?? "").trim();
-
-    if (!studentId || !sessionId) {
-        return { status: "error", message: "수업 일정을 선택해 주세요." };
-    }
-    if (reason.length < 2 || reason.length > 300) {
-        return { status: "error", message: "사유는 2~300자로 입력해 주세요." };
-    }
-
-    const link = await prisma.parentStudentLink.findFirst({
-        where: {
-            parentUserId: session.user.id,
-            studentId,
-            endedAt: null,
-        },
-        select: { id: true },
+    const result = await submitParentAbsence({
+        parentUserId: session.user.id,
+        studentId: String(formData.get("studentId") ?? ""),
+        sessionId: String(formData.get("sessionId") ?? ""),
+        reason: String(formData.get("reason") ?? ""),
     });
-    if (!link) {
-        return { status: "error", message: "연결된 자녀가 아닙니다." };
+    if (!result.ok) {
+        return { status: "error", message: result.message };
     }
-
-    const classSession = await prisma.classSession.findFirst({
-        where: {
-            id: sessionId,
-            startsAt: { gte: new Date() },
-            status: "SCHEDULED",
-            class: {
-                enrollments: {
-                    some: {
-                        studentId,
-                        status: "ACTIVE",
-                        endedAt: null,
-                    },
-                },
-            },
-        },
-        select: { id: true },
-    });
-    if (!classSession) {
-        return {
-            status: "error",
-            message: "신청 가능한 예정 수업을 찾을 수 없습니다.",
-        };
-    }
-
-    try {
-        await prisma.absenceRequest.upsert({
-            where: {
-                studentId_sessionId: { studentId, sessionId },
-            },
-            create: {
-                studentId,
-                sessionId,
-                requestedBy: session.user.id,
-                reason,
-            },
-            update: {
-                reason,
-                requestedBy: session.user.id,
-                cancelledAt: null,
-            },
-        });
-
-        revalidatePath("/parent/attendance");
-        return {
-            status: "success",
-            message:
-                "사유 결석이 접수되었습니다. 담당 선생님가 출결 기록 시 확인합니다.",
-        };
-    } catch {
-        return { status: "error", message: "신청에 실패했습니다." };
-    }
+    return { status: "success", message: result.message };
 }

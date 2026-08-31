@@ -24,29 +24,20 @@ import { buildChatPrompt } from "@/features/chatbot/prompt";
 import { getUsableAccount } from "@/lib/account-access";
 import { getAuditRequestMetadata } from "@/lib/audit";
 import { prisma } from "@/lib/db";
+import { readMobileUser } from "@/lib/mobile-auth";
 
 const MAX_MESSAGE_LENGTH = 500;
 
 /** 로그인·가용 계정·역할을 검사한 뒤 Gemini 답과 감사 로그를 남긴다. */
 export async function POST(request: Request) {
-    const session = await auth();
-
-    if (!session?.user?.id) {
+    const viewer = await resolveChatViewer(request);
+    if (!viewer) {
         return Response.json(
             { error: "UNAUTHORIZED", message: "로그인이 필요합니다." },
             { status: 401 },
         );
     }
-
-    const account = await getUsableAccount(session.user.id);
-    if (!account) {
-        return Response.json(
-            { error: "UNAUTHORIZED", message: "로그인이 필요합니다." },
-            { status: 401 },
-        );
-    }
-
-    const role = account.role;
+    const role = viewer.role;
     if (
         role !== "PARENT" &&
         role !== "STUDENT" &&
@@ -88,7 +79,7 @@ export async function POST(request: Request) {
 
     try {
         const viewerName =
-            session.user.name?.trim() ||
+            viewer.name?.trim() ||
             (role === "PARENT"
                 ? "학부모"
                 : role === "STUDENT"
@@ -101,11 +92,11 @@ export async function POST(request: Request) {
 
         const context =
             role === "PARENT"
-                ? await buildParentChatContext(account.id, viewerName)
+                ? await buildParentChatContext(viewer.id, viewerName)
                 : role === "STUDENT"
-                  ? await buildStudentChatContext(account.id, viewerName)
+                  ? await buildStudentChatContext(viewer.id, viewerName)
                   : await buildStaffChatContext(
-                        account.id,
+                        viewer.id,
                         viewerName,
                         role,
                         message,
@@ -116,10 +107,10 @@ export async function POST(request: Request) {
         const metadata = await getAuditRequestMetadata();
         await prisma.auditLog.create({
             data: {
-                actorUserId: account.id,
+                actorUserId: viewer.id,
                 action: "CHATBOT_REQUEST",
                 targetType: "CHATBOT",
-                targetId: account.id,
+                targetId: viewer.id,
                 details: { role, messageLength: message.length },
                 ipAddress: metadata.ipAddress,
                 userAgent: metadata.userAgent,
@@ -149,6 +140,22 @@ export async function POST(request: Request) {
             { status: 503 },
         );
     }
+}
+
+async function resolveChatViewer(request: Request) {
+    const mobile = await readMobileUser(request);
+    if (mobile) {
+        return { id: mobile.id, role: mobile.role, name: mobile.name };
+    }
+    const session = await auth();
+    if (!session?.user?.id) return null;
+    const account = await getUsableAccount(session.user.id);
+    if (!account) return null;
+    return {
+        id: account.id,
+        role: account.role,
+        name: session.user.name?.trim() || "",
+    };
 }
 
 /** JSON body에서 질문 문자열만 꺼낸다. 없거나 공백이면 null. */
