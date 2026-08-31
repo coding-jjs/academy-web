@@ -26,7 +26,10 @@ import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import type { JWT } from "@auth/core/jwt";
-import { getUsableAccount, getUsableAccountByEmail } from "@/lib/account-access";
+import {
+    getUsableAccount,
+    getUsableAccountByEmail,
+} from "@/lib/account-access";
 import { prisma } from "@/lib/db";
 import {
     DEV_LOGIN_PROVIDER_ID,
@@ -35,6 +38,7 @@ import {
     parseDevTestEmail,
 } from "@/lib/dev-login";
 import { clearOAuthIntent, readOAuthIntent } from "@/lib/oauth-intent";
+import { completeGoogleAccount } from "@/lib/google-account";
 
 /**
  * JWT에서 신원만 지워 GUEST로 되돌린다. 쿠키 자체는 maxAge까지 남는다.
@@ -150,68 +154,23 @@ const authConfig = {
             }
 
             const email = user.email.trim().toLowerCase();
-
             const intent = await readOAuthIntent();
             await clearOAuthIntent();
 
-            const existing = await prisma.user.findUnique({
-                where: { email },
-                select: { id: true },
-            });
-
-            if (existing) {
-                const usable = await getUsableAccount(existing.id);
-                if (!usable) return "/login?error=Blocked";
-            } else if (intent !== "signup") {
-                return "/login?error=Unregistered";
-            }
-
-            const dbUser = existing
-                ? await prisma.user.update({
-                      where: { id: existing.id },
-                      data: {
-                          imageUrl: user.image,
-                          lastLoginAt: new Date(),
-                      },
-                  })
-                : await prisma.user.create({
-                      data: {
-                          email,
-                          name: user.name?.trim() || email.split("@")[0],
-                          imageUrl: user.image,
-                          lastLoginAt: new Date(),
-                      },
-                  });
-
-            const accountKey = {
-                provider: account.provider,
+            const result = await completeGoogleAccount({
+                email,
+                name: user.name ?? null,
+                imageUrl: user.image ?? null,
                 providerAccountId: account.providerAccountId,
-            };
-
-            const existingAccount = await prisma.oAuthAccount.findUnique({
-                where: {
-                    provider_providerAccountId: accountKey,
-                },
+                intent,
             });
 
-            if (existingAccount && existingAccount.userId !== dbUser.id) {
+            if (!result.ok) {
+                if (result.code === "BLOCKED") return "/login?error=Blocked";
+                if (result.code === "UNREGISTERED")
+                    return "/login?error=Unregistered";
                 return false;
             }
-
-            await prisma.oAuthAccount.upsert({
-                where: {
-                    provider_providerAccountId: accountKey,
-                },
-                create: {
-                    userId: dbUser.id,
-                    type: account.type,
-                    provider: account.provider,
-                    providerAccountId: account.providerAccountId,
-                },
-                update: {
-                    updatedAt: new Date(),
-                },
-            });
 
             return true;
         },
