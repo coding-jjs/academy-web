@@ -31,6 +31,15 @@
 > [!NOTE]
 > 학부모 결제 PG 연동은 아직 준비 중입니다.
 
+## 설계 포인트
+
+- **역할은 원장이 부여** — 가입자는 Google로 GUEST만 되고, 원장이 교사·학부모 등을 부여합니다.
+- **권한은 라우트 + PermissionGrant** — 역할별 홈으로 진입을 나누고, 세부 기능은 부여로 제어합니다.
+- **AI는 초안 후 승인** — Gemini 리포트를 검토 흐름과 함께 씁니다.
+- **배포 초안 포함** — `deploy/`에 Lightsail + Docker + Caddy 구성을 문서화했습니다.
+
+더 짧은 소개: [Portfolio](https://coding-jjs.github.io)
+
 ## 실행 방법
 
 필요: Node.js, PostgreSQL, Google OAuth 클라이언트.
