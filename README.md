@@ -9,7 +9,7 @@
 ![Prisma](https://img.shields.io/badge/Prisma-PostgreSQL-2D3748?style=flat-square&logo=prisma)
 ![Gemini](https://img.shields.io/badge/Gemini-AI_Report-8E75B2?style=flat-square&logo=googlegemini)
 
-[기능](#주요-기능) · [실행](#실행-방법) · [구조](#프로젝트-구조) · [Google 로그인](#google-로그인-설정) · [데이터베이스](#데이터베이스) · [원장 설정](#최초-원장-설정) · [배포](#배포-aws-lightsail)
+[Portfolio](https://coding-jjs.github.io) · [기능](#주요-기능) · [설계 포인트](#설계-포인트) · [실행](#실행-방법) · [구조](#프로젝트-구조) · [Google 로그인](#google-로그인-설정) · [데이터베이스](#데이터베이스) · [원장 설정](#최초-원장-설정) · [배포](#배포-aws-lightsail)
 
 </div>
 
@@ -30,6 +30,15 @@
 
 > [!NOTE]
 > 학부모 결제 PG 연동은 아직 준비 중입니다.
+
+## 설계 포인트
+
+- **역할은 원장이 부여** — 가입자는 Google로 GUEST만 되고, 원장이 교사·학부모 등을 부여합니다. 공개 가입으로는 DIRECTOR가 생기지 않습니다.
+- **권한은 라우트 + PermissionGrant** — 역할별 홈으로 진입을 나누고, 교사·직원 세부 기능은 부여 단위로 제어합니다.
+- **AI는 초안 후 승인** — Gemini 리포트를 바로 보내지 않고 검토 흐름과 함께 씁니다.
+- **배포 초안 포함** — `deploy/`에 Lightsail + Docker + Caddy 구성을 문서화했습니다.
+
+짧은 소개와 구조도: [Portfolio](https://coding-jjs.github.io)
 
 ## 실행 방법
 
@@ -66,17 +75,51 @@ src/proxy.ts            역할별 URL 가드 (Next.js 16)
 
 ```mermaid
 flowchart TB
+  browser[Browser]
+
+  subgraph edge [Edge]
+    proxy["proxy.ts\n역할별 URL 가드"]
+  end
+
   subgraph app [src/app]
-    routes[역할별 라우트]
+    auth["(auth) 로그인·가입"]
+    roles["역할별 홈\ndirector / teacher / parent ..."]
   end
+
   subgraph features [src/features]
-    data[data.ts 읽기]
-    actions[actions.ts 쓰기]
+    data["data.ts 읽기"]
+    actions["actions.ts 쓰기\n+ 권한 재확인"]
   end
-  routes --> data
-  routes --> actions
-  actions --> db[(PostgreSQL)]
+
+  subgraph lib [src/lib]
+    authlib[Auth.js / session]
+    perms[permissions / guards]
+    dbclient[Prisma client]
+    ai[Gemini helper]
+  end
+
+  pg[(PostgreSQL)]
+  google[Google OAuth]
+  gemini[Gemini API]
+  supabase[Supabase Storage]
+
+  browser --> proxy
+  proxy --> auth
+  proxy --> roles
+  auth --> authlib
+  authlib --> google
+  roles --> data
+  roles --> actions
+  data --> dbclient
+  actions --> perms
+  actions --> dbclient
+  actions --> ai
+  dbclient --> pg
+  ai --> gemini
+  actions -.-> supabase
 ```
+
+요청 흐름 요약과 이미지는 [Portfolio Architecture](https://coding-jjs.github.io/#project)에서도 볼 수 있습니다.
 
 ## Google 로그인 설정
 
