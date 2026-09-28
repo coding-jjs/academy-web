@@ -8,9 +8,8 @@
 ![Auth.js](https://img.shields.io/badge/Auth.js-Google-4285F4?style=flat-square&logo=google)
 ![Prisma](https://img.shields.io/badge/Prisma-PostgreSQL-2D3748?style=flat-square&logo=prisma)
 ![Gemini](https://img.shields.io/badge/Gemini-AI_Report-8E75B2?style=flat-square&logo=googlegemini)
-[![Portfolio](https://img.shields.io/badge/Portfolio-coding--jjs.github.io-0f1419?style=flat-square)](https://coding-jjs.github.io)
 
-[기능](#주요-기능) · [실행](#실행-방법) · [구조](#프로젝트-구조) · [Google 로그인](#google-로그인-설정) · [데이터베이스](#데이터베이스) · [원장 설정](#최초-원장-설정) · [배포](#배포-aws-lightsail)
+[Portfolio](https://coding-jjs.github.io) · [기능](#주요-기능) · [실행](#실행-방법) · [구조](#프로젝트-구조) · [Google 로그인](#google-로그인-설정) · [데이터베이스](#데이터베이스) · [원장 설정](#최초-원장-설정) · [배포](#배포-aws-lightsail)
 
 </div>
 
